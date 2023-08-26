@@ -13,14 +13,20 @@
     "project": ["./tsconfig.json"]
   },
   "plugins": ["@typescript-eslint"],
+  "ignorePatterns": ["src/assets/js/*.js"],
   "rules": {
+    "max-len": ["error", { "code": 148 }],
     "jsx-quotes": ["error", "prefer-double"],
     "arrow-body-style": ["error", "as-needed"],
     "react/react-in-jsx-scope": "off",
     "semi": "off",
+    "no-extra-boolean-cast": "off",
+    "no-extra-parens": ["error", "all", { "returnAssign": false }],
     "@typescript-eslint/semi": "off",
     "@typescript-eslint/space-before-function-paren": [0, "always"],
     "@typescript-eslint/ban-ts-comment": 0,
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/promise-function-async": "off",
     "@typescript-eslint/member-delimiter-style": ["error", {
       "multiline": {
         "delimiter": "semi",    // 'none' or 'semi' or 'comma',
@@ -36,7 +42,7 @@
     "import/resolver": {
       "node": {
         "paths": ["src"],
-        "extensions": [".ts", ".tsx", ".native.js"]
+        "extensions": [".ts", ".tsx"]
       }
     },
     "react": {
