@@ -8,6 +8,7 @@ import Init from './Components/Init/init';
 import ErrorBoundary from './Components/ErrorBoundary/ErrorBoundary';
 import { CookiesProvider } from 'react-cookie';
 import { NotificationService } from './services/notification.service';
+import { LogsContainer } from './Components/Logger/Logger';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 axios.defaults.baseURL = process.env.REACT_APP_HTTP_SERVER_URL;
@@ -16,9 +17,12 @@ axios.interceptors.request.use(function (config) {
   config.headers['X-Http-Key'] = process.env.REACT_APP_HTTP_KEY;
   return config;
 });
-axios.interceptors.response.use(undefined, (error) => {
-  if (error.response.status >= 400) {
-    NotificationService.notifyError('Error', error.response.message, 3000);
+axios.interceptors.response.use(null, (error) => {
+  if (!Object.prototype.hasOwnProperty.call(error, 'response')) {
+    NotificationService.notifyError(error.name, error.message, 3000);
+    return Promise.reject(error);
+  } if (error.response.status >= 400) {
+    NotificationService.notifyError('Error', error.response.data.message, 3000);
     return Promise.reject(error);
   }
 });
@@ -35,6 +39,7 @@ root.render(
     <CookiesProvider>
         <ErrorBoundary>
             <Index />
+            <LogsContainer />
         </ErrorBoundary>
     </CookiesProvider>
 );

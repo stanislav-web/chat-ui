@@ -39,7 +39,7 @@ export class NotificationService {
       allowOutsideClick: true,
       backdrop: true,
       allowEscapeKey: true
-    }).then()
+    }).then(() => Promise.reject(NotificationService.escapeMessage(message)))
   }
 
   /**

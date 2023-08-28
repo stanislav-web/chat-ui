@@ -8,9 +8,13 @@ import {
   LinkedInLoginButton,
   AppleLoginButton
 } from 'react-social-login-buttons';
-import { getSocketConnection } from './functions/socket.function';
+import { getSocketConnection, isSocketSupported } from './functions/socket.function';
 import { isCookiesEnabled } from './functions/cookie.function';
-import { getUser } from './functions/user.function';
+import {
+  getUserAccount,
+  getUserBrowser,
+  getUserFingerprint
+} from './functions/user.function';
 import { type IUser, type IUserProp, type IUserState } from './interfaces';
 import { withCookies, Cookies } from 'react-cookie';
 import { instanceOf } from 'prop-types';
@@ -18,6 +22,8 @@ import { auth } from './functions/auth.function';
 import { type AuthProviderPath, type AuthProviderType } from './types/auth-provider.type';
 import { type Socket } from 'socket.io-client';
 import { NotificationService } from '../../services/notification.service';
+import { isWebRTCSupported } from './functions/webrtc.function';
+import { getUserMediaDevices } from './functions/media.function';
 
 class Init extends React.Component<IUserProp, Partial<IUserState>> {
   static propTypes = {
@@ -31,42 +37,31 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
   constructor(props: IUserProp) {
     super(props);
     this.state = {
-      isCookieEnabled: false,
-      isUserAuthorized: false,
-      isUserBanned: false,
-      isSocketConnected: false,
-      user: null,
-      userBan: null,
-      socket: null,
-      access_token: null
+      user: null
     };
   }
 
   async componentDidMount(): Promise<void> {
-    if (!this.isCookiesEnabled()) {
-      NotificationService.notifyError('Cookies', 'Please enable cookies');
-    }
-
-    const user = await this.getUser();
-    if (user.id === '') NotificationService.notifyError('Authorization', 'You are not authorized yet');
-    if (user?.ban !== null) NotificationService.notifyError('Ban', 'You have been banned');
-
-    this.startChat();
-  }
-
-  /**
-     * Check cookies state
-     * @return boolean
-     */
-  private isCookiesEnabled(): boolean {
-    if (isCookiesEnabled()) {
-      this.setState({
-        access_token: this.props.cookies.get('access_token'),
-        isCookieEnabled: true
-      });
-      return true;
-    }
-    return false;
+    getUserMediaDevices()
+      .then((devices) => {
+        console.log({ devices });
+        if (!isWebRTCSupported()) {
+          NotificationService.notifyError('WebRTC', 'Your browser is not support WebRTC');
+        }
+        if (!isSocketSupported()) {
+          NotificationService.notifyError('WebSockets', 'Your browser is not support WebSockets');
+        }
+        if (!isCookiesEnabled()) {
+          NotificationService.notifyError('Cookies', 'Please enable cookies');
+        }
+        return this.getUser();
+      })
+      .then((user) => {
+        if (user.id === '') NotificationService.notifyError('Authorization', 'You are not authorized yet');
+        if (user?.ban !== null) NotificationService.notifyError('Ban', 'You have been banned');
+        this.startChat();
+      })
+      .catch(() => { NotificationService.notifyError('Media', 'Please enable media access'); });
   }
 
   /**
@@ -74,10 +69,19 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
      * @return Promise<IUser>
      */
   private async getUser(): Promise<IUser> {
-    const { data } = await getUser();
+    const browserInfo = await getUserBrowser();
+    console.log({ visitor: browserInfo });
+    const fp = await getUserFingerprint();
+    console.log({ fingerprint: fp });
+    const { data } = await getUserAccount({
+      requestId: fp.requestId,
+      visitorId: fp.visitorId,
+      score: fp.confidence.score,
+      ...browserInfo
+    });
+    console.log({ user: data });
+
     this.setState({
-      isUserAuthorized: true,
-      isUserBanned: data.ban !== null,
       user: data
     });
     return data;
@@ -89,21 +93,16 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
      */
   private startChat(): void {
     const socket = getSocketConnection();
-    const connection = socket.connect();
     socket.on('connect', (): void => {
-      this.setState({ socket: connection, isSocketConnected: connection.connected });
       NotificationService.notifySuccess('Connection', 'Welcome to Chat');
     });
     socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
-      this.setState({ isSocketConnected: false, socket: null });
       NotificationService.notifyInfo('Disconnected', reason);
     });
     socket.on('connect_error', (error: Error): void => {
-      this.setState({ isSocketConnected: false, socket: null });
       NotificationService.notifyError('Disconnected', error);
     });
     socket.on('exception', (data): void => {
-      this.setState({ isSocketConnected: false });
       NotificationService.notifyError('Exception', data);
     });
   }

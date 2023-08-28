@@ -1,11 +1,20 @@
 import { io, type Socket } from 'socket.io-client';
+import DetectRTC from 'detectrtc';
+
+/**
+ * Is WebSockets supported by browser
+ * @return boolean
+ */
+export function isSocketSupported(): boolean {
+  return DetectRTC.isWebSocketsSupported
+}
 
 /**
  * Get websocket connection
  * @return Socket
  */
 export function getSocketConnection(): Socket {
-  const socket = io(process.env.REACT_APP_WS_SERVER_URL as string, {
+  return io(process.env.REACT_APP_WS_SERVER_URL as string, {
     transports: ['websocket'],
     forceNew: true,
     autoConnect: false,
@@ -20,5 +29,4 @@ export function getSocketConnection(): Socket {
     },
     withCredentials: true
   });
-  return socket;
 }

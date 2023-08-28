@@ -1,2 +1,4 @@
-1. Install and Setup Fingerprint js
-2. Setup social logins
+WebRTC 
+    -> SDP (Session Description Protocol)
+    -> ICE (Interactive Connectivity Establishment)
+    -> STUN/TURN - соединение (цеель пробиться через NAT)

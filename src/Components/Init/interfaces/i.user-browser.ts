@@ -1,7 +1,7 @@
 /**
- * UserDevice interface
+ * UserBrowser interface
  */
-export interface IUserDevice {
+export interface IUserBrowser {
   deviceId: string;
   browser: string;
   browserVersion: string;

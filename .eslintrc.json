@@ -15,6 +15,8 @@
   "plugins": ["@typescript-eslint"],
   "ignorePatterns": ["src/assets/js/*.js"],
   "rules": {
+    "indent": "off",
+    "@typescript-eslint/indent": "error",
     "max-len": ["error", { "code": 148 }],
     "jsx-quotes": ["error", "prefer-double"],
     "arrow-body-style": ["error", "as-needed"],
