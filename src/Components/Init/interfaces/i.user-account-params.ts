@@ -4,7 +4,7 @@ import { type IUserBrowser } from './i.user-browser';
  * User account params interface
  */
 export interface IUserAccountParams extends IUserBrowser {
-  requestId?: string;
-  visitorId: string;
-  score?: number;
+  readonly requestId?: string;
+  readonly visitorId: string;
+  readonly score?: number;
 }

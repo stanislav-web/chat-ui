@@ -2,20 +2,20 @@
  * UserBrowser interface
  */
 export interface IUserBrowser {
-  deviceId: string;
-  browser: string;
-  browserVersion: string;
-  deviceModel: string;
-  deviceBrand: string;
-  deviceFamily: string;
-  os: string;
-  osVersion: string;
-  region: string;
-  ipAddress?: string;
-  languages?: string[];
-  city?: string;
-  cityLatLong?: string;
-  countryCode?: string;
-  countryName?: string;
-  currencies?: string[];
+  readonly deviceId: string;
+  readonly browser: string;
+  readonly browserVersion: string;
+  readonly deviceModel: string;
+  readonly deviceBrand: string;
+  readonly deviceFamily: string;
+  readonly os: string;
+  readonly osVersion: string;
+  readonly region: string;
+  readonly ipAddress?: string;
+  readonly languages?: string[];
+  readonly city?: string;
+  readonly cityLatLong?: string;
+  readonly countryCode?: string;
+  readonly countryName?: string;
+  readonly currencies?: string[];
 }

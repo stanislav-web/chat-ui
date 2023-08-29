@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { type IUserBrowser, type IUserFingerprint, type IUserResponse } from '../interfaces';
-import { type IUserAccountParams } from '../interfaces/i.user-account-params';
+import { type IUserBrowser, type IUserFingerprint, type IUserResponse, type IUserAccountParams } from '../interfaces';
 import VisitorAPI from 'visitorapi';
 import hash from 'object-hash';
 import { defaultScriptUrlPattern, load, type Region } from '@fingerprintjs/fingerprintjs-pro';
-import { replace } from '../../../utils/string.util';
+import { replace } from '../../../Utils/string.util';
 
 /**
  * Get user browser

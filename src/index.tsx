@@ -1,31 +1,14 @@
 import React from 'react';
 // eslint-disable-next-line import/no-unresolved
 import { createRoot } from 'react-dom/client';
-import './index.css';
-import axios from 'axios';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Init from './Components/Init/init';
-import ErrorBoundary from './Components/ErrorBoundary/ErrorBoundary';
+import { ErrorBoundary, Init, Header, FooterWithSocialMediaIcons, Agreement } from './Components/index';
 import { CookiesProvider } from 'react-cookie';
-import { NotificationService } from './services/notification.service';
-import { LogsContainer } from './Components/Logger/Logger';
+import './index.css';
+import './Utils/i18.util';
+import './Utils/axios.util';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
-axios.defaults.baseURL = process.env.REACT_APP_HTTP_SERVER_URL;
-axios.defaults.withCredentials = true;
-axios.interceptors.request.use(function (config) {
-  config.headers['X-Http-Key'] = process.env.REACT_APP_HTTP_KEY;
-  return config;
-});
-axios.interceptors.response.use(null, (error) => {
-  if (!Object.prototype.hasOwnProperty.call(error, 'response')) {
-    NotificationService.notifyError(error.name, error.message, 3000);
-    return Promise.reject(error);
-  } if (error.response.status >= 400) {
-    NotificationService.notifyError('Error', error.response.data.message, 3000);
-    return Promise.reject(error);
-  }
-});
 
 const Index = (): React.JSX.Element =>
    <BrowserRouter>
@@ -38,8 +21,10 @@ const Index = (): React.JSX.Element =>
 root.render(
     <CookiesProvider>
         <ErrorBoundary>
+            <Agreement />
+            <Header />
             <Index />
-            <LogsContainer />
+            <FooterWithSocialMediaIcons />
         </ErrorBoundary>
     </CookiesProvider>
 );

@@ -2,7 +2,7 @@
  * User interface
  */
 export interface IUser {
-  id: string;
-  photoUrl?: string;
-  ban?: any;
+  readonly id: string;
+  readonly photoUrl?: string;
+  readonly ban?: any;
 }

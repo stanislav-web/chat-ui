@@ -1,13 +1,4 @@
-import Swal from 'sweetalert2';
 import React from 'react';
-import {
-  FacebookLoginButton,
-  GoogleLoginButton,
-  GithubLoginButton,
-  TwitterLoginButton,
-  LinkedInLoginButton,
-  AppleLoginButton
-} from 'react-social-login-buttons';
 import { getSocketConnection, isSocketSupported } from './functions/socket.function';
 import { isCookiesEnabled } from './functions/cookie.function';
 import {
@@ -18,12 +9,10 @@ import {
 import { type IUser, type IUserProp, type IUserState } from './interfaces';
 import { withCookies, Cookies } from 'react-cookie';
 import { instanceOf } from 'prop-types';
-import { auth } from './functions/auth.function';
-import { type AuthProviderPath, type AuthProviderType } from './types/auth-provider.type';
 import { type Socket } from 'socket.io-client';
-import { NotificationService } from '../../services/notification.service';
+import { NotificationService } from '../../Services/notification.service';
 import { isWebRTCSupported } from './functions/webrtc.function';
-import { getUserMediaDevices } from './functions/media.function';
+import { getUserMediaConstraints, getUserMediaDevices } from './functions/media.function';
 
 class Init extends React.Component<IUserProp, Partial<IUserState>> {
   static propTypes = {
@@ -45,6 +34,8 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
     getUserMediaDevices()
       .then((devices) => {
         console.log({ devices });
+        console.log({ constrants: getUserMediaConstraints() });
+
         if (!isWebRTCSupported()) {
           NotificationService.notifyError('WebRTC', 'Your browser is not support WebRTC');
         }
@@ -107,44 +98,9 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
     });
   }
 
-  /**
-   * Authentication provider handler
-   * @param {AuthProviderType} provider
-   * @param {AuthProviderPath} path
-   * @return Promise<void>
-   */
-  handleAuth (provider: AuthProviderType, path: AuthProviderPath): void {
-    auth(provider, path).catch(error => Swal.fire({
-      icon: 'error',
-      title: `${provider} launch error`,
-      text: error.toString(),
-      showConfirmButton: false,
-      timer: 2000
-    }));
-  }
-
   render(): React.JSX.Element {
     return (
-            <div className="social-logins">
-                <FacebookLoginButton onClick={ () => {
-                  this.handleAuth('facebook', '/auth/facebook')
-                }} />
-                <GoogleLoginButton onClick={ () => {
-                  this.handleAuth('google', '/auth/google')
-                }} />
-                <GithubLoginButton onClick={ () => {
-                  this.handleAuth('github', '/auth/github')
-                }} />
-                <TwitterLoginButton onClick={ () => {
-                  this.handleAuth('twitter', '/auth/twitter')
-                }} />
-                <LinkedInLoginButton onClick={ () => {
-                  this.handleAuth('linkedin', '/auth/linkedin')
-                }} />
-                <AppleLoginButton onClick={ () => {
-                  this.handleAuth('apple', '/auth/apple')
-                }} />
-            </div>
+        <></>
     );
   }
 }

@@ -1,10 +1,20 @@
-import JsMediaDevices from 'js-media-devices';
+import { MediaConfig } from '../configuration/media.config';
 
 /**
  * Get user media devices
  * @return Promise<MediaDeviceInfo[]>
  */
 export function getUserMediaDevices(): Promise<MediaDeviceInfo[]> {
-  const jsMediaDevices = new JsMediaDevices();
-  return jsMediaDevices.getDeviceList();
+  return navigator.mediaDevices.getUserMedia({
+    video: MediaConfig.allowVideo,
+    audio: MediaConfig.allowAudio
+  }).then(() => navigator.mediaDevices.enumerateDevices())
+}
+
+/**
+ * Get user media devices support properties
+ * @return MediaTrackSupportedConstraints
+ */
+export function getUserMediaConstraints(): MediaTrackSupportedConstraints {
+  return navigator.mediaDevices.getSupportedConstraints();
 }
