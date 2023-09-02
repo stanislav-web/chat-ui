@@ -1,18 +1,18 @@
 import React from 'react';
-import { getSocketConnection, isSocketSupported } from './functions/socket.function';
-import { isCookiesEnabled } from './functions/cookie.function';
 import {
-  getUserAccount,
-  getUserBrowser,
-  getUserFingerprint
-} from './functions/user.function';
-import { type IUser, type IUserProp, type IUserState } from './interfaces';
+  connectSocket,
+  getUserInfo
+} from '../../Functions';
+import { type IUserProp, type IUserState } from '../../Interfaces';
 import { withCookies, Cookies } from 'react-cookie';
 import { instanceOf } from 'prop-types';
-import { type Socket } from 'socket.io-client';
-import { NotificationService } from '../../Services/notification.service';
-import { isWebRTCSupported } from './functions/webrtc.function';
-import { getUserMediaConstraints, getUserMediaDevices } from './functions/media.function';
+import { Agreement } from '../index';
+import { getItem } from '../../Functions/localstorage.function';
+import Login from '../Login/Login';
+import VideoLocal from '../VideoLocal/VideoLocal';
+import VideoRemote from '../VideoRemote/VideoRemote';
+import VideoControl from '../VideoControl/VideoControl';
+import Chat from '../Chat/Chat';
 
 class Init extends React.Component<IUserProp, Partial<IUserState>> {
   static propTypes = {
@@ -25,82 +25,57 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
    */
   constructor(props: IUserProp) {
     super(props);
+    const { cookies } = props;
+    const accessToken = cookies.get('access_token');
+    const refreshToken = cookies.get('refresh_token');
     this.state = {
+      isUserAgree: getItem('isUserAgree') !== null ?? false,
+      isUserLogin: accessToken !== undefined && refreshToken !== undefined,
       user: null
     };
+    this.onAgreementChange = this.onAgreementChange.bind(this);
   }
 
+  /**
+   * On component render
+   * @return Promise<void>
+   */
   async componentDidMount(): Promise<void> {
-    getUserMediaDevices()
-      .then((devices) => {
-        console.log({ devices });
-        console.log({ constrants: getUserMediaConstraints() });
-
-        if (!isWebRTCSupported()) {
-          NotificationService.notifyError('WebRTC', 'Your browser is not support WebRTC');
-        }
-        if (!isSocketSupported()) {
-          NotificationService.notifyError('WebSockets', 'Your browser is not support WebSockets');
-        }
-        if (!isCookiesEnabled()) {
-          NotificationService.notifyError('Cookies', 'Please enable cookies');
-        }
-        return this.getUser();
-      })
-      .then((user) => {
-        if (user.id === '') NotificationService.notifyError('Authorization', 'You are not authorized yet');
-        if (user?.ban !== null) NotificationService.notifyError('Ban', 'You have been banned');
-        this.startChat();
-      })
-      .catch(() => { NotificationService.notifyError('Media', 'Please enable media access'); });
+    if (this.state.isUserAgree === true) {
+      const u = await getUserInfo();
+      console.log({ u })
+      if (u?.user !== null) {
+        connectSocket();
+      }
+      this.setState({ isUserLogin: u?.user != null, user: u?.user ?? null });
+    }
   }
 
   /**
-     * Check user state
-     * @return Promise<IUser>
-     */
-  private async getUser(): Promise<IUser> {
-    const browserInfo = await getUserBrowser();
-    console.log({ visitor: browserInfo });
-    const fp = await getUserFingerprint();
-    console.log({ fingerprint: fp });
-    const { data } = await getUserAccount({
-      requestId: fp.requestId,
-      visitorId: fp.visitorId,
-      score: fp.confidence.score,
-      ...browserInfo
-    });
-    console.log({ user: data });
-
-    this.setState({
-      user: data
-    });
-    return data;
-  }
-
-  /**
-     * Get socket state
-     * @return void
-     */
-  private startChat(): void {
-    const socket = getSocketConnection();
-    socket.on('connect', (): void => {
-      NotificationService.notifySuccess('Connection', 'Welcome to Chat');
-    });
-    socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
-      NotificationService.notifyInfo('Disconnected', reason);
-    });
-    socket.on('connect_error', (error: Error): void => {
-      NotificationService.notifyError('Disconnected', error);
-    });
-    socket.on('exception', (data): void => {
-      NotificationService.notifyError('Exception', data);
-    });
+   * On Agreement change
+   * @param {boolean} state
+   */
+  async onAgreementChange (state: boolean): Promise<void> {
+    this.setState({ isUserAgree: state });
+    this.setState({ isUserLogin: false });
   }
 
   render(): React.JSX.Element {
+    const { isUserAgree, isUserLogin, user } = this.state;
     return (
-        <></>
+        <div className="Init">
+          {isUserAgree === true ? <></> : <Agreement onAgreementChange={this.onAgreementChange} />}
+          {isUserAgree === false && isUserLogin === false ? <Agreement onAgreementChange={this.onAgreementChange} /> : <></>}
+          {isUserAgree === true && isUserLogin === false ? <Login /> : <></>}
+          {isUserAgree === true && isUserLogin === true && user !== null
+            ? <>
+              <VideoRemote />
+              <VideoLocal />
+              <VideoControl />
+              <Chat />
+              </>
+            : <></>}
+        </div>
     );
   }
 }

@@ -12,7 +12,7 @@
     "sourceType": "module",
     "project": ["./tsconfig.json"]
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "json-format"],
   "ignorePatterns": ["src/assets/js/*.js"],
   "rules": {
     "indent": "off",
@@ -29,6 +29,13 @@
     "@typescript-eslint/ban-ts-comment": 0,
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/promise-function-async": "off",
+    "@typescript-eslint/strict-boolean-expressions": 0,
+    "@typescript-eslint/consistent-type-assertions": [
+      "off",
+      {
+        "assertionStyle": "never"
+      }
+    ],
     "@typescript-eslint/member-delimiter-style": ["error", {
       "multiline": {
         "delimiter": "semi",    // 'none' or 'semi' or 'comma',

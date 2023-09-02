@@ -1,24 +1,19 @@
 import axios from 'axios';
-import { HttpConfig } from '../Components/Init/configuration/http.config';
-import { NotificationService } from '../Services/notification.service';
+import { HttpConfig } from '../Configuration/http.config';
+import { getItem } from '../Functions/localstorage.function';
+import { AppConfig } from '../Configuration/app.config';
 
-axios.defaults.baseURL = process.env.REACT_APP_HTTP_SERVER_URL;
-axios.defaults.withCredentials = HttpConfig.useCredentials;
+axios.defaults.baseURL = HttpConfig.baseURL;
+axios.defaults.withCredentials = HttpConfig.withCredentials;
 axios.defaults.responseType = HttpConfig.responseType;
 axios.defaults.timeout = HttpConfig.timeout;
-axios.defaults.validateStatus = (status) => status >= 200 && status < 400;
+axios.defaults.maxRedirects = HttpConfig.maxRedirects;
+axios.defaults.validateStatus = HttpConfig.validateStatus;
 axios.interceptors.request.use(function (config) {
-  config.headers['X-Http-Key'] = HttpConfig.key;
+  config.headers['X-Http-Key'] = HttpConfig.headers['X-Http-Key'];
+  config.headers['X-Requested-With'] = HttpConfig.headers['X-Requested-With'];
+  config.headers['X-Language'] = getItem('lang') || AppConfig.defaultLanguage;
   return config;
-});
-axios.interceptors.response.use(null, (error) => {
-  if (!Object.prototype.hasOwnProperty.call(error, 'response')) {
-    NotificationService.notifyError(error.name, error.message, 3000);
-    return Promise.reject(error);
-  } if (error.response.status >= 400) {
-    NotificationService.notifyError('Error', error.response.data.message, 3000);
-    return Promise.reject(error);
-  }
 });
 
 export default axios;

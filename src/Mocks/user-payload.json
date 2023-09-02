@@ -1,0 +1,26 @@
+{
+  "requestId": "1693515860860.PapK7u",
+  "visitorId": "SQ85swll3VmyUmmSNFJg",
+  "score": 0.9978601997146933,
+  "deviceId": "7ab4bf44790c4ef1fa8f821712c2821d",
+  "ipAddress": "37.19.218.168",
+  "countryCode": "UA",
+  "countryName": "Ukraine",
+  "currencies": [
+    "UAH"
+  ],
+  "languages": [
+    "ukr",
+    "rus"
+  ],
+  "region": "?",
+  "city": "?",
+  "cityLatLong": "0.000000,0.000000",
+  "browser": "Chrome",
+  "browserVersion": "116",
+  "deviceBrand": "Apple",
+  "deviceModel": "Mac",
+  "deviceFamily": "Mac",
+  "os": "Mac OS X",
+  "osVersion": "10"
+}

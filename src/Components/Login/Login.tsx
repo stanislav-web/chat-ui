@@ -8,11 +8,23 @@ import {
   TwitterLoginButton
 } from 'react-social-login-buttons';
 import { type AuthProviderPath, type AuthProviderType } from './types/auth-provider.type';
-import { NotificationService } from '../../Services/notification.service';
 import { auth } from './functions/auth.function';
-import { type AxiosError } from 'axios';
+// eslint-disable-next-line import/named
+import { Modal, type ModalProps } from 'flowbite-react';
 
 class Login extends React.Component<any, any> {
+  /**
+     * Constructor
+     * @param {any} props
+     */
+  constructor(props: ModalProps | any) {
+    super(props);
+    this.state = {
+      setOpenModal: 'default' as string | undefined,
+      openModal: 'default' as string | undefined
+    };
+  }
+
   /**
      * Authentication provider handler
      * @param {AuthProviderType} provider
@@ -20,36 +32,38 @@ class Login extends React.Component<any, any> {
      * @return Promise<void>
      */
   handleAuth (provider: AuthProviderType, path: AuthProviderPath): void {
-    auth(provider, path).catch((error: AxiosError) => {
-      NotificationService.notifyError(
-        `${provider} launch error`,
-        error.message
-      );
-    });
+    auth(provider, path);
   }
 
   render(): React.JSX.Element {
     return (
-        <div className="social-logins">
-            <FacebookLoginButton onClick={ () => {
-              this.handleAuth('facebook', '/auth/facebook')
-            }} />
-            <GoogleLoginButton onClick={ () => {
-              this.handleAuth('google', '/auth/google')
-            }} />
-            <GithubLoginButton onClick={ () => {
-              this.handleAuth('github', '/auth/github')
-            }} />
-            <TwitterLoginButton onClick={ () => {
-              this.handleAuth('twitter', '/auth/twitter')
-            }} />
-            <LinkedInLoginButton onClick={ () => {
-              this.handleAuth('linkedin', '/auth/linkedin')
-            }} />
-            <AppleLoginButton onClick={ () => {
-              this.handleAuth('apple', '/auth/apple')
-            }} />
-        </div>
+        <Modal show={this.state.openModal === 'default'}>
+            <Modal.Header>Login</Modal.Header>
+            <Modal.Body>
+                <div className="space-y-6 social-logins">
+                        <FacebookLoginButton onClick={ () => {
+                          this.handleAuth('facebook', '/auth/facebook')
+                        }} />
+                        <GoogleLoginButton onClick={ () => {
+                          this.handleAuth('google', '/auth/google')
+                        }} />
+                        <GithubLoginButton onClick={ () => {
+                          this.handleAuth('github', '/auth/github')
+                        }} />
+                        <TwitterLoginButton onClick={ () => {
+                          this.handleAuth('twitter', '/auth/twitter')
+                        }} />
+                        <LinkedInLoginButton onClick={ () => {
+                          this.handleAuth('linkedin', '/auth/linkedin')
+                        }} />
+                        <AppleLoginButton onClick={ () => {
+                          this.handleAuth('apple', '/auth/apple')
+                        }} />
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+            </Modal.Footer>
+        </Modal>
     )
   }
 }

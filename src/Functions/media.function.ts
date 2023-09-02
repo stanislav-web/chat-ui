@@ -1,4 +1,4 @@
-import { MediaConfig } from '../configuration/media.config';
+import { MediaConfig } from '../Configuration/media.config';
 
 /**
  * Get user media devices

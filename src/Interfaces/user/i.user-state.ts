@@ -5,5 +5,7 @@ import { type IUser } from './i.user';
  */
 export interface IUserState {
   hasError?: false;
+  readonly isUserAgree?: boolean;
+  readonly isUserLogin?: boolean;
   readonly user?: IUser | null;
 }
