@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "es6",
@@ -29,8 +29,11 @@
     ]
   },
   "ts-node": {
-    "esm": true
+    "esm": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
   },
-  "include": ["src"]
+  "include": ["src", "webpack.config.ts"]
 }
 

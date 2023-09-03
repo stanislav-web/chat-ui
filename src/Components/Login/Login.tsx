@@ -34,7 +34,7 @@ class Login extends React.Component<any, any> {
      */
   handleAuth (provider: AuthProviderType, path: AuthProviderPath): any {
     this.setState({ disabled: true });
-    auth(provider, path).then(r => { console.log({ r }); });
+    auth(provider, path);
   }
 
   render(): React.JSX.Element {
