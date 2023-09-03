@@ -7,20 +7,24 @@ import { HttpConfig } from '../../../Configuration/http.config';
  * @param {AuthProviderPath} path
  * @return void
  */
-export function auth(provider: AuthProviderType, path: AuthProviderPath): void {
+export function auth(provider: AuthProviderType, path: AuthProviderPath): Promise<any> {
   const authUrl = `${HttpConfig.baseURL as string}${path}`;
-  popup(authUrl, provider);
+  return popup(authUrl, provider);
 }
-function popup(url: string, provider: AuthProviderType): any {
-  (function(wrapped) {
-    window.open = function(): any {
-      const win = wrapped.apply(this, arguments as any);
-      const i = setInterval(function() {
-        if (win?.closed) {
-          clearInterval(i);
+
+async function popup(url: string, provider: AuthProviderType): Promise<any> {
+  const child = window.open(url, provider, 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes');
+  await new Promise((resolve) => {
+    const ke = (): void => {
+      setTimeout(() => {
+        if (!child || child.closed) {
+          resolve(true);
+          return
         }
-      }, 100);
+        ke()
+      }, 500);
     };
-  })(window.open)
-  window.open(url, provider as string, 'width=800,height=600,scrollbars=yes');
+    ke()
+  });
+  window.location.reload()
 }

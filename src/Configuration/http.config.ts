@@ -6,7 +6,7 @@ export const HttpConfig: AxiosRequestConfig & { responseType: ResponseType; head
   baseURL: process.env.REACT_APP_HTTP_SERVER_URL,
   withCredentials: true,
   maxRedirects: 0,
-  timeout: 1000,
+  timeout: 10000,
   responseType: 'json',
   validateStatus: (status: number) => status >= 200 && status < 400,
   headers: {

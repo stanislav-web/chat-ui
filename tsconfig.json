@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "es5",
     "outDir": "./build/",
     "sourceMap": true,
     "noImplicitAny": true,
@@ -11,7 +12,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
+    "module": "es6",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -32,3 +33,4 @@
   },
   "include": ["src"]
 }
+

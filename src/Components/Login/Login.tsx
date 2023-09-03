@@ -21,7 +21,8 @@ class Login extends React.Component<any, any> {
     super(props);
     this.state = {
       setOpenModal: 'default' as string | undefined,
-      openModal: 'default' as string | undefined
+      openModal: 'default' as string | undefined,
+      disabled: false
     };
   }
 
@@ -31,34 +32,36 @@ class Login extends React.Component<any, any> {
      * @param {AuthProviderPath} path
      * @return Promise<void>
      */
-  handleAuth (provider: AuthProviderType, path: AuthProviderPath): void {
-    auth(provider, path);
+  handleAuth (provider: AuthProviderType, path: AuthProviderPath): any {
+    this.setState({ disabled: true });
+    auth(provider, path).then(r => { console.log({ r }); });
   }
 
   render(): React.JSX.Element {
+    const { disabled, openModal } = this.state;
     return (
-        <Modal show={this.state.openModal === 'default'}>
+        <Modal show={openModal === 'default'}>
             <Modal.Header>Login</Modal.Header>
             <Modal.Body>
                 <div className="space-y-6 social-logins">
                         <FacebookLoginButton onClick={ () => {
                           this.handleAuth('facebook', '/auth/facebook')
-                        }} />
+                        }} crossorigin="anonymous" />
                         <GoogleLoginButton onClick={ () => {
                           this.handleAuth('google', '/auth/google')
-                        }} />
+                        }} crossorigin="anonymous" disabled={disabled} />
                         <GithubLoginButton onClick={ () => {
                           this.handleAuth('github', '/auth/github')
-                        }} />
+                        }} disabled={disabled} />
                         <TwitterLoginButton onClick={ () => {
                           this.handleAuth('twitter', '/auth/twitter')
-                        }} />
+                        }} disabled={disabled} />
                         <LinkedInLoginButton onClick={ () => {
                           this.handleAuth('linkedin', '/auth/linkedin')
-                        }} />
+                        }} disabled={disabled} />
                         <AppleLoginButton onClick={ () => {
                           this.handleAuth('apple', '/auth/apple')
-                        }} />
+                        }} disabled={disabled} />
                 </div>
             </Modal.Body>
             <Modal.Footer>
