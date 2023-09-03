@@ -1,5 +1,6 @@
 import { type AuthProviderPath, type AuthProviderType } from '../types/auth-provider.type';
 import { HttpConfig } from '../../../Configuration/http.config';
+import { openPopUp } from '../../../Functions/window.function';
 
 /**
  * Auth user via oauth
@@ -9,18 +10,6 @@ import { HttpConfig } from '../../../Configuration/http.config';
  */
 export function auth(provider: AuthProviderType, path: AuthProviderPath): void {
   const authUrl = `${HttpConfig.baseURL as string}${path}`;
-  popup(authUrl, provider);
-}
-function popup(url: string, provider: AuthProviderType): any {
-  (function(wrapped) {
-    window.open = function(): any {
-      const win = wrapped.apply(this, arguments as any);
-      const i = setInterval(function() {
-        if (win?.closed) {
-          clearInterval(i);
-        }
-      }, 100);
-    };
-  })(window.open)
-  window.open(url, provider as string, 'width=800,height=600,scrollbars=yes');
+  const child = openPopUp(authUrl, provider, 600, 700);
+  child.localStorage.setItem('auth', String(true));
 }

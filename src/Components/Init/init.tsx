@@ -13,6 +13,7 @@ import VideoLocal from '../VideoLocal/VideoLocal';
 import VideoRemote from '../VideoRemote/VideoRemote';
 import VideoControl from '../VideoControl/VideoControl';
 import Chat from '../Chat/Chat';
+import { preventOpener } from '../../Functions/window.function';
 
 class Init extends React.Component<IUserProp, Partial<IUserState>> {
   static propTypes = {
@@ -41,9 +42,9 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
    * @return Promise<void>
    */
   async componentDidMount(): Promise<void> {
+    preventOpener();
     if (this.state.isUserAgree === true) {
       const u = await getUserInfo();
-      console.log({ u })
       if (u?.user !== null) {
         connectSocket();
       }

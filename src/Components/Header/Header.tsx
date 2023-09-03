@@ -1,8 +1,17 @@
 /* eslint-disable max-len */
 import React from 'react';
 import Language from '../Language/Language';
+import ReactGA from 'react-ga4';
+import { AnalyticConfig } from '../../Configuration/analytic.config';
+import { v4 as uuidv4 } from 'uuid';
 
 class Header extends React.Component<any, any> {
+  componentDidMount(): void {
+    ReactGA.initialize(AnalyticConfig.googleTrackingId, {
+      nonce: uuidv4()
+    });
+  }
+
   render(): React.JSX.Element {
     return (
         <header>

@@ -1,7 +1,8 @@
 import React, { type BaseSyntheticEvent } from 'react';
 import { getItem } from '../../Functions/localstorage.function';
 import { AppConfig } from '../../Configuration/app.config';
-import i18n from 'i18next';
+import { changeLanguage } from 'i18next';
+import { notifySuccess } from '../../Functions/notification.function';
 
 class Language extends React.Component<any, any> {
   /**
@@ -29,8 +30,7 @@ class Language extends React.Component<any, any> {
     this.setState(() => ({
       selectedLanguage: lang
     }));
-    // eslint-disable-next-line import/no-named-as-default-member
-    i18n.changeLanguage(lang).then();
+    changeLanguage(lang).then(() => { notifySuccess('Language', 'Language has been changed', 3000); });
   };
 
   render(): React.JSX.Element {
