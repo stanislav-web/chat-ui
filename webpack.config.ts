@@ -4,6 +4,10 @@ import type * as DevServer from 'webpack-dev-server';
 import dotenv from 'dotenv';
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+// eslint-disable-next-line import/default
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 
 dotenv.config({
   debug: process.env.DOTENV_CONFIG_DEBUG === 'true',
@@ -11,14 +15,22 @@ dotenv.config({
   path: process.env.DOTENV_CONFIG_PATH ?? './.env.local'
 });
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const InterpolateHtmlPlugin = require('interpolate-html-plugin');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const Dotenv = require('dotenv-webpack');
 
 const currentEnvironment = process.env.NODE_ENV as 'none' | 'development' | 'production';
 const isProduction = currentEnvironment === 'production';
 const isDebuggerEnabled = currentEnvironment !== 'production';
 const loggerLevel = process.env.WEBPACK_LOGGER_LEVEL as 'none' | 'error' | 'warn' | 'info' | 'log' | 'verbose' | undefined;
+const stylesHandler = isProduction ? MiniCssExtractPlugin.loader : 'style-loader';
+const envDir = path.join(__dirname, './.env.local');
+const srcDir = path.join(__dirname, './src');
+const publicTemplateDir = path.join(__dirname, './public');
+const destinationDir = path.join(__dirname, './dist');
+const metaTitle = String(process.env.WEBPACK_TAG_TITLE);
+const metaDescription = String(process.env.WEBPACK_TAG_DESCRIPTION);
+const metaAuthor = String(process.env.WEBPACK_TAG_AUTHOR);
+const metaKeywords = String(process.env.WEBPACK_TAG_KEYWORDS);
+
 const devServerOption: DevServer.Configuration = {
   setupExitSignals: true,
   server: isProduction ? 'https' : 'http',
@@ -36,10 +48,9 @@ const devServerOption: DevServer.Configuration = {
   },
   compress: isProduction,
   static: [
-    { directory: path.resolve(__dirname, 'dist') },
+    { directory: destinationDir },
     {
-      directory: path.resolve(__dirname, 'public'),
-      serveIndex: true
+      directory: publicTemplateDir
     }
   ],
   headers: () => ({
@@ -54,25 +65,58 @@ const devServerOption: DevServer.Configuration = {
 const config: webpack.Configuration = {
   mode: currentEnvironment,
   name: currentEnvironment,
-  entry: './src/index.tsx',
+  context: srcDir,
+  entry: './index.tsx',
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    clean: true,
+    crossOriginLoading: 'anonymous',
+    path: destinationDir,
+    filename: !isProduction ? 'bundle.js' : '[name].[hash].js'
   },
   devtool: 'eval-cheap-source-map',
   devServer: devServerOption,
   plugins: [
     new Dotenv({
-      path: path.resolve(__dirname, '.env.local')
+      path: envDir
     }),
-    new InterpolateHtmlPlugin({
-      PUBLIC_URL: ''
+    new CleanWebpackPlugin({
+      verbose: true
     }),
+    new CopyWebpackPlugin(
+      {
+        patterns: [
+          {
+            from: publicTemplateDir + '/manifest.json', to: destinationDir + '/manifest.json'
+          },
+          {
+            from: publicTemplateDir + '/logo192.png', to: destinationDir + '/logo192.png'
+          },
+          {
+            from: publicTemplateDir + '/logo512.png', to: destinationDir + '/logo512.png'
+          }
+        ]
+      }
+    ),
     new HtmlWebpackPlugin(
       Object.assign(
         {},
         {
-          template: path.resolve(__dirname, 'public/index.html')
+          cache: isProduction,
+          hash: true,
+          minify: 'auto',
+          favicon: publicTemplateDir + '/favicon.ico',
+          template: publicTemplateDir + '/index.html',
+          templateParameters: {
+            manifest: 'manifest.json'
+          },
+          title: metaTitle,
+          meta: {
+            viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no',
+            description: { name: 'description', content: metaDescription },
+            author: { name: 'author', content: metaAuthor },
+            keywords: { name: 'keywords', content: metaKeywords }
+          },
+          showErrors: true
         },
         isProduction
           ? {
@@ -96,6 +140,7 @@ const config: webpack.Configuration = {
     rules: [
       {
         test: /\.(ts|js)x?$/,
+        include: srcDir,
         exclude: ['/node_modules/', '/public/'],
         use: {
           loader: 'babel-loader',
@@ -115,11 +160,16 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.css$/i,
-        include: path.resolve(__dirname, 'src'),
-        use: ['style-loader', 'css-loader', 'postcss-loader']
+        include: srcDir,
+        use: [stylesHandler, {
+          loader: 'css-loader',
+          options: { sourceMap: !isProduction }
+        },
+        {
+          loader: 'postcss-loader',
+          options: { sourceMap: !isProduction }
+        }]
       }
-      // Add your rules for custom modules here
-      // Learn more about loaders from https://webpack.js.org/loaders/
     ]
   },
   resolve: {

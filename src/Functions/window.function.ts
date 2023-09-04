@@ -1,4 +1,4 @@
-import { getItem, removeItem } from './localstorage.function';
+import { removeItem } from './localstorage.function';
 
 /**
  * Prevent double tab opener

@@ -10,6 +10,6 @@ import { openPopUp } from '../../../Functions/window.function';
  */
 export function auth(provider: AuthProviderType, path: AuthProviderPath): void {
   const authUrl = `${HttpConfig.baseURL as string}${path}`;
-  const child = openPopUp(authUrl, provider, 600, 700);
+  const child = openPopUp(authUrl, provider, 650, 700);
   child.localStorage.setItem('auth', String(true));
 }
