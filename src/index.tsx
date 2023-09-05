@@ -2,11 +2,11 @@ import './index.css';
 import React from 'react';
 // eslint-disable-next-line import/no-unresolved
 import { createRoot } from 'react-dom/client';
-import { checkAuth } from './Functions/window.function';
+import { checkAuth } from '@functions/window.function';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ErrorBoundary, Init, Header, FooterWithSocialMediaIcons } from './Components/index';
+import { ErrorBoundary, Init, Header, FooterWithSocialMediaIcons } from '@components/index';
 import { CookiesProvider } from 'react-cookie';
-import './Utils';
+import './utils';
 
 checkAuth();
 

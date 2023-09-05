@@ -5,17 +5,18 @@ import dotenv from 'dotenv';
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 // eslint-disable-next-line import/default
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import Dotenv from 'dotenv-webpack';
 
 dotenv.config({
   debug: process.env.DOTENV_CONFIG_DEBUG === 'true',
   override: process.env.DOTENV_CONFIG_OVERRIDE === 'true',
   path: process.env.DOTENV_CONFIG_PATH ?? './.env.local'
 });
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Dotenv = require('dotenv-webpack');
 
 const currentEnvironment = process.env.NODE_ENV as 'none' | 'development' | 'production';
 const isProduction = currentEnvironment === 'production';
@@ -173,6 +174,7 @@ const config: webpack.Configuration = {
     ]
   },
   resolve: {
+    plugins: [new TsconfigPathsPlugin()],
     extensions: ['.tsx', '.ts', '.jsx', '.js']
   }
 };

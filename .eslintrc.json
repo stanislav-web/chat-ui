@@ -5,14 +5,21 @@
   },
   "extends": [
     "plugin:import/recommended",
-    "standard-with-typescript"
+    "standard-with-typescript",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "tsconfigRootDir": "./",
     "ecmaVersion": "latest",
     "sourceType": "module",
     "project": ["./tsconfig.json"]
   },
-  "plugins": ["@typescript-eslint", "json-format"],
+  "plugins": [
+    "import",
+    "@typescript-eslint",
+    "json-format"
+  ],
   "ignorePatterns": ["src/assets/js/*.js"],
   "rules": {
     "indent": "off",
@@ -36,19 +43,24 @@
         "assertionStyle": "never"
       }
     ],
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-unsafe-argument": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-unsafe-return": "off",
     "@typescript-eslint/member-delimiter-style": ["error", {
       "multiline": {
         "delimiter": "semi",    // 'none' or 'semi' or 'comma',
         "requireLast": true
       },
       "singleline": {
-        "delimiter": "semi",    // 'semi' or 'comma',
+        "delimiter": "semi",
         "requireLast": false
       }
     }]
   },
   "settings": {
     "import/resolver": {
+      "typescript": {},
       "node": {
         "paths": ["src", "webpack.config.ts"],
         "extensions": [".ts", ".tsx"]

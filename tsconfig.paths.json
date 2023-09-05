@@ -1,0 +1,16 @@
+{
+  "compilerOptions":{
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@configuration/*": ["./src/configuration/*"],
+      "@declarations/*": ["./src/declarations/*"],
+      "@enums/*": ["./src/enums/*"],
+      "@exceptions/*": ["./src/exceptions/*"],
+      "@functions/*": ["./src/functions/*"],
+      "@interfaces/*": ["./src/interfaces/*"],
+      "@locales/*": ["./src/locales/*"],
+      "@mocks/*": ["./src/mocks/*"],
+      "@utils/*": ["./src/utils/*"],
+    }
+  },
+}
