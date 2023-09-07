@@ -6,7 +6,6 @@ import translationRU from '@locales/ru.json';
 import translationUA from '@locales/ua.json';
 import {
   type InitOptions
-// eslint-disable-next-line import/no-unresolved
 } from 'i18next/typescript/options';
 import { AppConfig } from '@configuration/app.config';
 
@@ -45,7 +44,6 @@ const intiOptions = {
   detection: detectionOptions
 } as InitOptions & PluginOptions<any>;
 
-// eslint-disable-next-line import/no-named-as-default-member
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)

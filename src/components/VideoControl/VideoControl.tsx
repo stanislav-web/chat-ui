@@ -1,11 +1,13 @@
 import React from 'react';
+import './VideoControl.css';
+import { type IVideoChatProp } from '@interfaces/peer/i.video-chat-prop';
 
-class VideoControl extends React.Component<any, any> {
+class VideoControl extends React.Component<IVideoChatProp, any> {
   /**
      * Constructor
-     * @param {any} props
+     * @param {IVideoChatProp} props
      */
-  constructor(props: any) {
+  constructor(props: IVideoChatProp) {
     super(props);
     this.state = {
       isReady: false

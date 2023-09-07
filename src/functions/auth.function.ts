@@ -1,4 +1,4 @@
-import { type AuthProviderPath, type AuthProviderType } from '@components/Login/types/auth-provider.type';
+import { type AuthProviderPath, type AuthProviderType } from '@types/auth-provider.type';
 import { HttpConfig } from '@configuration/http.config';
 import { openPopUp } from './window.function';
 

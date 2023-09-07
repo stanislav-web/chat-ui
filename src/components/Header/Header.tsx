@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import React from 'react';
+import './Header.css';
 import Language from '../Language/Language';
 import ReactGA from 'react-ga4';
 import { AnalyticConfig } from '@configuration/analytic.config';

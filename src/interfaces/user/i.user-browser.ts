@@ -1,8 +1,10 @@
+import { type UniqueId } from '@types/user.type';
+
 /**
  * UserBrowser interface
  */
 export interface IUserBrowser {
-  readonly deviceId: string;
+  readonly deviceId: UniqueId;
   readonly browser: string;
   readonly browserVersion: string;
   readonly deviceModel: string;

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/named
 import { Button, Modal, type ModalProps } from 'flowbite-react';
 import React from 'react';
 import { getItem, setItem } from '@functions/localstorage.function';

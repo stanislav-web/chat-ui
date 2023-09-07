@@ -7,9 +7,7 @@ import { type IUserBrowser } from '@interfaces/user/i.user-browser';
 import { type IUserFingerprint } from '@interfaces/user/i.user-fingerprint';
 import { type IUserResponse } from '@interfaces/user/i.user-response';
 import { type IUserAccountParams } from '@interfaces/user/i.user-account-params';
-// eslint-disable-next-line import/no-unresolved
 import { UserFingerprintException } from '@exceptions/user-fingerprint.exception';
-// eslint-disable-next-line import/no-unresolved
 import { UserBrowserException } from '@exceptions/user-browser.exception';
 
 /**

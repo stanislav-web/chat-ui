@@ -10,6 +10,7 @@
       "@interfaces/*": ["./src/interfaces/*"],
       "@locales/*": ["./src/locales/*"],
       "@mocks/*": ["./src/mocks/*"],
+      "@types/*": ["./src/types/*"],
       "@utils/*": ["./src/utils/*"],
     }
   },

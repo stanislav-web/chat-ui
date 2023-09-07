@@ -1,7 +1,7 @@
 import FooterWithSocialMediaIcons from './Footer/Footer';
 import Agreement from './Agreement/Agreement';
 import Header from './Header/Header';
-import Init from './Init/init';
+import Init from './Init/Init';
 import ErrorBoundary from './ErrorBoundary/ErrorBoundary';
 
 export {

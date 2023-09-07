@@ -1,22 +1,23 @@
 import React from 'react';
 import {
-  connectSocket,
+  getSocket,
   getUserInfo
 } from '../../functions';
+import './Init.css';
 import { withCookies, Cookies } from 'react-cookie';
 import { instanceOf } from 'prop-types';
 import { Agreement } from '../index';
 import { getItem } from '@functions/localstorage.function';
 import Login from '../Login/Login';
-import VideoLocal from '../VideoLocal/VideoLocal';
-import VideoRemote from '../VideoRemote/VideoRemote';
-import VideoControl from '../VideoControl/VideoControl';
-import Chat from '../Chat/Chat';
 import { preventOpener } from '@functions/window.function';
 import { type IUserProp } from '@interfaces/user/i.user-prop';
 import { type IUserState } from '@interfaces/user/i.user-state';
+import Peer from '@components/Peer/Peer';
+import { type Socket } from 'socket.io-client';
 
 class Init extends React.Component<IUserProp, Partial<IUserState>> {
+  private socket: Socket | null = null;
+
   static propTypes = {
     cookies: instanceOf(Cookies).isRequired
   };
@@ -45,7 +46,7 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
       const u = await getUserInfo();
       console.info({ user: u });
       if (u?.user !== null) {
-        connectSocket();
+        this.socket = getSocket();
       }
       this.setState({ isUserLogin: u?.user != null, user: u?.user ?? null });
     }
@@ -63,16 +64,12 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
   render(): React.JSX.Element {
     const { isUserAgree, isUserLogin, user } = this.state;
     return (
-        <div className="Init">
+        <div className="init">
           {isUserAgree === true ? <></> : <Agreement onAgreementChange={this.onAgreementChange} />}
           {isUserAgree === true && isUserLogin === false ? <Login /> : <></>}
           {isUserAgree === true && isUserLogin === true && user !== null
-            ? <>
-              <VideoRemote />
-              <VideoLocal />
-              <VideoControl />
-              <Chat />
-              </>
+            ? <Peer socket={ this.socket }>
+              </Peer>
             : <></>}
         </div>
     );

@@ -7,9 +7,8 @@ import {
   LinkedInLoginButton,
   TwitterLoginButton
 } from 'react-social-login-buttons';
-import { type AuthProviderPath, type AuthProviderType } from './types/auth-provider.type';
+import { type AuthProviderPath, type AuthProviderType } from '@types/auth-provider.type';
 import { auth } from '@functions/auth.function';
-// eslint-disable-next-line import/named
 import { Modal, type ModalProps } from 'flowbite-react';
 
 class Login extends React.Component<any, any> {

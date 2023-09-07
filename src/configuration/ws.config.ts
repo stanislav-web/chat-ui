@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import { type ManagerOptions } from 'socket.io-client/build/esm/manager';
 import { type SocketOptions } from 'socket.io-client/build/esm/socket';
 

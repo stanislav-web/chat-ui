@@ -9,7 +9,6 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 // eslint-disable-next-line import/default
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import Dotenv from 'dotenv-webpack';
 
 dotenv.config({
@@ -160,7 +159,7 @@ const config: webpack.Configuration = {
         type: 'asset'
       },
       {
-        test: /\.css$/i,
+        test: /\.css|.scss$/i,
         include: srcDir,
         use: [stylesHandler, {
           loader: 'css-loader',

@@ -1,8 +1,5 @@
-// eslint-disable-next-line import/no-unresolved
 import '@types/node';
-// eslint-disable-next-line import/no-unresolved
 import '@types/react';
-// eslint-disable-next-line import/no-unresolved
 import '@types/react-dom';
 
 declare module '*.avif' {

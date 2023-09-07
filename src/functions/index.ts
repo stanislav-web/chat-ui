@@ -1,6 +1,6 @@
 import { isCookiesEnabled } from './cookie.function';
 import { getUserMediaDevices } from './media.function';
-import { getSocketConnection } from './socket.function';
+import { getSocketInstance } from './socket.function';
 import { getUserFingerprint, getUserAccount, getUserBrowser } from './user.function';
 import { getPeerInfo } from './webrtc.function';
 import { notifyError, notifyInfo, notifySuccess } from './notification.function';
@@ -10,6 +10,7 @@ import { EnvironmentEnum } from '@enums/environment.enum';
 import { type IUserLoad } from '@interfaces/user/i.user-load';
 import { type IUserResponse } from '@interfaces/user/i.user-response';
 import { type IUserAccountParams } from '@interfaces/user/i.user-account-params';
+import { type IError } from '@interfaces/socket/i.error';
 
 /**
  * Get user info
@@ -69,21 +70,25 @@ export async function getUserInfo(): Promise<IUserLoad | null> {
 }
 
 /**
- * Connect chat
- * @return void
+ * Get socket
+ * @return {Socket}
  */
-export function connectSocket(): void {
-  const { socket } = getSocketConnection();
+export function getSocket(): Socket {
+  const socket: Socket = getSocketInstance();
   socket.on('connect', (): void => {
-    notifySuccess('Connection', 'Welcome to Chat', 3000);
+    notifySuccess('Connection', 'Welcome to VideoChat', 3000);
+  });
+  socket.on('connect', (): void => {
+    notifySuccess('Connection', 'Welcome to VideoChat', 3000);
   });
   socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
     notifyInfo('Disconnected', reason);
   });
   socket.on('connect_error', (error: Error): void => {
-    notifyError('Disconnected', error);
+    notifyError('Disconnected', error.message);
   });
-  socket.on('exception', (data): void => {
-    notifyError('Exception', data);
+  socket.on('exception', (data: IError): void => {
+    notifyError('Exception', data.message);
   });
+  return socket;
 }

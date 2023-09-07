@@ -20,7 +20,7 @@
     "@typescript-eslint",
     "json-format"
   ],
-  "ignorePatterns": ["src/assets/js/*.js"],
+  "ignorePatterns": ["node_modules"],
   "rules": {
     "indent": "off",
     "@typescript-eslint/indent": "error",
@@ -59,10 +59,33 @@
     }]
   },
   "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts",".d.ts"]
+    },
+    "import/internal-regex": "^@",
     "import/resolver": {
+      "eslint-import-resolver-custom-alias": {
+        "alias": {
+          "@components/*": "./src/components/*",
+          "@configuration/*": "./src/configuration/*",
+          "@declarations/*": "./src/declarations/*",
+          "@enums/*": "./src/enums/*",
+          "@exceptions/*": "./src/exceptions/*",
+          "@functions/*": "./src/functions/*",
+          "@interfaces/*": "./src/interfaces/*",
+          "@locales/*": "./src/locales/*",
+          "@mocks/*": "./src/mocks/*",
+          "@types": "./src/types",
+          "@utils/*": "./src/utils/*",
+          "i18next/typescript/options": "./node_modules/i18next/typescript/options.d.ts",
+          "socket.io-client/build/esm/manager": "./node_modules/socket.io-client/build/esm/manager.d.ts",
+          "socket.io-client/build/esm/socket": "./node_modules/socket.io-client/build/esm/socket.d.ts"
+        },
+        "extensions": [".ts", ".jsx"]
+      },
       "typescript": {},
       "node": {
-        "paths": ["src", "webpack.config.ts"],
+        "paths": ["src", "webpack.config.ts", "tailwind.config.ts"],
         "extensions": [".ts", ".tsx"]
       }
     },
