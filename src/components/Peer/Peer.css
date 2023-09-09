@@ -1,5 +1,9 @@
-    div.peer-container {
-    margin: 1rem;
+div.peer-container {
+    margin: 0 auto;
     padding: 2rem 2rem;
     text-align: center;
+    display: flex;
+    max-width: fit-content;
+    height: 545px;
+    flex-direction: row;
 }

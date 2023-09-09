@@ -23,6 +23,7 @@
   "ignorePatterns": ["node_modules"],
   "rules": {
     "indent": "off",
+    "import/no-unresolved": "error",
     "@typescript-eslint/indent": "error",
     "max-len": ["error", { "code": 148 }],
     "jsx-quotes": ["error", "prefer-double"],
@@ -60,9 +61,8 @@
   },
   "settings": {
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts",".d.ts"]
+      "@typescript-eslint/parser": [".ts",".d.ts", ".tsx"]
     },
-    "import/internal-regex": "^@",
     "import/resolver": {
       "eslint-import-resolver-custom-alias": {
         "alias": {
@@ -70,6 +70,7 @@
           "@configuration/*": "./src/configuration/*",
           "@declarations/*": "./src/declarations/*",
           "@enums/*": "./src/enums/*",
+          "@events/*": "./src/events/*",
           "@exceptions/*": "./src/exceptions/*",
           "@functions/*": "./src/functions/*",
           "@interfaces/*": "./src/interfaces/*",

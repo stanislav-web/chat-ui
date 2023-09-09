@@ -4,14 +4,6 @@ video.remote {
     vertical-align: middle;
     background: black;
     margin: 1rem 1rem;
-}
-canvas.noise {
-    z-index: -100;
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0.8;
-    background-color: #000;
-    pointer-events: none;
-    user-select: none;
+    height: 100%;
+    width: 100%;
 }

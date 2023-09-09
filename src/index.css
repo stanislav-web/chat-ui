@@ -3,3 +3,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media print {
+    html, body {
+        display: none;
+    }
+}

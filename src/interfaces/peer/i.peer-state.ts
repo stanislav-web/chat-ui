@@ -2,5 +2,6 @@
  * IPeerState interface
  */
 export interface IPeerState {
-  readonly isReady: boolean;
+  isReady: boolean;
+  devices: MediaDeviceInfo[] | [];
 }

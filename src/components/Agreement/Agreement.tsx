@@ -1,5 +1,6 @@
 import { Button, Modal, type ModalProps } from 'flowbite-react';
 import React from 'react';
+import './Agreement.css';
 import { getItem, setItem } from '@functions/localstorage.function';
 
 class Agreement extends React.Component<any, any> {

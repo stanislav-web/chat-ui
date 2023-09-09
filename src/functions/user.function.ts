@@ -62,8 +62,8 @@ export async function getUserFingerprint(extendedResult: boolean = true, linkedI
 export async function getUserAccount(payload: IUserAccountParams): Promise<IUserResponse | null> {
   try {
     return await axios.post('/user', payload);
-  } catch (e) {
-    console.log({ e })
+  } catch (error: any) {
+    console.log('User error', error);
     return null;
   }
 }

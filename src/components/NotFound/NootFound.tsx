@@ -1,5 +1,5 @@
-/* eslint-disable max-len */
 import React from 'react';
+import './NootFound.css';
 
 class NotFound extends React.Component<any, any> {
   render(): React.JSX.Element {

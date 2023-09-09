@@ -1,6 +1,7 @@
 import { Footer } from 'flowbite-react';
 import { BsDribbble, BsFacebook, BsGithub, BsInstagram, BsTwitter } from 'react-icons/bs';
 import React from 'react';
+import './Footer.css';
 
 class FooterWithSocialMediaIcons extends React.Component<any, any> {
   render(): React.JSX.Element {

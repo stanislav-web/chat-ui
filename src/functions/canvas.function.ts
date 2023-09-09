@@ -1,15 +1,17 @@
+import { MediaConfig } from '@configuration/media.config';
+
 /**
  * Get canvas rendering noise
  * @param {string} selector
  * @param {number} width
  * @param {number} height
  */
-export function getCanvasRenderingContext(selector: string, width: number, height: number): CanvasRenderingContext2D {
+function getCanvasRenderingContext(selector: string, width: number, height: number): CanvasRenderingContext2D {
   const canvas: HTMLCanvasElement = document.querySelector(selector);
   if (canvas) {
     const ctx = canvas.getContext('2d');
     resizeCanvasElement(canvas, width, height);
-    window.onresize = (event) => resizeCanvasElement;
+    window.onresize = () => resizeCanvasElement;
     return ctx;
   }
 }
@@ -18,7 +20,7 @@ export function getCanvasRenderingContext(selector: string, width: number, heigh
  * Make noise
  * @param {CanvasRenderingContext2D} ctx
  */
-export function makeCanvasNoise(ctx: CanvasRenderingContext2D): void {
+function makeCanvasNoise(ctx: CanvasRenderingContext2D): void {
   if (ctx) {
     const w = ctx.canvas.width;
     const h = ctx.canvas.height;
@@ -42,4 +44,29 @@ function resizeCanvasElement(canvas: HTMLCanvasElement, width: number, height: n
   canvas.height = height * window.devicePixelRatio;
   canvas.style.width = String(width) + 'px';
   canvas.style.height = String(height) + 'px';
+}
+
+/**
+ * Use noise on video
+ * @param {boolean} state
+ */
+export function useNoise(state: boolean = false): void {
+  const canvasCtx = getCanvasRenderingContext('canvas',
+    MediaConfig.remote.containerWidth,
+    MediaConfig.remote.containerHeight
+  );
+  if (!state) {
+    makeCanvasNoise(canvasCtx);
+    return;
+  }
+  let toggle = true;
+  (function loop() {
+    toggle = !toggle;
+    if (toggle) {
+      requestAnimationFrame(loop);
+      return;
+    }
+    makeCanvasNoise(canvasCtx);
+    requestAnimationFrame(loop);
+  })();
 }

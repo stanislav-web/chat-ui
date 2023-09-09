@@ -1,13 +1,13 @@
 import React from 'react';
 import './VideoControl.css';
-import { type IVideoChatProp } from '@interfaces/peer/i.video-chat-prop';
+import { type IVideoControlProp } from '@interfaces/peer/i.video-control-prop';
 
-class VideoControl extends React.Component<IVideoChatProp, any> {
+class VideoControl extends React.Component<IVideoControlProp, any> {
   /**
      * Constructor
-     * @param {IVideoChatProp} props
+     * @param {IVideoControlProp} props
      */
-  constructor(props: IVideoChatProp) {
+  constructor(props: IVideoControlProp) {
     super(props);
     this.state = {
       isReady: false
@@ -16,7 +16,7 @@ class VideoControl extends React.Component<IVideoChatProp, any> {
 
   render(): React.JSX.Element {
     return (
-        <div>
+        <div className="peer-control">
           <button id="stop">Stop</button>
           <button id="call">Call</button>
         </div>

@@ -1,15 +1,26 @@
-import { MediaConfig } from '@configuration/media.config';
+import { notifyError } from '@functions/notification.function';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { MediaTypeError } from '@types/media.type';
 import { type ISnapshot } from '@interfaces/video/i.snapshot';
 
 /**
- * Get user media
+ * Get user medias
+ * @param {MediaTrackConstraints | boolean} audio
+ * @param {MediaTrackConstraints | boolean} video
+ * @throws MediaTypeError
  * @return Promise<MediaStream>
  */
-export function getUserMedia(): Promise<MediaStream> {
-  return navigator.mediaDevices.getUserMedia({
-    video: MediaConfig.allowVideo,
-    audio: MediaConfig.allowAudio
-  })
+export function getUserMedia(audio: MediaTrackConstraints | boolean = true, video: MediaTrackConstraints | boolean = true): Promise<MediaStream> {
+  const constraints: MediaStreamConstraints = {
+    audio,
+    video
+  };
+
+  try {
+    return navigator.mediaDevices.getUserMedia(constraints)
+  } catch (error: MediaTypeError) {
+    notifyError('Media', error.message);
+  }
 }
 
 /**
@@ -29,19 +40,23 @@ export function getUserMediaConstraints(): MediaTrackSupportedConstraints {
 }
 
 /**
- * Capture video snapshot
- * @param {ISnapshot} param
+ * Capture video stream
+ * @param {HTMLVideoElement} sourceEl
+ * @param {ISnapshot} config
+ * @param {MediaStream} stream
+ * @param {MediaStreamTrack} device
  * @return string
  */
-export function captureSnapshot(param: ISnapshot): string {
-  if (param.stream !== null) {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d');
-    const sourceEl = document.getElementById(param.sourceId) as HTMLVideoElement;
-    ctx.canvas.width = param.width;
-    ctx.canvas.height = param.height;
-    ctx.drawImage(sourceEl, 0, 0, param.width, param.height);
-    return canvas.toDataURL('image/png', 1).split(',')[1];
-  }
-  return '';
+export function captureStream(
+  sourceEl: HTMLVideoElement,
+  config: ISnapshot,
+  stream: MediaStream,
+  device: MediaStreamTrack
+): string {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d');
+  ctx.canvas.width = config?.width | 128;
+  ctx.canvas.height = config?.height | 128;
+  ctx.drawImage(sourceEl, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  return canvas.toDataURL(config.type, config.quality).split(',')[1];
 }

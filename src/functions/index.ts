@@ -18,7 +18,6 @@ import { type IError } from '@interfaces/socket/i.error';
  */
 export async function getUserInfo(): Promise<IUserLoad | null> {
   const peerInfo = getPeerInfo();
-  console.info({ peerInfo });
   if (!peerInfo.isWebRTCSupported) {
     notifyError('WebRTC', 'Your browser is not support WebRTC');
   }
@@ -76,18 +75,19 @@ export async function getUserInfo(): Promise<IUserLoad | null> {
 export function getSocket(): Socket {
   const socket: Socket = getSocketInstance();
   socket.on('connect', (): void => {
-    notifySuccess('Connection', 'Welcome to VideoChat', 3000);
-  });
-  socket.on('connect', (): void => {
+    console.log('socketConnect', { connected: socket.connected })
     notifySuccess('Connection', 'Welcome to VideoChat', 3000);
   });
   socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
+    console.log('socketDisconnect', { disconnected: socket.disconnected })
     notifyInfo('Disconnected', reason);
   });
   socket.on('connect_error', (error: Error): void => {
+    console.log('socketConnectError', { error })
     notifyError('Disconnected', error.message);
   });
   socket.on('exception', (data: IError): void => {
+    console.log('socketException', { data })
     notifyError('Exception', data.message);
   });
   return socket;

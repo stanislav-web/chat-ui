@@ -1,5 +1,5 @@
 import path from 'path';
-import type webpack from 'webpack';
+import webpack from 'webpack';
 import type * as DevServer from 'webpack-dev-server';
 import dotenv from 'dotenv';
 
@@ -21,7 +21,6 @@ const currentEnvironment = process.env.NODE_ENV as 'none' | 'development' | 'pro
 const isProduction = currentEnvironment === 'production';
 const isDebuggerEnabled = currentEnvironment !== 'production';
 const loggerLevel = process.env.WEBPACK_LOGGER_LEVEL as 'none' | 'error' | 'warn' | 'info' | 'log' | 'verbose' | undefined;
-const stylesHandler = isProduction ? MiniCssExtractPlugin.loader : 'style-loader';
 const envDir = path.join(__dirname, './.env.local');
 const srcDir = path.join(__dirname, './src');
 const publicTemplateDir = path.join(__dirname, './public');
@@ -71,20 +70,26 @@ const config: webpack.Configuration = {
     clean: true,
     crossOriginLoading: 'anonymous',
     path: destinationDir,
-    filename: !isProduction ? 'bundle.js' : '[name].[hash].js'
+    filename: !isProduction ? 'bundle.js' : '[name].[fullhash].js'
   },
   devtool: 'eval-cheap-source-map',
   devServer: devServerOption,
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(currentEnvironment)
+    }),
     new Dotenv({
       path: envDir
     }),
     new CleanWebpackPlugin({
-      verbose: true
+      verbose: !isProduction
     }),
     new CopyWebpackPlugin(
       {
         patterns: [
+          {
+            from: publicTemplateDir + '/assets/noise.gif', to: destinationDir + '/assets/noise.gif'
+          },
           {
             from: publicTemplateDir + '/manifest.json', to: destinationDir + '/manifest.json'
           },
@@ -134,7 +139,8 @@ const config: webpack.Configuration = {
               }
             }
           : undefined
-      ))
+      )),
+    new MiniCssExtractPlugin()
   ],
   module: {
     rules: [
@@ -161,7 +167,7 @@ const config: webpack.Configuration = {
       {
         test: /\.css|.scss$/i,
         include: srcDir,
-        use: [stylesHandler, {
+        use: [isProduction ? MiniCssExtractPlugin.loader : 'style-loader', {
           loader: 'css-loader',
           options: { sourceMap: !isProduction }
         },

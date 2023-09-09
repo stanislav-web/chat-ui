@@ -6,6 +6,7 @@
       "@declarations/*": ["./src/declarations/*"],
       "@enums/*": ["./src/enums/*"],
       "@exceptions/*": ["./src/exceptions/*"],
+      "@events/*": ["./src/events/*"],
       "@functions/*": ["./src/functions/*"],
       "@interfaces/*": ["./src/interfaces/*"],
       "@locales/*": ["./src/locales/*"],

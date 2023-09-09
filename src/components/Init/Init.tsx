@@ -16,7 +16,7 @@ import Peer from '@components/Peer/Peer';
 import { type Socket } from 'socket.io-client';
 
 class Init extends React.Component<IUserProp, Partial<IUserState>> {
-  private socket: Socket | null = null;
+  private socket: Socket;
 
   static propTypes = {
     cookies: instanceOf(Cookies).isRequired
@@ -44,7 +44,7 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
     preventOpener();
     if (this.state.isUserAgree === true) {
       const u = await getUserInfo();
-      console.info({ user: u });
+      console.info('Auth user', { user: u });
       if (u?.user !== null) {
         this.socket = getSocket();
       }

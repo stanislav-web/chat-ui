@@ -1,14 +1,11 @@
+import { AppConfig } from '@configuration/app.config';
+
 export const WebrtcConfig: RTCConfiguration = {
   bundlePolicy: 'balanced',
   iceServers: [
     {
-      urls: 'stun:stun.services.mozilla.com',
-      username: 'louis@mozilla.com',
-      credential: 'webrtcdemo'
-    },
-    {
-      urls: ['stun:stun.example.com', 'stun:stun-1.example.com']
+      urls: ['stun:23.21.150.121:3478', 'stun:iphone-stun.strato-iphone.de:3478', 'stun:numb.viagenie.ca:3478']
     }
   ],
-  iceTransportPolicy: 'relay'
+  iceTransportPolicy: AppConfig.isProduction ? 'relay' : 'all'
 }

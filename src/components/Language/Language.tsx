@@ -1,4 +1,5 @@
 import React, { type BaseSyntheticEvent } from 'react';
+import './Language.css';
 import { getItem } from '@functions/localstorage.function';
 import { AppConfig } from '@configuration/app.config';
 import { changeLanguage } from 'i18next';

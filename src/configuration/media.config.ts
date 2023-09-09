@@ -1,8 +1,23 @@
-export const MediaConfig = {
-  allowVideo: true,
-  allowAudio: true,
-  allowSnapshots: true,
-  snapshotsInterval: 20000,
+import { type MediaConfigInterface } from '@interfaces/config/media-config.interface';
+
+export const MediaConfig: MediaConfigInterface = {
+  audio: {
+    echoCancellation: true,
+    noiseSuppression: true
+  },
+  video: {
+    facingMode: 'user',
+    frameRate: 30
+  },
+  poster: 'assets/noise.gif',
+  snapshot: {
+    isAllow: true,
+    interval: 180000,
+    type: 'image/png',
+    quality: 0.92,
+    width: 64,
+    height: 64
+  },
   local: {
     containerId: 'local-video',
     containerWidth: 500,

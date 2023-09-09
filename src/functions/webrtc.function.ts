@@ -1,6 +1,8 @@
 import DetectRTC from 'detectrtc';
 import { type IUserPeerInfo } from '@interfaces/user/i.user-peer-info';
 import { WebrtcConfig } from '@configuration/webrtc.config';
+import { notifyError } from '@functions/notification.function';
+import { PeerException } from '@exceptions/peer.exception';
 
 /**
  * Get peer info
@@ -24,18 +26,10 @@ export function getPeerInfo(): IUserPeerInfo {
 
 /**
  * Get peer connection
- * @param callback
- * @param error
+ * @return RTCPeerConnection
  */
-export function getPeerConnection(callback: any, error: any): RTCPeerConnection {
-  const connection = new RTCPeerConnection(WebrtcConfig);
-  connection.addEventListener('icecandidate', (event: RTCPeerConnectionIceEvent) => {
-    callback(event);
-  });
-  connection.addEventListener('icecandidateerror', (event: RTCPeerConnectionIceErrorEvent) => {
-    error(event);
-  });
-  return connection;
+export function getPeerConnection(): RTCPeerConnection {
+  return new RTCPeerConnection(WebrtcConfig);
 }
 
 /**
@@ -44,13 +38,17 @@ export function getPeerConnection(callback: any, error: any): RTCPeerConnection 
  * return Promise<RTCSessionDescriptionInit>
  */
 export async function createPeerOffer(localConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> {
-  const offer = await localConnection.createOffer({
-    iceRestart: true,
-    offerToReceiveAudio: true,
-    offerToReceiveVideo: true
-  });
-  await localConnection.setLocalDescription(offer);
-  return offer;
+  try {
+    const offer = await localConnection.createOffer({
+      iceRestart: true,
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true
+    });
+    await localConnection.setLocalDescription(offer);
+    return offer;
+  } catch (error) {
+    throw new PeerException(error.message, error);
+  }
 }
 
 /**
@@ -59,11 +57,15 @@ export async function createPeerOffer(localConnection: RTCPeerConnection): Promi
  * return Promise<RTCSessionDescriptionInit>
  */
 export async function createPeerAnswer(remoteConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> {
-  const answer = await remoteConnection.createAnswer({
-    iceRestart: true,
-    offerToReceiveAudio: true,
-    offerToReceiveVideo: true
-  });
-  await remoteConnection.setLocalDescription(answer);
-  return answer;
+  try {
+    const answer = await remoteConnection.createAnswer({
+      iceRestart: true,
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true
+    });
+    await remoteConnection.setLocalDescription(answer);
+    return answer;
+  } catch (error) {
+    throw new PeerException(error.message, error);
+  }
 }
