@@ -6,6 +6,7 @@ export const MediaConfig: MediaConfigInterface = {
     noiseSuppression: true
   },
   video: {
+    displaySurface: 'browser',
     facingMode: 'user',
     frameRate: 30
   },

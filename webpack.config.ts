@@ -1,5 +1,5 @@
 import path from 'path';
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import type * as DevServer from 'webpack-dev-server';
 import dotenv from 'dotenv';
 
@@ -8,12 +8,13 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 // eslint-disable-next-line import/default
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
 
 dotenv.config({
   debug: process.env.DOTENV_CONFIG_DEBUG === 'true',
-  override: process.env.DOTENV_CONFIG_OVERRIDE === 'true',
+  override: true,
   path: process.env.DOTENV_CONFIG_PATH ?? './.env.local'
 });
 
@@ -21,7 +22,7 @@ const currentEnvironment = process.env.NODE_ENV as 'none' | 'development' | 'pro
 const isProduction = currentEnvironment === 'production';
 const isDebuggerEnabled = currentEnvironment !== 'production';
 const loggerLevel = process.env.WEBPACK_LOGGER_LEVEL as 'none' | 'error' | 'warn' | 'info' | 'log' | 'verbose' | undefined;
-const envDir = path.join(__dirname, './.env.local');
+const envDir = path.join(__dirname, process.env.DOTENV_CONFIG_PATH ?? './.env.local');
 const srcDir = path.join(__dirname, './src');
 const publicTemplateDir = path.join(__dirname, './public');
 const destinationDir = path.join(__dirname, './dist');
@@ -66,6 +67,23 @@ const config: webpack.Configuration = {
   name: currentEnvironment,
   context: srcDir,
   entry: './index.tsx',
+  optimization: {
+    emitOnErrors: true,
+    minimize: isProduction,
+    minimizer: [
+      new TerserPlugin({
+        extractComments: true
+      })
+    ]
+  },
+  performance: {
+    maxAssetSize: 17550000,
+    maxEntrypointSize: 17550000,
+    hints: 'error',
+    assetFilter: function(assetFilename) {
+      return !assetFilename.endsWith('.png') && !assetFilename.endsWith('.gif');
+    }
+  },
   output: {
     clean: true,
     crossOriginLoading: 'anonymous',
@@ -75,9 +93,6 @@ const config: webpack.Configuration = {
   devtool: 'eval-cheap-source-map',
   devServer: devServerOption,
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(currentEnvironment)
-    }),
     new Dotenv({
       path: envDir
     }),
@@ -126,6 +141,8 @@ const config: webpack.Configuration = {
         isProduction
           ? {
               minify: {
+                html5: true,
+                decodeEntities: true,
                 removeComments: true,
                 collapseWhitespace: true,
                 removeRedundantAttributes: true,

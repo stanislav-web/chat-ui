@@ -1,5 +1,5 @@
 import { type AxiosRequestConfig, type ResponseType } from 'axios';
-import { type ExceptionStatusType, type FailedStatusType, type SuccessStatusType } from '@types/status.type';
+import { type ExceptionStatusType, type FailedStatusType, type SuccessStatusType } from '@types/http-status.type';
 export const HttpConfig: AxiosRequestConfig & { responseType: ResponseType; headers: {
   'X-Http-Key': string;
   'X-Requested-With': string;

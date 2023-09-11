@@ -8,7 +8,6 @@ import { type IPeerProp } from '@interfaces/peer/i.peer-prop';
 import { notifyError } from '@functions/notification.function';
 import { getUserMediaDevices } from '@functions/media.function';
 import { type IPeerState } from '@interfaces/peer/i.peer-state';
-import { getPeerConnection } from '@functions/webrtc.function';
 
 class Peer extends React.Component<IPeerProp, IPeerState> {
   /**
@@ -31,11 +30,12 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
     if (!this.props.socket?.connected) {
       this.props.socket?.connect();
       try {
-        const devices = await getUserMediaDevices();
+        const devices = await getUserMediaDevices(null);
         this.setState({
           devices,
           isReady: this.props.socket.connected
         })
+        console.log('2. Socket connected: ', this.props.socket.connected);
       } catch (error) {
         notifyError('Media', error?.message)
       }
@@ -48,10 +48,16 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
 
     return (
         <div className="peer-container">
+          <div className="peer-output">
             <VideoRemote socket={socket} />
             <VideoLocal socket={socket} />
+          </div>
+          <div className="peer-control">
             <VideoControl socket={socket} devices={devices}/>
+          </div>
+          <div className="peer-chat">
             <VideoChat socket={socket} />
+          </div>
         </div>
     )
   }

@@ -3,7 +3,8 @@ import { type Socket } from 'socket.io-client';
 import { emit } from '@functions/socket.function';
 import { type SocketEmitType } from '@types/socket.type';
 import { type IEventEmitCandidate } from '@interfaces/socket/i.event-emit';
-import { EventEmitEnum } from '@enums/event-emit.enum';
+import { type EventEmitEnum } from '@enums/event-emit.enum';
+import { MediaTackException } from '@exceptions/media-tack.exception';
 
 /**
  * Event is sent on an RTCPeerConnection object after a new track has been added to an RTCRtpReceiver
@@ -18,23 +19,26 @@ export const onConnectionStateChange = (event: Event, peer: RTCPeerConnection): 
   console.info('onConnectionStateChange', { event, peer });
   switch (peer.connectionState) {
     case 'new':
+      console.info('PEER CONNECTION STATE', 'new');
+
+      break;
     case 'connecting':
-      // setOnlineStatus('Connecting…');
+      console.info('PEER CONNECTION STATE', 'connecting');
       break;
     case 'connected':
-      // setOnlineStatus('Online');
+      console.info('PEER CONNECTION STATE', 'connected');
       break;
     case 'disconnected':
-      // setOnlineStatus('Disconnecting…');
+      console.info('PEER CONNECTION STATE', 'disconnected');
       break;
     case 'closed':
-      // setOnlineStatus('Offline');
+      console.info('PEER CONNECTION STATE', 'closed');
       break;
     case 'failed':
-      // setOnlineStatus('Error');
+      console.info('PEER CONNECTION STATE', 'failed');
+      peer.restartIce();
       break;
     default:
-      // setOnlineStatus('Unknown');
       break;
   }
 }
@@ -67,8 +71,25 @@ export const onIceCandidateError = (error: RTCPeerConnectionIceErrorEvent): void
  */
 export function onSignalingStateChange(peer: RTCPeerConnection, event: Event): void {
   switch (peer.signalingState) {
+    case 'have-local-offer':
+      console.info('PEER SIGNAL STATE', peer.signalingState);
+      break;
+    case 'have-local-pranswer':
+      console.info('PEER SIGNAL STATE', peer.signalingState);
+      break;
+    case 'have-remote-offer':
+      console.info('PEER SIGNAL STATE', peer.signalingState);
+      break;
+    case 'have-remote-pranswer':
+      console.info('PEER SIGNAL STATE', peer.signalingState);
+      break;
+    case 'closed':
+      console.info('PEER SIGNAL STATE', peer.signalingState);
+      break;
     case 'stable':
-      // updateStatus('ICE negotiation complete');
+      console.info('PEER SIGNAL STATE', peer.signalingState);
+      break;
+    default:
       break;
   }
   console.log('onSignalingStateChange', { peer, event });
@@ -78,11 +99,12 @@ export function onSignalingStateChange(peer: RTCPeerConnection, event: Event): v
  * RTC ice candidate handler
  * @param {Socket} socket
  * @param {RTCPeerConnectionIceEvent} event
+ * @param {EventEmitEnum} candidate
  * @return void
  */
-export function onIceCandidate(socket: Socket, event: RTCPeerConnectionIceEvent): void {
+export function onIceCandidate(socket: Socket, event: RTCPeerConnectionIceEvent, candidate: EventEmitEnum): void {
   if (event.candidate) {
-    emit<SocketEmitType, IEventEmitCandidate>(socket, EventEmitEnum.CANDIDATE, event.candidate);
+    emit<SocketEmitType, IEventEmitCandidate>(socket, candidate, event.candidate);
   }
   console.log('onIceCandidate', event);
 }
@@ -94,7 +116,12 @@ export function onIceCandidate(socket: Socket, event: RTCPeerConnectionIceEvent)
  * @return void
  */
 export function onTrack(target: HTMLVideoElement, event: RTCTrackEvent): void {
-  target.srcObject = event.streams[0];
-  // hangupButton.disabled = false;
-  console.log('onTrack', { event });
+  const [remoteStream] = event.streams;
+  if (!'srcObject' in target) {
+    throw new MediaTackException('No remote video');
+  } else {
+    if (target.srcObject !== remoteStream) {
+      target.srcObject = remoteStream;
+    }
+  }
 }

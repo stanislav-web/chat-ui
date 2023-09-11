@@ -1,6 +1,6 @@
 import { notifyError } from '@functions/notification.function';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { MediaTypeError } from '@types/media.type';
+import { type MediaDevicesTypes, MediaTypeError } from '@types/media.type';
 import { type ISnapshot } from '@interfaces/video/i.snapshot';
 
 /**
@@ -25,10 +25,13 @@ export function getUserMedia(audio: MediaTrackConstraints | boolean = true, vide
 
 /**
  * Get user media devices
+ * @param {MediaDevicesTypes | null} type
  * @return Promise<MediaDeviceInfo[]>
  */
-export function getUserMediaDevices(): Promise<MediaDeviceInfo[]> {
-  return getUserMedia().then(() => navigator.mediaDevices.enumerateDevices())
+export async function getUserMediaDevices(type: MediaDevicesTypes | null): Promise<MediaDeviceInfo[]> {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  if (type === null) return devices;
+  else return devices.filter(device => device.kind === type)
 }
 
 /**

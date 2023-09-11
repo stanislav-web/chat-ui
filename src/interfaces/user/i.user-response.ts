@@ -1,5 +1,5 @@
 import { type IUser } from './i.user';
-import { type Status } from '@types/status.type';
+import { type Status } from '@types/http-status.type';
 
 /**
  * UserResponse interface

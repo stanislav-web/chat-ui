@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ES2021",
-    "outDir": "./build/",
+    "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": false,
     "noImplicitThis": true,

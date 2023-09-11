@@ -1,5 +1,5 @@
 /**
- * Media Device types
+ * MediaDeviceTypeEnum
  */
 export enum MediaDeviceTypeEnum {
   AUDIO = 'audioinput',

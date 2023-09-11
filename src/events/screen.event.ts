@@ -3,7 +3,7 @@ import { AppConfig } from '@configuration/app.config';
 import { notifyInfo } from '@functions/notification.function';
 import { ctrlShiftKey, stopDefaultBehavior } from '@functions/keyboard.function';
 
-if (!AppConfig.isCommandEnabled) {
+if (!AppConfig.isCommandAllowed) {
   window.addEventListener('keyup', (event: KeyboardEvent) => {
     if (event.key === 'PrintScreen') {
       notifyInfo('Warning', 'This section is not allowed execute this command');

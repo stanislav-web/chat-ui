@@ -75,19 +75,18 @@ export async function getUserInfo(): Promise<IUserLoad | null> {
 export function getSocket(): Socket {
   const socket: Socket = getSocketInstance();
   socket.on('connect', (): void => {
-    console.log('socketConnect', { connected: socket.connected })
     notifySuccess('Connection', 'Welcome to VideoChat', 3000);
   });
   socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
-    console.log('socketDisconnect', { disconnected: socket.disconnected })
+    console.log('socket disconnected: ', socket.disconnected)
     notifyInfo('Disconnected', reason);
   });
   socket.on('connect_error', (error: Error): void => {
-    console.log('socketConnectError', { error })
+    console.log('socket connect error:', { error })
     notifyError('Disconnected', error.message);
   });
   socket.on('exception', (data: IError): void => {
-    console.log('socketException', { data })
+    console.log('socket exception:', { data })
     notifyError('Exception', data.message);
   });
   return socket;

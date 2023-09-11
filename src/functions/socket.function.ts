@@ -1,6 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
 import { WsConfig } from '@configuration/ws.config';
-import { IEventListenOffer } from '@interfaces/socket/i.event-listen';
 
 /**
  * Get websocket instance
@@ -34,7 +33,7 @@ export function emitVolatile<Ev, D>(socket: Socket, event: Ev, params: D): void 
 }
 
 /**
- * Emit data to server (volatile)
+ * Emit Listener
  * @param {Socket} socket
  * @param event
  * @param callback

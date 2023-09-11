@@ -14,6 +14,7 @@ import { type IUserProp } from '@interfaces/user/i.user-prop';
 import { type IUserState } from '@interfaces/user/i.user-state';
 import Peer from '@components/Peer/Peer';
 import { type Socket } from 'socket.io-client';
+import { AppConfig } from '@configuration/app.config';
 
 class Init extends React.Component<IUserProp, Partial<IUserState>> {
   private socket: Socket;
@@ -41,10 +42,10 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
    * @return Promise<void>
    */
   async componentDidMount(): Promise<void> {
-    preventOpener();
+    !AppConfig.isMultiTabAllowed && preventOpener();
     if (this.state.isUserAgree === true) {
       const u = await getUserInfo();
-      console.info('Auth user', { user: u });
+      console.info('1. Auth user', u);
       if (u?.user !== null) {
         this.socket = getSocket();
       }

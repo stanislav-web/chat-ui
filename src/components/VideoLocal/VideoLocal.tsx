@@ -4,7 +4,11 @@ import { MediaConfig } from '@configuration/media.config';
 import { getUserMedia } from '@functions/media.function';
 import { notifyError } from '@functions/notification.function';
 import {
-  createPeerOffer, getPeerConnection
+  addCandidate,
+  createPeerConnection,
+  createPeerOffer,
+  getRTCStats,
+  isPeerAvailable
 } from '@functions/webrtc.function';
 import { type IVideoProp } from '@interfaces/peer/i.video-prop';
 import { type IPeerState } from '@interfaces/peer/i.peer-state';
@@ -46,77 +50,76 @@ class VideoLocal extends React.Component<IVideoProp, IPeerState> {
     } else {
       const { socket } = this.props;
       const { snapshot, audio, video } = MediaConfig;
-      // 1. Load user devices
       const stream = await getUserMedia(audio, video);
-      // 2. Create video stream
+      console.log('3. User media stream', stream);
       videoEl.srcObject = stream;
-      const videoTrack = stream.getVideoTracks().pop();
-      const audioTrack = stream.getAudioTracks().pop();
+      console.log('4. Local video element', videoEl);
 
       videoEl.onloadedmetadata = (event: Event) => { onLoadedVideoMetadata({ videoEl }); };
       videoEl.onresize = (event: Event) => { onResizeVideo({ videoEl }); };
-      videoEl.onvolumechange = (event: Event) => { onVolumeChange({ videoEl, videoTrack, socket }); };
+      videoEl.onvolumechange = (event: Event) => { onVolumeChange({ videoEl, stream, socket }); };
       videoEl.onplay = (event: Event) => {
         onPlay({
           videoEl,
           stream,
-          videoTrack,
           socket,
           snapshot
         });
       };
 
-      // 3. Create peer connection
-      const localPeer = getPeerConnection();
-      localPeer.addTrack(videoTrack, stream);
+      const localPeer = createPeerConnection(stream);
+      console.log('5. Local peer', localPeer);
+
       localPeer.onconnectionstatechange = (event: Event) => {
         onConnectionStateChange(event, localPeer);
+        getRTCStats(localPeer).then(console.info)
       };
       localPeer.onsignalingstatechange = (event: Event) => {
         onSignalingStateChange(localPeer, event);
+        getRTCStats(localPeer).then(console.info)
       };
       localPeer.ondatachannel = (event: RTCDataChannelEvent) => {
         onDataChannel(event);
       };
       localPeer.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-        onIceCandidate(socket, event);
+        onIceCandidate(socket, event, EventEmitEnum.CANDIDATE);
       }
       localPeer.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => {
         onIceCandidateError(error);
       }
 
-      try {
-        const offer = await createPeerOffer(localPeer);
-        emit<SocketEmitType, IEventEmitOffer>(socket, EventEmitEnum.OFFER, offer);
-        on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.ANSWER, async (event: IEventListenAnswer) => {
-          try {
-            await localPeer.setRemoteDescription(event);
-          } catch (error) {
-            throw new PeerException(error.message, error);
-          }
-        });
-        on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.CANDIDATE, (event: IEventListenCandidate) => {
-          setTimeout(() => {
-            localPeer.addIceCandidate(new RTCIceCandidate(event)).catch();
-          }, 300);
-        });
-
-        console.log('LOCAL: VideoElement', videoEl);
-        console.log('LOCAL: Stream', stream);
-        console.log('LOCAL: VideoTrack', videoTrack);
-        console.log('LOCAL: AudioTrack', audioTrack);
-        console.log('LOCAL: Peer', localPeer);
-        console.log('LOCAL: Peer Offer', offer);
-      } catch (error) {
-        notifyError(error.name, error.message);
+      localPeer.onnegotiationneeded = async (event: Event) => {
+        try {
+          const offer = await createPeerOffer(localPeer);
+          emit<SocketEmitType, IEventEmitOffer>(socket, EventEmitEnum.OFFER, offer);
+          on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.ANSWER, async (event: IEventListenAnswer) => {
+            try {
+              if (event.type === EventListenEnum.ANSWER && isPeerAvailable(localPeer.connectionState)) {
+                await localPeer.setRemoteDescription(new RTCSessionDescription(event));
+              }
+            } catch (error) {
+              throw new PeerException(error.message, error);
+            }
+          });
+        } catch (error) {
+          notifyError(error.name, error.message);
+        }
       }
+
+      on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.CANDIDATE, async (event: IEventListenCandidate) => {
+        try {
+          await addCandidate(localPeer, event);
+        } catch (error) {
+          throw new PeerException(error.message, error);
+        }
+      });
     }
   }
 
   render(): React.JSX.Element {
     return (
         <>
-          <video id={this.containerId} className="local" autoPlay playsInline />
+          <video id={this.containerId} disablePictureInPicture className="local" autoPlay playsInline />
         </>
     )
   }

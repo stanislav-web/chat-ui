@@ -3,19 +3,9 @@ import './VideoRemote.css';
 import { MediaConfig } from '@configuration/media.config';
 import { type IVideoProp } from '@interfaces/peer/i.video-prop';
 import { type IPeerState } from '@interfaces/peer/i.peer-state';
-import {
-  createPeerAnswer, getPeerConnection
-} from '@functions/webrtc.function';
+import { addCandidate, createPeerAnswer, createPeerConnection, getRTCStats, isPeerAvailable } from '@functions/webrtc.function';
 import { notifyError } from '@functions/notification.function';
-import {
-  onConnectionStateChange,
-  onDataChannel,
-  onIceCandidate,
-  onIceCandidateError,
-  onSignalingStateChange,
-  onTrack
-// eslint-disable-next-line import/no-unresolved
-} from '@events/peer.event';
+import { onConnectionStateChange, onDataChannel, onIceCandidate, onIceCandidateError, onSignalingStateChange, onTrack } from '@events/peer.event';
 import { emit, on } from '@functions/socket.function';
 import { type SocketEmitType, type SocketListenType } from '@types/socket.type';
 import { type IEventEmitAnswer } from '@interfaces/socket/i.event-emit';
@@ -57,10 +47,14 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
       videoEl.onloadedmetadata = (event: Event) => { onLoadedVideoMetadata({ videoEl }); };
       videoEl.onresize = (event: Event) => { onResizeVideo({ videoEl }); };
 
-      // 3. Create peer connection
-      const remotePeer = getPeerConnection();
+      const remotePeer = createPeerConnection();
       remotePeer.onconnectionstatechange = (event: Event) => {
         onConnectionStateChange(event, remotePeer);
+        getRTCStats(remotePeer).then(console.info)
+      };
+      remotePeer.onsignalingstatechange = (event: Event) => {
+        onSignalingStateChange(remotePeer, event);
+        getRTCStats(remotePeer).then(console.info)
       };
       remotePeer.ondatachannel = (event: RTCDataChannelEvent) => {
         onDataChannel(event);
@@ -68,11 +62,8 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
       remotePeer.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => {
         onIceCandidateError(error);
       }
-      remotePeer.onsignalingstatechange = (event: Event) => {
-        onSignalingStateChange(remotePeer, event);
-      };
       remotePeer.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-        onIceCandidate(socket, event);
+        onIceCandidate(socket, event, EventEmitEnum.CANDIDATE);
       };
       remotePeer.ontrack = (event: RTCTrackEvent) => {
         onTrack(videoEl, event);
@@ -80,27 +71,30 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
 
       on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.OFFER, async (event: IEventListenOffer) => {
         try {
-          await remotePeer.setRemoteDescription(event);
-          const answer = await createPeerAnswer(remotePeer);
-          console.log('REMOTE: Peer  answer', answer);
-          emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, answer);
+          if (event.type === EventListenEnum.OFFER && isPeerAvailable(remotePeer.connectionState)) {
+            await remotePeer.setRemoteDescription(new RTCSessionDescription(event));
+            const answer = await createPeerAnswer(remotePeer);
+            console.log('REMOTE: Peer answer', answer);
+            emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, answer);
+          }
         } catch (error) {
           throw new PeerException(error.message, error);
         }
       });
       on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.CANDIDATE, async (event: IEventListenCandidate) => {
-        await remotePeer.addIceCandidate(new RTCIceCandidate(event));
+        try {
+          await addCandidate(remotePeer, event);
+        } catch (error) {
+          throw new PeerException(error.message, error);
+        }
       });
-
-      console.log('REMOTE: VideoElement', videoEl);
-      console.log('REMOTE: Peer', remotePeer);
     }
   }
 
   render(): React.JSX.Element {
     return (
         <>
-            <video id={this.containerId} className="remote" autoPlay playsInline poster={this.poster}/>
+            <video id={this.containerId} disablePictureInPicture className="remote" autoPlay={true} playsInline poster={this.poster}/>
             {this.useNoise &&
                 <canvas className="noise"/>
             }
