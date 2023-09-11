@@ -1,12 +1,17 @@
 import './index.css';
 import React from 'react';
-// eslint-disable-next-line import/no-unresolved
 import { createRoot } from 'react-dom/client';
-import { checkAuth } from './Functions/window.function';
+import { GlobalDebug } from '@functions/log.function';
+import { checkAuth } from '@functions/window.function';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ErrorBoundary, Init, Header, FooterWithSocialMediaIcons } from './Components/index';
+import { ErrorBoundary, Init, Header, FooterWithSocialMediaIcons } from '@components/index';
 import { CookiesProvider } from 'react-cookie';
-import './Utils';
+import './utils';
+import './events/screen.event.ts';
+import NotFound from '@components/NotFound/NootFound';
+import { AppConfig } from '@configuration/app.config';
+
+AppConfig.isProduction && GlobalDebug(false);
 
 checkAuth();
 
@@ -16,6 +21,7 @@ const Index = (): React.JSX.Element =>
    <BrowserRouter>
     <Routes>
         <Route path="/" element={<Init />} />
+        <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>
 ;
