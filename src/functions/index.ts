@@ -78,15 +78,15 @@ export function getSocket(): Socket {
     notifySuccess('Connection', 'Welcome to VideoChat', 3000);
   });
   socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
-    console.log('socket disconnected: ', socket.disconnected)
+    console.log('[!] Socket disconnected: ', socket.disconnected)
     notifyInfo('Disconnected', reason);
   });
   socket.on('connect_error', (error: Error): void => {
-    console.log('socket connect error:', { error })
+    console.log('[!] Socket connect error:', { error })
     notifyError('Disconnected', error.message);
   });
   socket.on('exception', (data: IError): void => {
-    console.log('socket exception:', { data })
+    console.log('[!] Socket exception:', { data })
     notifyError('Exception', data.message);
   });
   return socket;

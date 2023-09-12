@@ -3,7 +3,7 @@ import './VideoRemote.css';
 import { MediaConfig } from '@configuration/media.config';
 import { type IVideoProp } from '@interfaces/peer/i.video-prop';
 import { type IPeerState } from '@interfaces/peer/i.peer-state';
-import { addCandidate, createPeerAnswer, createPeerConnection, getRTCStats, isPeerAvailable } from '@functions/webrtc.function';
+import { addCandidate, createPeerAnswer, createPeerConnection, isPeerSignalStable } from '@functions/webrtc.function';
 import { notifyError } from '@functions/notification.function';
 import { onConnectionStateChange, onDataChannel, onIceCandidate, onIceCandidateError, onSignalingStateChange, onTrack } from '@events/peer.event';
 import { emit, on } from '@functions/socket.function';
@@ -28,7 +28,6 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
   constructor(props: IVideoProp) {
     super(props);
     this.state = {
-      isReady: false,
       devices: []
     };
   }
@@ -50,11 +49,9 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
       const remotePeer = createPeerConnection();
       remotePeer.onconnectionstatechange = (event: Event) => {
         onConnectionStateChange(event, remotePeer);
-        getRTCStats(remotePeer).then(console.info)
       };
       remotePeer.onsignalingstatechange = (event: Event) => {
         onSignalingStateChange(remotePeer, event);
-        getRTCStats(remotePeer).then(console.info)
       };
       remotePeer.ondatachannel = (event: RTCDataChannelEvent) => {
         onDataChannel(event);
@@ -71,11 +68,13 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
 
       on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.OFFER, async (event: IEventListenOffer) => {
         try {
-          if (event.type === EventListenEnum.OFFER && isPeerAvailable(remotePeer.connectionState)) {
-            await remotePeer.setRemoteDescription(new RTCSessionDescription(event));
+          await remotePeer.setRemoteDescription(event);
+          if (event.type === EventListenEnum.OFFER && !isPeerSignalStable(remotePeer)) {
             const answer = await createPeerAnswer(remotePeer);
-            console.log('REMOTE: Peer answer', answer);
-            emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, answer);
+            console.log('[!] REMOTE: Peer answer', answer);
+            setTimeout(() => {
+              if (answer) emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, answer);
+            }, 1000);
           }
         } catch (error) {
           throw new PeerException(error.message, error);
@@ -94,7 +93,7 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
   render(): React.JSX.Element {
     return (
         <>
-            <video id={this.containerId} disablePictureInPicture className="remote" autoPlay={true} playsInline poster={this.poster}/>
+            <video id={this.containerId} className="remote" autoPlay playsInline poster={this.poster}/>
             {this.useNoise &&
                 <canvas className="noise"/>
             }

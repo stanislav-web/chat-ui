@@ -9,6 +9,7 @@ import { type IUserResponse } from '@interfaces/user/i.user-response';
 import { type IUserAccountParams } from '@interfaces/user/i.user-account-params';
 import { UserFingerprintException } from '@exceptions/user-fingerprint.exception';
 import { UserBrowserException } from '@exceptions/user-browser.exception';
+import { AppConfig } from '@configuration/app.config';
 
 /**
  * Get user browser
@@ -46,7 +47,7 @@ export async function getUserFingerprint(extendedResult: boolean = true, linkedI
     return await load(options).then(fp => fp.get({
       extendedResult,
       linkedId,
-      debug: process.env.REACT_APP_DEBUG === 'true',
+      debug: AppConfig.debug,
       products: ['identification', 'botd']
     }))
   } catch (e) {
@@ -61,9 +62,9 @@ export async function getUserFingerprint(extendedResult: boolean = true, linkedI
  */
 export async function getUserAccount(payload: IUserAccountParams): Promise<IUserResponse | null> {
   try {
-    return await axios.post('/user', payload);
+    return await axios.post(process.env.REACT_APP_HTTP_USER_PATH, payload);
   } catch (error: any) {
-    console.log('User error', error);
+    console.log('[!] User error', error);
     return null;
   }
 }

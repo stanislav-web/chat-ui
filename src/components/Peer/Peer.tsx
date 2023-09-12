@@ -17,7 +17,6 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
   constructor(props: IPeerProp) {
     super(props);
     this.state = {
-      isReady: false,
       devices: []
     };
   }
@@ -35,7 +34,7 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
           devices,
           isReady: this.props.socket.connected
         })
-        console.log('2. Socket connected: ', this.props.socket.connected);
+        console.log('[!] Socket connected: ', this.props.socket.connected);
       } catch (error) {
         notifyError('Media', error?.message)
       }

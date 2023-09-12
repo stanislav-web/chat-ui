@@ -1,4 +1,5 @@
 import './index.css';
+import adapter from 'webrtc-adapter';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { GlobalDebug } from '@functions/log.function';
@@ -11,8 +12,10 @@ import './events/screen.event.ts';
 import NotFound from '@components/NotFound/NootFound';
 import { AppConfig } from '@configuration/app.config';
 
-AppConfig.isProduction && GlobalDebug(false);
+adapter.disableWarnings(AppConfig.isProduction)
+adapter.disableLog(AppConfig.isProduction)
 
+AppConfig.isProduction && GlobalDebug(false);
 checkAuth();
 
 const root = createRoot(document.getElementById('root') as HTMLElement);

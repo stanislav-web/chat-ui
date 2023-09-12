@@ -1,5 +1,5 @@
 /**
- * Media Device types
+ * RtcConnectionStateEnum
  */
 export enum RtcConnectionStateEnum {
   NEW = 'new',

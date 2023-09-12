@@ -6,7 +6,7 @@ import { RtcConnectionStateEnum } from '@enums/rtc-connection-state.enum';
 import { type IEventListenCandidate } from '@interfaces/socket/i.event-listen';
 import { MediaTrackStateEnum } from '@enums/media-track-state.enum';
 import { MediaTackException } from '@exceptions/media-tack.exception';
-import { RtcStatsTypeEnum } from '@enums/rtc-stats-type.enum';
+import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
 
 /**
  * Get peer info
@@ -31,7 +31,7 @@ export function getPeerInfo(): IUserPeerInfo {
 /**
  * Get peer connection
  * @param {MediaStream} stream
- * @return RTCPeerConnection
+ * @return Promise<RTCPeerConnection>
  */
 export function createPeerConnection(stream?: MediaStream): RTCPeerConnection {
   const peer = new RTCPeerConnection(WebrtcConfig);
@@ -43,17 +43,18 @@ export function createPeerConnection(stream?: MediaStream): RTCPeerConnection {
  * Create peer offer
  * @param {RTCPeerConnection} localConnection
  * @throws PeerException
- * return Promise<RTCSessionDescriptionInit>
+ * return Promise<RTCSessionDescriptionInit> | null
  */
-export async function createPeerOffer(localConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> {
+export async function createPeerOffer(localConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> | null {
   try {
     const offer = await localConnection.createOffer({
       iceRestart: true,
       offerToReceiveAudio: true,
       offerToReceiveVideo: true
     });
+    if (!isPeerSignalStable(localConnection)) return null;
     await localConnection.setLocalDescription(offer);
-    return offer;
+    return localConnection.localDescription;
   } catch (error) {
     throw new PeerException(error.message, error);
   }
@@ -63,17 +64,18 @@ export async function createPeerOffer(localConnection: RTCPeerConnection): Promi
  * Create peer answer
  * @param {RTCPeerConnection} remoteConnection
  * @throws PeerException
- * return Promise<RTCSessionDescriptionInit>
+ * return Promise<RTCSessionDescriptionInit> | null
  */
-export async function createPeerAnswer(remoteConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> {
+export async function createPeerAnswer(remoteConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> | null {
   try {
     const answer = await remoteConnection.createAnswer({
       iceRestart: true,
       offerToReceiveAudio: true,
       offerToReceiveVideo: true
     });
+    if (isPeerSignalStable(remoteConnection)) return null;
     await remoteConnection.setLocalDescription(answer);
-    return answer;
+    return remoteConnection.localDescription;
   } catch (error) {
     throw new PeerException(error.message, error);
   }
@@ -90,6 +92,15 @@ export function isPeerAvailable(state: RTCPeerConnectionState): boolean {
 }
 
 /**
+ * Is Peer signal stable
+ * @param {RTCPeerConnection} connection
+ * @return boolean
+ */
+export function isPeerSignalStable(connection: RTCPeerConnection): boolean {
+  return RtcSignallingStateEnum.STABLE === connection.signalingState;
+}
+
+/**
  * Add tracks to peer
  * @param {RTCPeerConnection} peer
  * @param {MediaStream} stream
@@ -99,14 +110,14 @@ export function isPeerAvailable(state: RTCPeerConnectionState): boolean {
 export function addTracks(peer: RTCPeerConnection, stream: MediaStream): void {
   let error: { label: string } = {};
   let hasError = false;
-  stream.getTracks().forEach((track: MediaStreamTrack) => {
+  for (const track: MediaStreamTrack of stream.getTracks()) {
     if (!hasError && track.enabled && track.readyState === MediaTrackStateEnum.LIVE) {
       peer.addTrack(track, stream);
     } else {
       hasError = true;
       error = { label: track.label };
     }
-  });
+  }
   if (error?.label) {
     throw new MediaTackException(`${error.label} is not ready to add`);
   }
@@ -119,45 +130,50 @@ export function addTracks(peer: RTCPeerConnection, stream: MediaStream): void {
  * @return void
  */
 export async function addCandidate(peer: RTCPeerConnection, candidate: IEventListenCandidate | RTCIceCandidate): Promise<void> {
-  if (peer?.remoteDescription && candidate.candidate) {
+  if (peer.remoteDescription !== null && candidate.candidate) {
     const cand = new RTCIceCandidate(candidate);
     await peer.addIceCandidate(cand);
   } else await peer.addIceCandidate({});
 }
 
 /**
- * Get RTC Statistics
- * @param {RTCPeerConnection} peer
- * @param {MediaStreamTrack | null} track
+ * Parse ICE Candidate
+ * @param {string} line
+ * @return RTCIceCandidate
  */
-export async function getRTCStats(
-  peer: RTCPeerConnection,
-  track?: MediaStreamTrack | null
-): Promise<{ activeCandidatePair: unknown; remoteCandidate: unknown }> {
-  const results = await peer.getStats(track);
-  let activeCandidatePair: unknown = null;
-  let remoteCandidate: unknown = null;
-  results.forEach((report: RTCTransportStats) => {
-    if (report.type === RtcStatsTypeEnum.TRANSPORT) {
-      activeCandidatePair = results.get(report.selectedCandidatePairId);
+export function parseCandidate(line): RTCIceCandidate {
+  const parts: string[] = line.indexOf('a=candidate:') === 0
+    ? line.substring(12).split(' ') as string[]
+    : line.substring(10).split(' ') as string[];
+
+  // @TODO fix interface type
+  const candidate: RTCIceCandidate & any = {
+    foundation: parts[0],
+    component: parts[1],
+    protocol: parts[2].toLowerCase(),
+    priority: parseInt(parts[3], 10),
+    ip: parts[4],
+    relatedAddress: null,
+    relatedPort: null,
+    tcpType: null,
+    port: parseInt(parts[5], 10),
+    type: parts[7]
+  };
+
+  for (let i: number = 8; i < parts.length; i += 2) {
+    switch (parts[i]) {
+      case 'raddr':
+        candidate.relatedAddress = parts[i + 1];
+        break;
+      case 'rport':
+        candidate.relatedPort = parseInt(parts[i + 1], 10);
+        break;
+      case 'tcptype':
+        candidate.tcpType = parts[i + 1];
+        break;
+      default:
+        break;
     }
-  });
-  if (!activeCandidatePair) {
-    results.forEach((report: RTCIceCandidatePairStats) => {
-      if (report.type === RtcStatsTypeEnum.CANDIDATE_PAIR && report.state === 'succeeded') {
-        activeCandidatePair = report;
-      }
-    });
   }
-  if (activeCandidatePair?.remoteCandidateId) {
-    results.forEach(report => {
-      if (report.type === RtcStatsTypeEnum.REMOTE_CANDIDATE && report.id === activeCandidatePair.remoteCandidateId) {
-        remoteCandidate = report;
-      }
-    });
-  }
-  return {
-    remoteCandidate,
-    activeCandidatePair
-  }
+  return candidate;
 }

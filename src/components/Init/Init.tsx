@@ -45,7 +45,7 @@ class Init extends React.Component<IUserProp, Partial<IUserState>> {
     !AppConfig.isMultiTabAllowed && preventOpener();
     if (this.state.isUserAgree === true) {
       const u = await getUserInfo();
-      console.info('1. Auth user', u);
+      console.log('[!] Auth user', u);
       if (u?.user !== null) {
         this.socket = getSocket();
       }

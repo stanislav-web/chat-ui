@@ -5,6 +5,9 @@ import { type SocketEmitType } from '@types/socket.type';
 import { type IEventEmitCandidate } from '@interfaces/socket/i.event-emit';
 import { type EventEmitEnum } from '@enums/event-emit.enum';
 import { MediaTackException } from '@exceptions/media-tack.exception';
+import { parseCandidate } from '@functions/webrtc.function';
+import { RtcConnectionStateEnum } from '@enums/rtc-connection-state.enum';
+import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
 
 /**
  * Event is sent on an RTCPeerConnection object after a new track has been added to an RTCRtpReceiver
@@ -16,26 +19,24 @@ import { MediaTackException } from '@exceptions/media-tack.exception';
  * @return void
  */
 export const onConnectionStateChange = (event: Event, peer: RTCPeerConnection): void => {
-  console.info('onConnectionStateChange', { event, peer });
   switch (peer.connectionState) {
-    case 'new':
-      console.info('PEER CONNECTION STATE', 'new');
-
+    case RtcConnectionStateEnum.NEW:
+      console.log('[!] PEER CONNECTION STATE: NEW', peer);
       break;
-    case 'connecting':
-      console.info('PEER CONNECTION STATE', 'connecting');
+    case RtcConnectionStateEnum.CONNECTING:
+      console.log('[!] PEER CONNECTION STATE: CONNECTING', peer);
       break;
-    case 'connected':
-      console.info('PEER CONNECTION STATE', 'connected');
+    case RtcConnectionStateEnum.CONNECTED:
+      console.log('[!] PEER CONNECTION STATE: CONNECTED', peer);
       break;
-    case 'disconnected':
-      console.info('PEER CONNECTION STATE', 'disconnected');
+    case RtcConnectionStateEnum.DISCONNECTED:
+      console.log('[!] PEER CONNECTION STATE: DISCONNECTED', peer);
       break;
-    case 'closed':
-      console.info('PEER CONNECTION STATE', 'closed');
+    case RtcConnectionStateEnum.CLOSED:
+      console.log('[!] PEER CONNECTION STATE: CLOSED', peer);
       break;
-    case 'failed':
-      console.info('PEER CONNECTION STATE', 'failed');
+    case RtcConnectionStateEnum.FAILED:
+      console.log('[!] PEER CONNECTION STATE: FAILED', peer);
       peer.restartIce();
       break;
     default:
@@ -71,28 +72,22 @@ export const onIceCandidateError = (error: RTCPeerConnectionIceErrorEvent): void
  */
 export function onSignalingStateChange(peer: RTCPeerConnection, event: Event): void {
   switch (peer.signalingState) {
-    case 'have-local-offer':
-      console.info('PEER SIGNAL STATE', peer.signalingState);
+    case RtcSignallingStateEnum.HAVE_LOCAL_OFFER:
       break;
-    case 'have-local-pranswer':
-      console.info('PEER SIGNAL STATE', peer.signalingState);
+    case RtcSignallingStateEnum.HAVE_LOCAL_ANSWER:
       break;
-    case 'have-remote-offer':
-      console.info('PEER SIGNAL STATE', peer.signalingState);
+    case RtcSignallingStateEnum.HAVE_REMOTE_OFFER:
       break;
-    case 'have-remote-pranswer':
-      console.info('PEER SIGNAL STATE', peer.signalingState);
+    case RtcSignallingStateEnum.HAVE_REMOTE_ANSWER:
       break;
-    case 'closed':
-      console.info('PEER SIGNAL STATE', peer.signalingState);
+    case RtcSignallingStateEnum.CLOSED:
       break;
-    case 'stable':
-      console.info('PEER SIGNAL STATE', peer.signalingState);
+    case RtcSignallingStateEnum.STABLE:
       break;
     default:
       break;
   }
-  console.log('onSignalingStateChange', { peer, event });
+  console.log(`[!] SIGNAL/CONNECTION STATE: ${peer.signalingState} / ${peer.connectionState}`, peer);
 }
 
 /**
@@ -103,10 +98,22 @@ export function onSignalingStateChange(peer: RTCPeerConnection, event: Event): v
  * @return void
  */
 export function onIceCandidate(socket: Socket, event: RTCPeerConnectionIceEvent, candidate: EventEmitEnum): void {
-  if (event.candidate) {
-    emit<SocketEmitType, IEventEmitCandidate>(socket, candidate, event.candidate);
+  const candidates = [];
+  if (event.candidate?.candidate.includes('srflx')) {
+    const cand = parseCandidate(event.candidate.candidate);
+    console.log('[!] CANDIDATE', cand);
+    if (!candidates[cand.relatedPort]) candidates[cand.relatedPort] = [];
+    candidates[cand.relatedPort].push(cand.port);
+    setTimeout(() => {
+      emit<SocketEmitType, IEventEmitCandidate>(socket, candidate, event.candidate);
+    }, 1000);
+  } else if (!event.candidate) {
+    if (Object.keys(candidates).length === 1) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const ports: any = candidates[Object.keys(candidates)[0]];
+      console.log(ports.length === 1 ? 'normal nat' : 'symmetric nat');
+    }
   }
-  console.log('onIceCandidate', event);
 }
 
 /**

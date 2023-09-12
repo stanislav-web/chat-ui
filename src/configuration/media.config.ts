@@ -8,7 +8,8 @@ export const MediaConfig: MediaConfigInterface = {
   video: {
     displaySurface: 'browser',
     facingMode: 'user',
-    frameRate: 30
+    frameRate: 30,
+    noiseSuppression: true
   },
   poster: 'assets/noise.gif',
   snapshot: {
@@ -23,7 +24,7 @@ export const MediaConfig: MediaConfigInterface = {
     containerId: 'local-video',
     containerWidth: 500,
     containerHeight: 500,
-    useNoise: true
+    useNoise: false
   },
   remote: {
     containerId: 'remote-video',
