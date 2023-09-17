@@ -1,9 +1,7 @@
-1. [] Media Devices
-   1. [] Use Default devices onload
-   2. [] Change device selection
-2. 
-3. 
-4. Disable execution of command (Preen Screen) from (IOS, Android)
-5. Configure buttons
-6. Encode streams https://github.com/webrtc/samples/blob/gh-pages/src/content/insertable-streams/endtoend-encryption/js/main.js
-7. Restart https://github.com/webrtc/samples/blob/gh-pages/src/content/peerconnection/restart-ice/js/main.js
+1. [v] Media Devices
+   1. [v] Use Default devices onload
+   2. [v] Change device selection
+2. [] Control buttons
+3. [] Encoding
+   1. [] Streams https://github.com/webrtc/samples/blob/gh-pages/src/content/insertable-streams/endtoend-encryption/js/main.js
+   2. [] WebSockets pack
