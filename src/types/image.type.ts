@@ -1,13 +1,26 @@
 /**
- * ImageType
+ * Image type
+ * @type {string|string|string}
+ * @const
  */
-export type ImageType = 'image/png' | 'image/jpeg' | 'image/webp';
-/**
- * ImageWidth
- */
-export type ImageWidth = number;
+type ImageType = 'image/png' | 'image/jpeg' | 'image/webp';
 
 /**
- * ImageHeight
+ * ImageWidth type
+ * @type {number}
+ * @const
  */
-export type ImageHeight = number;
+type ImageWidth = number;
+
+/**
+ * ImageHeight type
+ * @type {number}
+ * @const
+ */
+type ImageHeight = number;
+
+export type {
+  ImageType,
+  ImageHeight,
+  ImageWidth
+}

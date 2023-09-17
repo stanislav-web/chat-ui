@@ -1,8 +1,7 @@
-import { type Socket } from 'socket.io-client';
+import { type IBasePeerTransport } from '@interfaces/base/i.base-peer-transport';
 
 /**
  * IVideoProp interface
  */
-export interface IVideoChatProp {
-  readonly socket: Socket;
+export interface IVideoChatProp extends IBasePeerTransport {
 }

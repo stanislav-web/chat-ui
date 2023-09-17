@@ -1,5 +1,7 @@
 /**
  * Events emit enum
+ * @module enums
+ * @enum {string}
  */
 export enum EventEmitEnum {
   ONLINE = 'online',

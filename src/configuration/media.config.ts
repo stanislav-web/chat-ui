@@ -1,14 +1,14 @@
-import { type MediaConfigInterface } from '@interfaces/config/media-config.interface';
+import { type IMediaConfig } from '@interfaces/config/media-config.interface';
+import { v4 as uuid } from 'uuid';
 
-export const MediaConfig: MediaConfigInterface = {
+export const MediaConfig: IMediaConfig = {
   audio: {
     echoCancellation: true,
-    noiseSuppression: true
+    sampleSize: 16,
+    channelCount: 1
   },
   video: {
-    displaySurface: 'browser',
-    facingMode: 'user',
-    frameRate: 30
+    advanced: [{ frameRate: 30 }]
   },
   poster: 'assets/noise.gif',
   snapshot: {
@@ -20,15 +20,22 @@ export const MediaConfig: MediaConfigInterface = {
     height: 64
   },
   local: {
-    containerId: 'local-video',
-    containerWidth: 500,
-    containerHeight: 500,
-    useNoise: true
-  },
-  remote: {
-    containerId: 'remote-video',
+    containerId: uuid(),
     containerWidth: 500,
     containerHeight: 500,
     useNoise: false
+  },
+  remote: {
+    containerId: uuid(),
+    containerWidth: 500,
+    containerHeight: 500,
+    useNoise: false
+  },
+  control: {
+    videoSelectorId: uuid(),
+    audioSelectorId: uuid(),
+    callBtnId: uuid(),
+    breakBtnId: uuid(),
+    recallBtnId: uuid()
   }
 }

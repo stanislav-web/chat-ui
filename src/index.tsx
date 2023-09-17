@@ -1,37 +1,51 @@
 import './index.css';
+import adapter from 'webrtc-adapter';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { GlobalDebug } from '@functions/log.function';
 import { checkAuth } from '@functions/window.function';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ErrorBoundary, Init, Header, FooterWithSocialMediaIcons } from '@components/index';
-import { CookiesProvider } from 'react-cookie';
-import './utils';
 import './events/screen.event.ts';
 import NotFound from '@components/NotFound/NootFound';
 import { AppConfig } from '@configuration/app.config';
+import Agreement from '@components/Agreement/Agreement';
+import About from '@components/About/About';
+import Payments from '@components/Payments/Payments';
+import Rules from '@components/Rules/Rules';
+import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary';
+import Header from '@components/Header/Header';
+import FooterWithSocialMediaIcons from '@components/Footer/Footer';
+import Init from '@components/Init/Init';
+import { I18nextProvider } from 'react-i18next';
+import { i18n } from './utils';
+
+adapter.disableWarnings(AppConfig.isProduction)
+adapter.disableLog(AppConfig.isProduction)
 
 AppConfig.isProduction && GlobalDebug(false);
-
 checkAuth();
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
-
+const { index, about, agreement, rules, payments, notFound } = AppConfig.routes;
 const Index = (): React.JSX.Element =>
    <BrowserRouter>
     <Routes>
-        <Route path="/" element={<Init />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path={index} element={<Init />} />
+        <Route path={about} element={<About />} />
+        <Route path={agreement} element={<Agreement />} />
+        <Route path={rules} element={<Rules />} />
+        <Route path={payments} element={<Payments />} />
+        <Route path={notFound} element={<NotFound />} />
     </Routes>
   </BrowserRouter>
 ;
 
 root.render(
-    <CookiesProvider>
+    <I18nextProvider i18n={i18n}>
         <ErrorBoundary>
             <Header />
             <Index />
             <FooterWithSocialMediaIcons />
         </ErrorBoundary>
-    </CookiesProvider>
+    </I18nextProvider>
 );

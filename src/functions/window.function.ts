@@ -2,8 +2,10 @@ import { removeItem } from './localstorage.function';
 
 /**
  * Prevent double tab opener
+ * @module functions
+ * @return void
  */
-export function preventOpener(): void {
+export const preventOpener = (): void => {
   localStorage.o = Date.now();
   window.addEventListener('storage', (e: StorageEvent) => {
     if (e.key === 'o') {
@@ -23,7 +25,17 @@ export function preventOpener(): void {
  * @param {number} h
  * @return Window
  */
-export function openPopUp(url: string, title: string, w: number, h: number): Window {
+
+/**
+ * Custom popup
+ * @module functions
+ * @param {string} url
+ * @param {string} title
+ * @param {number} w
+ * @param {number} h
+ * @return Window
+ */
+export const openPopUp = (url: string, title: string, w: number, h: number): Window => {
   const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
   const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
   const width = window.innerWidth
@@ -50,8 +62,10 @@ export function openPopUp(url: string, title: string, w: number, h: number): Win
 
 /**
  * Check tab authentication
+ * @module functions
+ * @return void
  */
-export function checkAuth(): void {
+export const checkAuth = (): void => {
   const handler = function(event: StorageEvent): void {
     if (event.key === 'auth' && event.newValue === null) {
       window.removeEventListener('storage', handler, false)

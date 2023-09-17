@@ -2,19 +2,22 @@ import axios from 'axios';
 import VisitorAPI from 'visitorapi';
 import hash from 'object-hash';
 import { defaultScriptUrlPattern, load, type Region } from '@fingerprintjs/fingerprintjs-pro';
-import { replace } from '@utils/string.util';
+import { replace } from '@functions/string.function';
 import { type IUserBrowser } from '@interfaces/user/i.user-browser';
 import { type IUserFingerprint } from '@interfaces/user/i.user-fingerprint';
 import { type IUserResponse } from '@interfaces/user/i.user-response';
-import { type IUserAccountParams } from '@interfaces/user/i.user-account-params';
+import { type IUserRequest } from '@interfaces/user/i.user-request';
 import { UserFingerprintException } from '@exceptions/user-fingerprint.exception';
 import { UserBrowserException } from '@exceptions/user-browser.exception';
+import { AppConfig } from '@configuration/app.config';
+import { UserException } from '@exceptions/user.exception';
 
 /**
  * Get user browser
+ * @module functions
  * @return Promise<IUserBrowser>
  */
-export async function getUserBrowser(): Promise<IUserBrowser> {
+export const getUserBrowser = async (): Promise<IUserBrowser> => {
   try {
     const browserInfo = await VisitorAPI(process.env.REACT_APP_VISITOR_API_KEY as string) as IUserBrowser;
     const browserId = hash.MD5(browserInfo);
@@ -29,11 +32,12 @@ export async function getUserBrowser(): Promise<IUserBrowser> {
 
 /**
  * Get user fingerprint
+ * @module functions
  * @param {boolean} extendedResult
  * @param {string} linkedId
  * @return Promise<IUserFingerprint>
  */
-export async function getUserFingerprint(extendedResult: boolean = true, linkedId?: string): Promise<IUserFingerprint> {
+export const getUserFingerprint = async (extendedResult: boolean = true, linkedId?: string): Promise<IUserFingerprint> => {
   const options = {
     apiKey: process.env.REACT_APP_FINGERPRINT_JS_PUBLIC_KEY as string,
     region: process.env.REACT_APP_FINGERPRINT_JS_REGION as Region,
@@ -46,7 +50,7 @@ export async function getUserFingerprint(extendedResult: boolean = true, linkedI
     return await load(options).then(fp => fp.get({
       extendedResult,
       linkedId,
-      debug: process.env.REACT_APP_DEBUG === 'true',
+      debug: AppConfig.debug,
       products: ['identification', 'botd']
     }))
   } catch (e) {
@@ -56,14 +60,15 @@ export async function getUserFingerprint(extendedResult: boolean = true, linkedI
 
 /**
  * Get user account info
- * @param {IUserAccountParams} payload
+ * @module functions
+ * @param {IUserRequest} payload
+ * @throws UserException
  * @return Promise<UserResponseType | null>
  */
-export async function getUserAccount(payload: IUserAccountParams): Promise<IUserResponse | null> {
+export const getUserAccount = async (payload: IUserRequest): Promise<IUserResponse | null> => {
   try {
-    return await axios.post('/user', payload);
-  } catch (error: any) {
-    console.log('User error', error);
-    return null;
+    return await axios.post(process.env.REACT_APP_HTTP_USER_PATH, payload);
+  } catch (error: Error) {
+    throw new UserException(error.name, error.message)
   }
 }

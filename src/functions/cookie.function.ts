@@ -1,4 +1,9 @@
-export function isCookiesEnabled(): boolean {
+/**
+ * Check if cookie is supported
+ * @module functions
+ * @return boolean
+ */
+export const isCookiesSupported = (): boolean => {
   try {
     document.cookie = 'test=1';
     const cookiesEnabled = document.cookie.includes('test=');

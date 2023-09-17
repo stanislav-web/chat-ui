@@ -1,9 +1,18 @@
 /**
- * SocketEmitType
+ * SocketEmit type
+ * @type {string|string|string|string|string}
+ * @const
  */
-export type SocketEmitType = 'online' | 'mute' | 'offer' | 'answer' | 'candidate';
+ type SocketEmitType = 'online' | 'mute' | 'offer' | 'answer' | 'candidate';
 
 /**
- * SocketListenType
+ * SocketListen type
+ * @type {SocketEmitType|string|string}
+ * @const
  */
-export type SocketListenType = SocketEmitType | 'ban' | 'exception';
+ type SocketListenType = SocketEmitType | 'ban' | 'exception';
+
+export type {
+  SocketEmitType,
+  SocketListenType
+}

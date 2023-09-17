@@ -1,15 +1,30 @@
 /**
+ * Check if localStorage is supported
+ * @module functions
+ * @return boolean
+ */
+export const isLocalStorageSupported = (): boolean => {
+  try {
+    return 'localStorage' in window && window.localStorage !== null;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * Save an item to localStorage
+ * @module functions
  * @param {string} key
- * @param {object} value
+ * @param {object | string | number | boolean} value
  * @return void
  */
-export function setItem(key: string, value: object | string | number | boolean): void {
+export const setItem = <T>(key: T, value: object | string | number | boolean): void => {
   localStorage.setItem(key, JSON.stringify({ value }));
 }
 
 /**
  * Get an item from localStorage
+ * @module functions
  * @param {string} key
  * @return any
  */
@@ -28,9 +43,10 @@ export function getItem<T>(key: string): T | string | null {
 
 /**
  * Remove an item from localStorage
+ * @module functions
  * @param {string} key
  * @return void
  */
-export function removeItem(key: string): void {
+export const removeItem = (key: string): void => {
   localStorage.removeItem(key);
 }

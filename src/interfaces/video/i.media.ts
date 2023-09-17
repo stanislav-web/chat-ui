@@ -2,7 +2,7 @@ import { type Socket } from 'socket.io-client';
 import { type IESnapshot } from '@interfaces/video/i.snapshot';
 
 export interface IOnLoadedVideoMetadata {
-  videoEl: HTMLVideoElement;
+  videoElement: HTMLVideoElement;
 }
 
 export interface IOnPlayEvent extends IOnLoadedVideoMetadata {
