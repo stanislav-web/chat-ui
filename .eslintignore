@@ -1,4 +1,5 @@
 dist
 node_modules
 public
-src/declarations/visitorapi.d.ts
+src/declarations/*
+test.js

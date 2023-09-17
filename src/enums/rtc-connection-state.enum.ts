@@ -1,5 +1,7 @@
 /**
- * RtcConnectionStateEnum
+ * RTC connections states
+ * @module enums
+ * @enum {string}
  */
 export enum RtcConnectionStateEnum {
   NEW = 'new',

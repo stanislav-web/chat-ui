@@ -1,9 +1,23 @@
-video.local {
+.video-local {
     display: inline-block;
     padding: 1rem 1rem;
     vertical-align: middle;
-    background: black;
-    margin: 1rem 1rem;
     height: 100%;
     width: 100%;
 }
+
+.video-local video {
+    height: 480px;
+    width: 640px;
+}
+
+.video-local-container {
+
+}
+
+
+
+.video-local-control {
+
+}
+

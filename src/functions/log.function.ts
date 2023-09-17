@@ -1,4 +1,11 @@
 /* eslint-disable */
+
+/**
+ * GlobalDebug
+ * @module functions
+ * @param {function} anonymous
+ * @return void
+ */
 export const GlobalDebug = (function () {
   const savedConsole = console;
   /**

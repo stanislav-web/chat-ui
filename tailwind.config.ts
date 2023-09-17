@@ -40,6 +40,9 @@ export default {
   plugins: [
     require('flowbite/plugin'),
     require('@tailwindcss/aspect-ratio'),
-    require('@tailwindcss/typography')
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms')({
+      strategy: 'class'
+    })
   ]
 };

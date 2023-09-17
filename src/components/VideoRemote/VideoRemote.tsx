@@ -1,11 +1,16 @@
 import React from 'react';
 import './VideoRemote.css';
 import { MediaConfig } from '@configuration/media.config';
-import { type IVideoProp } from '@interfaces/peer/i.video-prop';
-import { type IPeerState } from '@interfaces/peer/i.peer-state';
-import { addCandidate, createPeerAnswer, createPeerConnection, isPeerSignalStable } from '@functions/webrtc.function';
+import { addCandidate, createPeerAnswer, createPeerConnection, isPeerAvailable } from '@functions/webrtc.function';
 import { notifyError } from '@functions/notification.function';
-import { onConnectionStateChange, onDataChannel, onIceCandidate, onIceCandidateError, onSignalingStateChange, onTrack } from '@events/peer.event';
+import {
+  onConnectionStateChange,
+  onDataChannel,
+  onIceCandidateError,
+  onRemoteIceCandidate,
+  onSignalingStateChange,
+  onTrack
+} from '@events/peer.event';
 import { emit, on } from '@functions/socket.function';
 import { type SocketEmitType, type SocketListenType } from '@types/socket.type';
 import { type IEventEmitAnswer } from '@interfaces/socket/i.event-emit';
@@ -13,10 +18,12 @@ import { EventEmitEnum } from '@enums/event-emit.enum';
 import { type IEventListenCandidate, type IEventListenOffer } from '@interfaces/socket/i.event-listen';
 import { EventListenEnum } from '@enums/event-listen.enum';
 import { PeerException } from '@exceptions/peer.exception';
-// eslint-disable-next-line import/no-unresolved
 import { onLoadedVideoMetadata, onResizeVideo } from '@events/media.event';
+import { type IVideoProp } from '@interfaces/peer/i.video-prop';
+import { type IVideoRemoteState } from '@interfaces/peer/i.video-remote-state';
+import VideoControlRemote from '@components/VideoRemote/VideoCotrolRemote/VideoControlRemote';
 
-class VideoRemote extends React.Component<IVideoProp, IPeerState> {
+class VideoRemote extends React.Component<IVideoProp, IVideoRemoteState> {
   private readonly containerId: string = MediaConfig.remote.containerId;
   private readonly useNoise: boolean = MediaConfig.remote.useNoise;
   private readonly poster: string = MediaConfig.poster ?? '';
@@ -28,7 +35,10 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
   constructor(props: IVideoProp) {
     super(props);
     this.state = {
-      devices: []
+      video: null,
+      peer: null,
+      stream: null,
+      socket: null
     };
   }
 
@@ -37,16 +47,22 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
    * @return void
    */
   componentDidMount(): void {
-    const videoEl = document.getElementById(this.containerId) as HTMLVideoElement;
-    if (!videoEl) {
+    const videoElement = document.getElementById(this.containerId) as HTMLVideoElement;
+    if (!videoElement) {
       notifyError('Local Video', 'Local video is unavailable')
     } else {
       const { socket } = this.props;
 
-      videoEl.onloadedmetadata = (event: Event) => { onLoadedVideoMetadata({ videoEl }); };
-      videoEl.onresize = (event: Event) => { onResizeVideo({ videoEl }); };
-
+      // eslint-disable-next-line no-unused-vars
+      videoElement.onloadedmetadata = (event: Event) => { onLoadedVideoMetadata({ videoElement }); };
+      // eslint-disable-next-line no-unused-vars
+      videoElement.onresize = (event: Event) => { onResizeVideo({ videoElement }); };
       const remotePeer = createPeerConnection();
+      this.setState({
+        remoteVideoElement: videoElement,
+        remotePeer
+      });
+
       remotePeer.onconnectionstatechange = (event: Event) => {
         onConnectionStateChange(event, remotePeer);
       };
@@ -60,24 +76,18 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
         onIceCandidateError(error);
       }
       remotePeer.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-        onIceCandidate(socket, event, EventEmitEnum.CANDIDATE);
+        onRemoteIceCandidate(socket, event, EventEmitEnum.CANDIDATE);
       };
       remotePeer.ontrack = (event: RTCTrackEvent) => {
-        onTrack(videoEl, event);
+        onTrack(videoElement, event);
       }
 
       on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.OFFER, async (event: IEventListenOffer) => {
-        try {
-          await remotePeer.setRemoteDescription(event);
-          if (event.type === EventListenEnum.OFFER && !isPeerSignalStable(remotePeer)) {
-            const answer = await createPeerAnswer(remotePeer);
-            console.log('[!] REMOTE: Peer answer', answer);
-            setTimeout(() => {
-              if (answer) emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, answer);
-            }, 1000);
-          }
-        } catch (error) {
-          throw new PeerException(error.message, error);
+        if (event.type === EventListenEnum.OFFER && isPeerAvailable(remotePeer.connectionState)) {
+          await Promise.all([
+            remotePeer.setRemoteDescription(new RTCSessionDescription(event)),
+            createPeerAnswer(remotePeer)
+          ]).then(() => { emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, remotePeer.localDescription); });
         }
       });
       on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.CANDIDATE, async (event: IEventListenCandidate) => {
@@ -91,13 +101,20 @@ class VideoRemote extends React.Component<IVideoProp, IPeerState> {
   }
 
   render(): React.JSX.Element {
+    const { peer, stream, video, socket } = this.state;
+
     return (
-        <>
-            <video id={this.containerId} className="remote" autoPlay playsInline poster={this.poster}/>
+        <div className="video-remote">
+          <div className="video-remote-container">
+            <video id={this.containerId} disablePictureInPicture autoPlay playsInline poster={this.poster}/>
             {this.useNoise &&
                 <canvas className="noise"/>
             }
-        </>
+          </div>
+          <div className="video-remote-control">
+            <VideoControlRemote socket={socket} peer={peer} stream={stream} video={video} />
+          </div>
+        </div>
     )
   }
 }

@@ -1,4 +1,4 @@
-import { captureStream, getUserMediaDevices } from '@functions/media.function';
+import { captureStream, getUserDevices } from '@functions/media.function';
 import { notifyError } from '@functions/notification.function';
 import { type IOnLoadedVideoMetadata, type IOnPlayEvent, type IOnVolumeChange } from '@interfaces/video/i.media';
 import { emitVolatile } from '@functions/socket.function';
@@ -11,11 +11,10 @@ import { type MediaDevicesTypes } from '@types/media.type';
 /**
  * Event is fired when device has changed
  * @param {MediaDevicesTypes} type
- * @param {Event} event
  * @return void
  */
-export const onDeviceChange = (type: MediaDevicesTypes, event: Event): void => {
-  const deviceList = getUserMediaDevices(type);
+export const onDeviceChange = (type: MediaDevicesTypes): void => {
+  const deviceList = getUserDevices(type);
   console.info('onDeviceChange', deviceList);
 }
 
@@ -25,21 +24,20 @@ export const onDeviceChange = (type: MediaDevicesTypes, event: Event): void => {
  * @return void
  */
 export const onLoadedVideoMetadata = (params: IOnLoadedVideoMetadata): void => {
-  params.videoEl.play().then().catch((error) => { notifyError('Video', error.toString()); })
+  params.videoElement.play().then().catch((error) => { notifyError('Video', error.toString()); })
 }
 
 /**
  * Event is fired when resize video
- * @param {IOnLoadedVideoMetadata} params
+ * @param {HTMLVideoElement} videoElement
  * @return void
  */
-export const onResizeVideo = (params: IOnLoadedVideoMetadata): void => {
-  const { videoEl } = params;
-  const w = videoEl.videoWidth;
-  const h = videoEl.videoHeight;
+export const onResizeVideo = (videoElement: HTMLVideoElement): void => {
+  const w = videoElement.videoWidth;
+  const h = videoElement.videoHeight;
   if (w && h) {
-    videoEl.style.width = `${w}px`;
-    videoEl.style.height = `${h}px`;
+    videoElement.style.width = `${w}px`;
+    videoElement.style.height = `${h}px`;
   }
 }
 
@@ -50,7 +48,7 @@ export const onResizeVideo = (params: IOnLoadedVideoMetadata): void => {
  */
 export const onPlay = (params: IOnPlayEvent): void => {
   const {
-    videoEl,
+    videoElement,
     snapshot,
     stream,
     socket
@@ -60,10 +58,8 @@ export const onPlay = (params: IOnPlayEvent): void => {
     const videoTrack = stream.getVideoTracks()[0];
     setInterval(() => {
       const photo = captureStream(
-        videoEl,
-        snapshot,
-        stream,
-        videoTrack
+        videoElement,
+        snapshot
       );
       if (photo) {
         emitVolatile<SocketEmitType, IEventEmitOnline>(socket, EventEmitEnum.ONLINE, {
@@ -84,13 +80,13 @@ export const onPlay = (params: IOnPlayEvent): void => {
  */
 export const onVolumeChange = (params: IOnVolumeChange): void => {
   console.info('onVolumeChange', params);
-  const { stream, videoEl, socket } = params;
+  const { stream, socket } = params;
   const videoTrack = stream.getVideoTracks()[0];
 
   if (videoTrack.readyState === 'live') {
     emitVolatile<SocketEmitType, IEventMute>(socket, EventEmitEnum.MUTE, {
       deviceId: videoTrack.id,
-      isMute: videoEl.muted && videoTrack.muted
+      isMute: videoTrack.muted
     })
   }
 }

@@ -1,0 +1,7 @@
+{
+  "Authorization": "Authorization",
+  "Not authorized": "You are not authorized yet",
+  "Ban": "Ban",
+  "Banned": "You have been banned",
+  "LocalVideoUnavailable": "Local video is unavailable"
+}

@@ -1,5 +1,3 @@
-import DetectRTC from 'detectrtc';
-import { type IUserPeerInfo } from '@interfaces/user/i.user-peer-info';
 import { WebrtcConfig } from '@configuration/webrtc.config';
 import { PeerException } from '@exceptions/peer.exception';
 import { RtcConnectionStateEnum } from '@enums/rtc-connection-state.enum';
@@ -9,34 +7,12 @@ import { MediaTackException } from '@exceptions/media-tack.exception';
 import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
 
 /**
- * Get peer info
- */
-export function getPeerInfo(): IUserPeerInfo {
-  return {
-    isWebRTCSupported: DetectRTC.isWebRTCSupported,
-    isMobileDevice: DetectRTC.isMobileDevice,
-    isWebSocketsBlocked: DetectRTC.isWebSocketsBlocked,
-    isWebSocketsSupported: DetectRTC.isWebSocketsSupported,
-    hasMicrophone: DetectRTC.hasMicrophone,
-    hasSpeakers: DetectRTC.hasSpeakers,
-    hasWebcam: DetectRTC.hasWebcam,
-    detectRTCVersion: DetectRTC.version,
-    osName: DetectRTC.osName,
-    osVersion: DetectRTC.osVersion,
-    browserName: DetectRTC.browser.name,
-    browserVersion: DetectRTC.browser.version
-  }
-}
-
-/**
- * Get peer connection
- * @param {MediaStream} stream
+ * Create peer connection
  * @return Promise<RTCPeerConnection>
  */
-export function createPeerConnection(stream?: MediaStream): RTCPeerConnection {
-  const peer = new RTCPeerConnection(WebrtcConfig);
-  if (stream) addTracks(peer, stream);
-  return peer;
+export function createPeerConnection(): RTCPeerConnection {
+  console.log('[!] CONFIGURATION:', WebrtcConfig);
+  return new RTCPeerConnection(WebrtcConfig);
 }
 
 /**
@@ -45,16 +21,18 @@ export function createPeerConnection(stream?: MediaStream): RTCPeerConnection {
  * @throws PeerException
  * return Promise<RTCSessionDescriptionInit> | null
  */
-export async function createPeerOffer(localConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> | null {
+export async function createPeerOffer(localConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> {
   try {
     const offer = await localConnection.createOffer({
       iceRestart: true,
       offerToReceiveAudio: true,
       offerToReceiveVideo: true
     });
-    if (!isPeerSignalStable(localConnection)) return null;
-    await localConnection.setLocalDescription(offer);
-    return localConnection.localDescription;
+    console.log('[!] -> LOCAL: Peer offer', offer);
+    if (!isPeerConnected(localConnection)) {
+      await localConnection.setLocalDescription(offer);
+    }
+    return offer;
   } catch (error) {
     throw new PeerException(error.message, error);
   }
@@ -75,10 +53,29 @@ export async function createPeerAnswer(remoteConnection: RTCPeerConnection): Pro
     });
     if (isPeerSignalStable(remoteConnection)) return null;
     await remoteConnection.setLocalDescription(answer);
-    return remoteConnection.localDescription;
+    console.log('[!] <- REMOTE: Peer answer', answer);
+    return answer;
   } catch (error) {
     throw new PeerException(error.message, error);
   }
+}
+
+/**
+ * Is Peer connected
+ * @param {RTCPeerConnection} peer
+ * @return boolean
+ */
+export function isPeerConnected(peer: RTCPeerConnection): boolean {
+  return peer.connectionState === RtcConnectionStateEnum.CONNECTED;
+}
+
+/**
+ * Is Peer New
+ * @param {RTCPeerConnection} peer
+ * @return boolean
+ */
+export function isPeerNew(peer: RTCPeerConnection): boolean {
+  return peer.connectionState === RtcConnectionStateEnum.NEW;
 }
 
 /**
@@ -93,44 +90,53 @@ export function isPeerAvailable(state: RTCPeerConnectionState): boolean {
 
 /**
  * Is Peer signal stable
- * @param {RTCPeerConnection} connection
+ * @param {RTCPeerConnection} peer
  * @return boolean
  */
-export function isPeerSignalStable(connection: RTCPeerConnection): boolean {
-  return RtcSignallingStateEnum.STABLE === connection.signalingState;
+export function isPeerSignalStable(peer: RTCPeerConnection): boolean {
+  return RtcSignallingStateEnum.STABLE === peer.signalingState;
 }
 
 /**
  * Add tracks to peer
  * @param {RTCPeerConnection} peer
  * @param {MediaStream} stream
+ * @param {boolean} replace
  * @throws MediaTackException
  * @return void
  */
-export function addTracks(peer: RTCPeerConnection, stream: MediaStream): void {
+export function addMediaTracks(peer: RTCPeerConnection, stream: MediaStream, replace: boolean = false): void {
   let error: { label: string } = {};
   let hasError = false;
-  for (const track: MediaStreamTrack of stream.getTracks()) {
+  stream.getTracks().forEach((track: MediaStreamTrack) => {
     if (!hasError && track.enabled && track.readyState === MediaTrackStateEnum.LIVE) {
-      peer.addTrack(track, stream);
+      if (replace) {
+        const sender = peer
+          .getSenders()
+          .find((s) => s.track.kind === track.kind);
+        sender.replaceTrack(track).then();
+      } else {
+        peer.addTrack(track, stream);
+      }
     } else {
       hasError = true;
       error = { label: track.label };
     }
-  }
+  });
   if (error?.label) {
     throw new MediaTackException(`${error.label} is not ready to add`);
   }
 }
 
 /**
+ *
  * Add candidate to peer
  * @param {RTCPeerConnection} peer
  * @param {IEventListenCandidate | RTCIceCandidate} candidate
  * @return void
  */
 export async function addCandidate(peer: RTCPeerConnection, candidate: IEventListenCandidate | RTCIceCandidate): Promise<void> {
-  if (peer.remoteDescription !== null && candidate.candidate) {
+  if (peer?.remoteDescription && candidate.candidate) {
     const cand = new RTCIceCandidate(candidate);
     await peer.addIceCandidate(cand);
   } else await peer.addIceCandidate({});
@@ -150,7 +156,7 @@ export function parseCandidate(line): RTCIceCandidate {
   const candidate: RTCIceCandidate & any = {
     foundation: parts[0],
     component: parts[1],
-    protocol: parts[2].toLowerCase(),
+    protocol: parts[2]?.toLowerCase(),
     priority: parseInt(parts[3], 10),
     ip: parts[4],
     relatedAddress: null,

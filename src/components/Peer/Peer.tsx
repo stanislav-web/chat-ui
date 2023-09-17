@@ -2,13 +2,19 @@ import React from 'react';
 import './Peer.css';
 import VideoRemote from '@components/VideoRemote/VideoRemote';
 import VideoLocal from '@components/VideoLocal/VideoLocal';
-import VideoControl from '@components/VideoControl/VideoControl';
-import VideoChat from '@components/VideoChat/VideoChat';
-import { type IPeerProp } from '@interfaces/peer/i.peer-prop';
-import { notifyError } from '@functions/notification.function';
-import { getUserMediaDevices } from '@functions/media.function';
-import { type IPeerState } from '@interfaces/peer/i.peer-state';
+import { type IPeerProp } from '@interfaces/component/peer/i.peer-prop';
+import { notifyError, notifyInfo, notifySuccess } from '@functions/notification.function';
+import { type IPeerState } from '@interfaces/component/peer/i.peer-state';
+import { getSocketInstance } from '@functions/socket.function';
+import { type Socket } from 'socket.io-client';
+import { type IException } from '@interfaces/socket/i.exception';
+import { withTranslation } from 'react-i18next';
 
+/**
+ * Peer app class
+ * @module components
+ * @extends React.Component<IPeerProp, IPeerState>
+ */
 class Peer extends React.Component<IPeerProp, IPeerState> {
   /**
      * Constructor
@@ -17,7 +23,7 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
   constructor(props: IPeerProp) {
     super(props);
     this.state = {
-      devices: []
+      socket: null
     };
   }
 
@@ -25,41 +31,56 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
    * On component render
    * @return Promise<void>
    */
-  async componentDidMount(): Promise<void> {
-    if (!this.props.socket?.connected) {
-      this.props.socket?.connect();
-      try {
-        const devices = await getUserMediaDevices(null);
-        this.setState({
-          devices,
-          isReady: this.props.socket.connected
-        })
-        console.log('[!] Socket connected: ', this.props.socket.connected);
-      } catch (error) {
-        notifyError('Media', error?.message)
-      }
-    } else notifyError('WebSocket', 'Cannot connected to Socket')
+  componentDidMount(): void {
+    const socket: Socket = getSocketInstance();
+    if (!socket.connected) socket.connect();
+    socket.on('connect', (): void => {
+      notifySuccess(this.props.t('Connected', {
+        ns: 'Base'
+      }), this.props.t('Welcome', {
+        ns: 'Base'
+      }), 2000);
+    });
+    socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
+      console.log('[!] Socket disconnected: ', socket.disconnected)
+      notifyInfo(this.props.t('Disconnected', {
+        ns: 'Base'
+      }), reason, 2000);
+    });
+    socket.on('connect_error', (error: Error): void => {
+      console.log('[!] Socket connect error:', { error })
+      notifyError(this.props.t('Disconnected', {
+        ns: 'Base'
+      }), error.message, 2000);
+    });
+    socket.on('exception', (data: IException): void => {
+      console.log('[!] Socket exception:', { data })
+      notifyError(this.props.t('Exception', {
+        ns: 'Exceptions'
+      }), this.props.t(data.message, {
+        ns: 'Exceptions'
+      }), 2000);
+    });
+    this.setState({
+      socket
+    });
   }
 
   render(): React.JSX.Element {
-    const { socket } = this.props;
-    const { devices } = this.state;
-
+    const { socket } = this.state;
+    const { stream } = this.props;
     return (
         <div className="peer-container">
-          <div className="peer-output">
-            <VideoRemote socket={socket} />
-            <VideoLocal socket={socket} />
-          </div>
-          <div className="peer-control">
-            <VideoControl socket={socket} devices={devices}/>
-          </div>
-          <div className="peer-chat">
-            <VideoChat socket={socket} />
-          </div>
+            {stream && socket.connected
+              ? <div className="peer-output">
+                  <VideoLocal socket={socket} stream={stream}/>
+                  <VideoRemote socket={socket} />
+                </div>
+              : <div className="peer-error">TODO: Error connection</div>
+            }
         </div>
     )
   }
 }
 
-export default Peer;
+export default withTranslation(['Base', 'Exceptions'])(Peer);

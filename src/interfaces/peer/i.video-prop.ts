@@ -1,8 +1,9 @@
-import { type Socket } from 'socket.io-client';
+import { type IBasePeerTransport } from '@interfaces/base/i.base-peer-transport';
+import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
 
 /**
  * IVideoProp interface
  */
-export interface IVideoProp {
-  readonly socket: Socket;
+export interface IVideoProp extends IBasePeerTransport, IBasePeerSteam {
+
 }

@@ -1,9 +1,18 @@
 /**
  * Authorization providers types
+ * @type {string}
+ * @const
  */
-export type AuthProviderType = 'google' | 'facebook' | 'vk' | 'twitter' | 'apple' | 'github' | 'linkedin';
+ type AuthProviderType = 'google' | 'facebook' | 'vk' | 'twitter' | 'apple' | 'github' | 'linkedin';
 
 /**
  * Authorization providers types
+ * @type {string}
+ * @const
  */
-export type AuthProviderPath = '/auth/google' | '/auth/facebook' | '/auth/vk' | '/auth/twitter' | '/auth/apple' | '/auth/github' | '/auth/linkedin';
+ type AuthProviderPath = '/auth/google' | '/auth/facebook' | '/auth/vk' | '/auth/twitter' | '/auth/apple' | '/auth/github' | '/auth/linkedin';
+
+export type {
+  AuthProviderType,
+  AuthProviderPath
+}

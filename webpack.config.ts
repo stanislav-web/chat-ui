@@ -77,8 +77,8 @@ const config: webpack.Configuration = {
     ]
   },
   performance: {
-    maxAssetSize: 20550000,
-    maxEntrypointSize: 20550000,
+    maxAssetSize: 50550000,
+    maxEntrypointSize: 50550000,
     hints: 'error',
     assetFilter: function(assetFilename) {
       return !assetFilename.endsWith('.png') && !assetFilename.endsWith('.gif');

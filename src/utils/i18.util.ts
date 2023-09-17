@@ -1,9 +1,11 @@
 import i18n, { type PluginOptions } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector, { type DetectorOptions } from 'i18next-browser-languagedetector';
-import translationEN from '@locales/en.json';
-import translationRU from '@locales/ru.json';
-import translationUA from '@locales/ua.json';
+
+import * as translationEN from '@locales/en';
+import * as translationRU from '@locales/ru';
+import * as translationUA from '@locales/ua';
+
 import {
   type InitOptions
 } from 'i18next/typescript/options';
@@ -21,25 +23,18 @@ const intiOptions = {
   debug: AppConfig.debug,
   fallbackLng: AppConfig.defaultLanguage,
   resources: {
-    en: {
-      translation: translationEN
-    },
-    ru: {
-      translation: translationRU
-    },
-    ua: {
-      translation: translationUA
-    }
+    en: translationEN,
+    ru: translationRU,
+    ua: translationUA
   },
   cleanCode: true,
-  ns: 'locales',
-  saveMissing: AppConfig.environment !== 'production',
-  returnDetails: AppConfig.environment !== 'production',
+  defaultNS: 'Base',
+  keySeparator: '.',
   interpolation: {
     escapeValue: false
   },
   react: {
-    nsMode: 'default'
+    useSuspense: true
   },
   detection: detectionOptions
 } as InitOptions & PluginOptions<any>;
@@ -47,6 +42,6 @@ const intiOptions = {
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
-  .init(intiOptions).then();
+  .init(intiOptions);
 
 export default i18n;

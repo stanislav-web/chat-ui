@@ -1,5 +1,7 @@
 /**
- * RtcConnectionStateEnum
+ * RTC signals states
+ * @module enums
+ * @enum {string}
  */
 export enum RtcSignallingStateEnum {
   HAVE_LOCAL_OFFER = 'have-local-offer',

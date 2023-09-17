@@ -1,14 +1,16 @@
 .peer-container {
-
+    width: 100%;
+    display: flex;
+    align-content: center;
+    flex-wrap: nowrap;
+    flex-direction: column-reverse;
+    justify-content: space-between;
 }
 .peer-output {
     margin: 0 auto;
-    padding: 2rem 2rem;
-    text-align: center;
     display: flex;
     max-width: fit-content;
-    height: 545px;
-    flex-direction: row;
+    flex-direction: row-reverse;
 }
 
 .peer-control {
@@ -18,6 +20,9 @@
     display: flex;
 }
 
+.peer-error {
+
+}
 .peer-chat  {
 
 }

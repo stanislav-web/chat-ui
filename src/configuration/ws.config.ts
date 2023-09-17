@@ -4,10 +4,11 @@ import * as MsgParser from 'socket.io-msgpack-parser';
 import { AppConfig } from '@configuration/app.config';
 
 export const WsConfig: Partial<ManagerOptions & SocketOptions> = {
-  transports: ['websocket'],
+  transports: ['websocket', 'polling', 'webtransport'],
   forceNew: true,
   autoConnect: false,
   reconnection: true,
+  ackTimeout: 10000,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 3000,
   requestTimeout: 10000,

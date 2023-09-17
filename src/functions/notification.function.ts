@@ -2,12 +2,13 @@ import Swal from 'sweetalert2';
 
 /**
  * Success notification
+ * @module functions
  * @param {string} title
  * @param {any} message
  * @param {number} timer
  * @param {boolean} confirmation
  */
-export function notifySuccess(title: string, message: any, timer?: number, confirmation?: boolean): void {
+export const notifySuccess = (title: string, message: any, timer?: number, confirmation?: boolean): void => {
   Swal.fire({
     icon: 'success',
     title,
@@ -22,12 +23,13 @@ export function notifySuccess(title: string, message: any, timer?: number, confi
 
 /**
  * Error notification
+ * @module functions
  * @param {string} title
  * @param {string} message
  * @param {number} timer
  * @param {boolean} confirmation
  */
-export function notifyError(title: string, message: any, timer?: number, confirmation?: boolean): void {
+export const notifyError = (title: string, message: any, timer?: number, confirmation?: boolean): void => {
   Swal.fire({
     icon: 'error',
     title,
@@ -42,12 +44,13 @@ export function notifyError(title: string, message: any, timer?: number, confirm
 
 /**
  * Error notification
+ * @module functions
  * @param {string} title
  * @param {string} message
  * @param {number} timer
  * @param {boolean} confirmation
  */
-export function notifyInfo(title: string, message: any, timer?: number, confirmation?: boolean): void {
+export const notifyInfo = (title: string, message: any, timer?: number, confirmation?: boolean): void => {
   Swal.fire({
     icon: 'info',
     title,
@@ -61,10 +64,11 @@ export function notifyInfo(title: string, message: any, timer?: number, confirma
 }
 
 /**
-     * Escape message
-     * @param {any} message
-     * @private
-     */
+ * Escape message
+ * @module functions
+ * @param {any} message
+ * @private
+ */
 function escapeMessage(message: any): string {
   return typeof message !== 'string' ? JSON.stringify(message) : message;
 }

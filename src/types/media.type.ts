@@ -1,9 +1,10 @@
 /**
- * MediaTypeError
+ * MediaTypeError type
+ * @type {string|string|string}
+ * @const
  */
-export type MediaDevicesTypes = 'audioinput' | 'videoinput';
+ type MediaDevicesTypes = Pick<MediaDeviceKind, 'audioinput' | 'videoinput' | 'audiooutput'>;
 
-/**
- * MediaTypeError
- */
-export type MediaTypeError = OverconstrainedError | TypeError | Error;
+export type {
+  MediaDevicesTypes
+}

@@ -70,6 +70,7 @@ export const onIceCandidateError = (error: RTCPeerConnectionIceErrorEvent): void
  * @param {Event} event
  * @return void
  */
+// eslint-disable-next-line no-unused-vars
 export function onSignalingStateChange(peer: RTCPeerConnection, event: Event): void {
   switch (peer.signalingState) {
     case RtcSignallingStateEnum.HAVE_LOCAL_OFFER:
@@ -87,32 +88,36 @@ export function onSignalingStateChange(peer: RTCPeerConnection, event: Event): v
     default:
       break;
   }
-  console.log(`[!] SIGNAL/CONNECTION STATE: ${peer.signalingState} / ${peer.connectionState}`, peer);
+  console.log(`[!] SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`, peer);
 }
 
 /**
- * RTC ice candidate handler
+ * RTC local ice candidates handler
  * @param {Socket} socket
  * @param {RTCPeerConnectionIceEvent} event
  * @param {EventEmitEnum} candidate
  * @return void
  */
-export function onIceCandidate(socket: Socket, event: RTCPeerConnectionIceEvent, candidate: EventEmitEnum): void {
-  const candidates = [];
-  if (event.candidate?.candidate.includes('srflx')) {
+export function onLocalIceCandidate(socket: Socket, event: RTCPeerConnectionIceEvent, candidate: EventEmitEnum): void {
+  if (event.candidate) {
     const cand = parseCandidate(event.candidate.candidate);
-    console.log('[!] CANDIDATE', cand);
-    if (!candidates[cand.relatedPort]) candidates[cand.relatedPort] = [];
-    candidates[cand.relatedPort].push(cand.port);
-    setTimeout(() => {
-      emit<SocketEmitType, IEventEmitCandidate>(socket, candidate, event.candidate);
-    }, 1000);
-  } else if (!event.candidate) {
-    if (Object.keys(candidates).length === 1) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const ports: any = candidates[Object.keys(candidates)[0]];
-      console.log(ports.length === 1 ? 'normal nat' : 'symmetric nat');
-    }
+    console.log('[!] -> LOCAL: CANDIDATE', cand);
+    emit<SocketEmitType, IEventEmitCandidate>(socket, candidate, event.candidate);
+  }
+}
+
+/**
+ * RTC remote ice candidates handler
+ * @param {Socket} socket
+ * @param {RTCPeerConnectionIceEvent} event
+ * @param {EventEmitEnum} candidate
+ * @return void
+ */
+export function onRemoteIceCandidate(socket: Socket, event: RTCPeerConnectionIceEvent, candidate: EventEmitEnum): void {
+  if (event.candidate) {
+    emit<SocketEmitType, IEventEmitCandidate>(socket, candidate, event.candidate);
+    const cand = parseCandidate(event.candidate.candidate);
+    console.log('[!] <- REMOTE: CANDIDATE', cand);
   }
 }
 
