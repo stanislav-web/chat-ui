@@ -1,5 +1,5 @@
 import React, { type SyntheticEvent } from 'react';
-import './SelectLocalDevice.css';
+import './SelectRemoteCountry.css';
 import { type ISelectLocalDeviceProp } from '@interfaces/component/select-local-device/i.select-local-device-prop';
 import { filterUserDevicesByType, findUserDeviceByLabel, getUserDevices, switchCamera, switchMicrophone } from '@functions/media.function';
 import { notifyError } from '@functions/notification.function';
@@ -12,12 +12,12 @@ import { withTranslation } from 'react-i18next';
 import { MediaConfig } from '@configuration/media.config';
 
 /**
- * SelectLocalDevice app class
+ * SelectRemoteCountry app class
  * @module components
  * @extends React.Component<ISelectLocalDeviceProp, ISelectLocalDeviceState>
  * @implements ISelectLocalDevice
  */
-class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectLocalDeviceState> implements ISelectLocalDevice {
+class SelectRemoteCountry extends React.Component<ISelectLocalDeviceProp, ISelectLocalDeviceState> implements ISelectLocalDevice {
   /**
      * @type UniqueId videoSelectorId
      * @private
@@ -107,8 +107,8 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
             audio,
             video
           },
-          videoElement,
-          peer
+          peer,
+          videoElement
         );
         this.setState({
           stream,
@@ -161,4 +161,4 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
   }
 }
 
-export default withTranslation(['Base', 'Exceptions'])(SelectLocalDevice);
+export default withTranslation(['Base', 'Exceptions'])(SelectRemoteCountry);

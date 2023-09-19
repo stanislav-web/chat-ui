@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import VisitorAPI from 'visitorapi';
 import hash from 'object-hash';
 import { defaultScriptUrlPattern, load, type Region } from '@fingerprintjs/fingerprintjs-pro';
@@ -25,8 +25,9 @@ export const getUserBrowser = async (): Promise<IUserBrowser> => {
       deviceId: browserId,
       ...browserInfo
     };
-  } catch (e) {
-    throw new UserBrowserException('Cannot get user browser info', e);
+  } catch (error: any) {
+    const typedError = error as Error;
+    throw new UserBrowserException('Cannot get user browser info', typedError);
   }
 }
 
@@ -53,8 +54,9 @@ export const getUserFingerprint = async (extendedResult: boolean = true, linkedI
       debug: AppConfig.debug,
       products: ['identification', 'botd']
     }))
-  } catch (e) {
-    throw new UserFingerprintException('Cannot get user fingerprint', e)
+  } catch (error: any) {
+    const typedError = error as Error;
+    throw new UserFingerprintException('Cannot get user fingerprint', typedError);
   }
 }
 
@@ -68,7 +70,12 @@ export const getUserFingerprint = async (extendedResult: boolean = true, linkedI
 export const getUserAccount = async (payload: IUserRequest): Promise<IUserResponse | null> => {
   try {
     return await axios.post(process.env.REACT_APP_HTTP_USER_PATH, payload);
-  } catch (error: Error) {
-    throw new UserException(error.name, error.message)
+  } catch (error: any) {
+    if (error instanceof AxiosError) {
+      throw new UserException(error.name, error.message);
+    } else {
+      const typedError = error as Error;
+      throw new UserException(typedError.name, typedError.message);
+    }
   }
 }

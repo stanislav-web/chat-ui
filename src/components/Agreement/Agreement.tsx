@@ -16,8 +16,8 @@ class Agreement extends React.Component<ModalProps | any, IAgreementState> imple
   constructor(props: ModalProps | any) {
     super(props);
     this.state = {
-      setOpenModal: 'default' as string | undefined,
-      openModal: 'default' as string | undefined
+      setOpenModal: 'default' | undefined,
+      openModal: 'default' | undefined
     };
   }
 

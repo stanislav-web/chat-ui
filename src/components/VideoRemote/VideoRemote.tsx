@@ -19,25 +19,29 @@ import { type IEventListenCandidate, type IEventListenOffer } from '@interfaces/
 import { EventListenEnum } from '@enums/event-listen.enum';
 import { PeerException } from '@exceptions/peer.exception';
 import { onLoadedVideoMetadata, onResizeVideo } from '@events/media.event';
-import { type IVideoProp } from '@interfaces/peer/i.video-prop';
-import { type IVideoRemoteState } from '@interfaces/peer/i.video-remote-state';
+import { type IVideoRemoteState } from '@interfaces/component/video-remote/i.video-remote-state';
 import VideoControlRemote from '@components/VideoRemote/VideoCotrolRemote/VideoControlRemote';
+import { type IVideoRemoteProp } from '@interfaces/component/video-remote/i.video-remote-prop';
+import { withTranslation } from 'react-i18next';
 
-class VideoRemote extends React.Component<IVideoProp, IVideoRemoteState> {
+/**
+ * VideoRemote app class
+ * @module components
+ * @extends React.Component<IVideoRemoteProp, IVideoRemoteState>
+ */
+class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> {
   private readonly containerId: string = MediaConfig.remote.containerId;
-  private readonly useNoise: boolean = MediaConfig.remote.useNoise;
   private readonly poster: string = MediaConfig.poster ?? '';
 
   /**
      * Constructor
-     * @param {IVideoProp} props
+     * @param {IVideoRemoteProp} props
      */
-  constructor(props: IVideoProp) {
+  constructor(props: IVideoRemoteProp) {
     super(props);
     this.state = {
       video: null,
       peer: null,
-      stream: null,
       socket: null
     };
   }
@@ -49,50 +53,55 @@ class VideoRemote extends React.Component<IVideoProp, IVideoRemoteState> {
   componentDidMount(): void {
     const videoElement = document.getElementById(this.containerId) as HTMLVideoElement;
     if (!videoElement) {
-      notifyError('Local Video', 'Local video is unavailable')
+      notifyError(this.props.t('Remote Video', {
+        ns: 'VideoRemote'
+      }), this.props.t('RemoteVideoUnavailable', {
+        ns: 'Errors'
+      }));
     } else {
-      const { socket } = this.props;
+      const { socket, user } = this.props;
 
-      // eslint-disable-next-line no-unused-vars
-      videoElement.onloadedmetadata = (event: Event) => { onLoadedVideoMetadata({ videoElement }); };
-      // eslint-disable-next-line no-unused-vars
-      videoElement.onresize = (event: Event) => { onResizeVideo({ videoElement }); };
-      const remotePeer = createPeerConnection();
+      videoElement.onloadedmetadata = () => { onLoadedVideoMetadata({ videoElement }); };
+      videoElement.onresize = () => { onResizeVideo({ videoElement }); };
+      const peer = createPeerConnection(user.ice);
       this.setState({
-        remoteVideoElement: videoElement,
-        remotePeer
+        video: videoElement,
+        peer,
+        socket
       });
 
-      remotePeer.onconnectionstatechange = (event: Event) => {
-        onConnectionStateChange(event, remotePeer);
+      peer.onconnectionstatechange = () => {
+        onConnectionStateChange(peer);
       };
-      remotePeer.onsignalingstatechange = (event: Event) => {
-        onSignalingStateChange(remotePeer, event);
+      peer.onsignalingstatechange = (event: Event) => {
+        onSignalingStateChange(peer, event);
       };
-      remotePeer.ondatachannel = (event: RTCDataChannelEvent) => {
+      peer.ondatachannel = (event: RTCDataChannelEvent) => {
         onDataChannel(event);
       };
-      remotePeer.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => {
+      peer.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => {
         onIceCandidateError(error);
       }
-      remotePeer.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+      peer.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
         onRemoteIceCandidate(socket, event, EventEmitEnum.CANDIDATE);
       };
-      remotePeer.ontrack = (event: RTCTrackEvent) => {
+      peer.ontrack = (event: RTCTrackEvent) => {
         onTrack(videoElement, event);
       }
 
       on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.OFFER, async (event: IEventListenOffer) => {
-        if (event.type === EventListenEnum.OFFER && isPeerAvailable(remotePeer.connectionState)) {
+        console.log(event);
+        console.log(peer);
+        if (event.type === EventListenEnum.OFFER) {
           await Promise.all([
-            remotePeer.setRemoteDescription(new RTCSessionDescription(event)),
-            createPeerAnswer(remotePeer)
-          ]).then(() => { emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, remotePeer.localDescription); });
+            peer.setRemoteDescription(new RTCSessionDescription(event)),
+            createPeerAnswer(peer)
+          ]).then(() => { emit<SocketEmitType, IEventEmitAnswer>(socket, EventEmitEnum.ANSWER, peer.localDescription); });
         }
       });
       on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.CANDIDATE, async (event: IEventListenCandidate) => {
         try {
-          await addCandidate(remotePeer, event);
+          await addCandidate(peer, event);
         } catch (error) {
           throw new PeerException(error.message, error);
         }
@@ -101,22 +110,19 @@ class VideoRemote extends React.Component<IVideoProp, IVideoRemoteState> {
   }
 
   render(): React.JSX.Element {
-    const { peer, stream, video, socket } = this.state;
+    const { video } = this.state;
 
     return (
         <div className="video-remote">
           <div className="video-remote-container">
             <video id={this.containerId} disablePictureInPicture autoPlay playsInline poster={this.poster}/>
-            {this.useNoise &&
-                <canvas className="noise"/>
-            }
           </div>
           <div className="video-remote-control">
-            <VideoControlRemote socket={socket} peer={peer} stream={stream} video={video} />
+            <VideoControlRemote video={video}/>
           </div>
         </div>
     )
   }
 }
 
-export default VideoRemote;
+export default withTranslation(['VideoRemote', 'Errors', 'Exceptions'])(VideoRemote);

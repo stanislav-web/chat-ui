@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src/index.tsx"],
+  "out": "doc",
+  "tsconfig": "./tsconfig.paths.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "noImplicitAny": false,
+    "noImplicitThis": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strictNullChecks": false
+  }
+}

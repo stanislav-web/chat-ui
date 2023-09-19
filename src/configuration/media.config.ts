@@ -22,14 +22,12 @@ export const MediaConfig: IMediaConfig = {
   local: {
     containerId: uuid(),
     containerWidth: 500,
-    containerHeight: 500,
-    useNoise: false
+    containerHeight: 500
   },
   remote: {
     containerId: uuid(),
     containerWidth: 500,
-    containerHeight: 500,
-    useNoise: false
+    containerHeight: 500
   },
   control: {
     videoSelectorId: uuid(),

@@ -4,6 +4,8 @@
 export const AppConfig = {
   debug: process.env.REACT_APP_DEBUG === 'true',
   environment: process.env.NODE_ENV,
+  isDecrypt: process.env.REACT_APP_SENSITIVE_DATA_CRYPT === 'true',
+  key: process.env.REACT_APP_DATA_CRYPTO_KEY as string,
   defaultLanguage: process.env.REACT_APP_DEFAULT_LANGUAGE as string,
   languageProperty: 'lang',
   isProduction: process.env.NODE_ENV === 'production',

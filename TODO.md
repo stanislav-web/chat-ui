@@ -5,3 +5,10 @@
 3. [] Encoding
    1. [] Streams https://github.com/webrtc/samples/blob/gh-pages/src/content/insertable-streams/endtoend-encryption/js/main.js
    2. [] WebSockets pack
+4. [V] Decrypt sensitive data REACT_APP_SENSITIVE_DATA_DECRYPTION=true REACT_APP_DATA_CRYPTO_KEY
+5. [] Video Remote
+   1. [] Add Country flags
+   2. [] Add Socket emit to server to keep countries
+6. [] Axios
+   1. [] Intercept to error statuses !=401
+   2. [] Make request for refresh token

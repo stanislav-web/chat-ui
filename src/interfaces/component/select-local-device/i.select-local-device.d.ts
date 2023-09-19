@@ -3,7 +3,7 @@
 import { type SyntheticEvent } from 'react';
 
 /**
- * @typedef ISelectLocalDevice SelectLocalDevice.tsx
+ * @typedef ISelectLocalDevice SelectRemoteCountry.tsx
  * @module interfaces/component/select-local-device
  */
 export interface ISelectLocalDevice {
