@@ -5,14 +5,27 @@ import { type IEventListenCandidate } from '@interfaces/socket/i.event-listen';
 import { MediaTrackStateEnum } from '@enums/media-track-state.enum';
 import { MediaTackException } from '@exceptions/media-tack.exception';
 import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
+import { type IUserIce } from '@interfaces/user/i.user-ice';
+import { decryptMessage } from '@functions/crypt.function';
+import { AppConfig } from '@configuration/app.config';
 
 /**
  * Create peer connection
+ * @param {IUserIce[]} [iceServers]
  * @return Promise<RTCPeerConnection>
  */
-export function createPeerConnection(): RTCPeerConnection {
-  console.log('[!] CONFIGURATION:', WebrtcConfig);
-  return new RTCPeerConnection(WebrtcConfig);
+export function createPeerConnection(iceServers?: IUserIce[]): RTCPeerConnection {
+  const config: RTCConfiguration = iceServers
+    ? {
+        ...WebrtcConfig,
+        iceServers: iceServers.map((ice: IUserIce) => ({
+          urls: AppConfig.isDecrypt ? decryptMessage(ice.urls) : ice.urls,
+          username: AppConfig.isDecrypt ? decryptMessage(ice.username) : ice.username,
+          credential: AppConfig.isDecrypt ? decryptMessage(ice.credential) : ice.credential
+        }))
+      }
+    : WebrtcConfig;
+  return new RTCPeerConnection(config);
 }
 
 /**
@@ -33,8 +46,9 @@ export async function createPeerOffer(localConnection: RTCPeerConnection): Promi
       await localConnection.setLocalDescription(offer);
     }
     return offer;
-  } catch (error) {
-    throw new PeerException(error.message, error);
+  } catch (error: any) {
+    const typedError = error as DOMException;
+    throw new PeerException(typedError?.message, error);
   }
 }
 
@@ -47,7 +61,6 @@ export async function createPeerOffer(localConnection: RTCPeerConnection): Promi
 export async function createPeerAnswer(remoteConnection: RTCPeerConnection): Promise<RTCSessionDescriptionInit> | null {
   try {
     const answer = await remoteConnection.createAnswer({
-      iceRestart: true,
       offerToReceiveAudio: true,
       offerToReceiveVideo: true
     });
@@ -55,8 +68,9 @@ export async function createPeerAnswer(remoteConnection: RTCPeerConnection): Pro
     await remoteConnection.setLocalDescription(answer);
     console.log('[!] <- REMOTE: Peer answer', answer);
     return answer;
-  } catch (error) {
-    throw new PeerException(error.message, error);
+  } catch (error: any) {
+    const typedError = error as DOMException;
+    throw new PeerException(typedError?.message, error);
   }
 }
 
@@ -106,7 +120,9 @@ export function isPeerSignalStable(peer: RTCPeerConnection): boolean {
  * @return void
  */
 export function addMediaTracks(peer: RTCPeerConnection, stream: MediaStream, replace: boolean = false): void {
-  let error: { label: string } = {};
+  let error: { label: string } = {
+    label: ''
+  };
   let hasError = false;
   stream.getTracks().forEach((track: MediaStreamTrack) => {
     if (!hasError && track.enabled && track.readyState === MediaTrackStateEnum.LIVE) {

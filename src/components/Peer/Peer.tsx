@@ -68,13 +68,13 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
 
   render(): React.JSX.Element {
     const { socket } = this.state;
-    const { stream } = this.props;
+    const { stream, user } = this.props;
     return (
         <div className="peer-container">
             {stream && socket.connected
               ? <div className="peer-output">
-                  <VideoLocal socket={socket} stream={stream}/>
-                  <VideoRemote socket={socket} />
+                  <VideoLocal socket={socket} stream={stream} user={user} />
+                  <VideoRemote socket={socket} user={user} />
                 </div>
               : <div className="peer-error">TODO: Error connection</div>
             }

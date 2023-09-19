@@ -52,9 +52,9 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
     try {
       checkSupportedEnvironments();
     } catch (error: Error) {
-      notifyError(this.props.t(error.name, {
+      notifyError(this.props.t(error?.name, {
         ns: 'Exceptions'
-      }), this.props.t(error.message, {
+      }), this.props.t(error?.message, {
         ns: 'Exceptions'
       }));
       return;
@@ -63,10 +63,10 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
     try {
       const stream = await getUserMedia(audio, video);
       this.setState({ stream });
-    } catch (error: Error) {
-      notifyError(this.props.t(error.name, {
+    } catch (error: DOMException | TypeError) {
+      notifyError(this.props.t(error?.name, {
         ns: 'Exceptions'
-      }), this.props.t(error.message, {
+      }), this.props.t(error?.message, {
         ns: 'Exceptions'
       }));
       return;
@@ -136,9 +136,9 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
     return (
         <div className="init">
           {isUserAgree === true ? <></> : <Agreement onAgreementChange={this.onAgreementChange} />}
-          {isUserAgree === true && isUserLogin === false ? <Login /> : <></>}
-          {isUserAgree === true && isUserLogin === true && user !== null
-            ? <Peer stream={stream}>
+          {stream && isUserAgree === true && isUserLogin === false ? <Login /> : <></>}
+          {stream && isUserAgree === true && isUserLogin === true && user !== null
+            ? <Peer stream={stream} user={user}>
               </Peer>
             : <Peer>
               </Peer>}

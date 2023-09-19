@@ -26,13 +26,11 @@ interface ISnapshot {
  * @prop {UniqueId} containerId
  * @prop {number} containerWidth
  * @prop {number} containerHeight
- * @prop {boolean} useNoise
  */
 interface IVideoContainer {
   containerId: UniqueId;
   containerWidth: number;
   containerHeight: number;
-  useNoise: boolean;
 }
 
 /**

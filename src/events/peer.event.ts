@@ -1,47 +1,96 @@
 import { notifyError } from '@functions/notification.function';
 import { type Socket } from 'socket.io-client';
-import { emit } from '@functions/socket.function';
-import { type SocketEmitType } from '@types/socket.type';
-import { type IEventEmitCandidate } from '@interfaces/socket/i.event-emit';
-import { type EventEmitEnum } from '@enums/event-emit.enum';
+import { emit, on } from '@functions/socket.function';
+import { type SocketEmitType, type SocketListenType } from '@types/socket.type';
+import { type IEventEmitCandidate, type IEventEmitOffer } from '@interfaces/socket/i.event-emit';
 import { MediaTackException } from '@exceptions/media-tack.exception';
-import { parseCandidate } from '@functions/webrtc.function';
+import { createPeerOffer, isPeerAvailable, parseCandidate } from '@functions/webrtc.function';
 import { RtcConnectionStateEnum } from '@enums/rtc-connection-state.enum';
 import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
+import { type IEventListenAnswer, type IEventListenOffer } from '@interfaces/socket/i.event-listen';
+import { EventListenEnum } from '@enums/event-listen.enum';
+import { EventEmitEnum } from '@enums/event-emit.enum';
+
+/**
+ * RTC Negotiation start event handler
+ * @module events
+ * @param {Socket} socket
+ * @param {RTCPeerConnection} peer
+ * @return void
+ */
+export const onNegotiationNeeded = async (socket: Socket, peer: RTCPeerConnection): void => {
+  try {
+    const offer = await createPeerOffer(peer);
+    emit<SocketEmitType, IEventEmitOffer>(socket, EventEmitEnum.OFFER, offer);
+    on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.ANSWER, async (event: IEventListenAnswer) => {
+      try {
+        if (event.type === EventListenEnum.ANSWER && isPeerAvailable(peer?.connectionState)) {
+          await peer?.setRemoteDescription(new RTCSessionDescription(event));
+        }
+      } catch (error) {
+        notifyError(error.name, error.message);
+      }
+    });
+  } catch (error: Error) {
+    notifyError(error.name, error.message);
+  }
+}
+
+/**
+ * RTC Signaling state change handler
+ * @module events
+ * @param {RTCPeerConnection} peer
+ * @return void
+ */
+export function onSignalingStateChange(peer: RTCPeerConnection): void {
+  switch (peer.signalingState) {
+    case RtcSignallingStateEnum.HAVE_LOCAL_OFFER:
+      console.log(`[!] -> SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`);
+      break;
+    case RtcSignallingStateEnum.HAVE_LOCAL_ANSWER:
+      break;
+    case RtcSignallingStateEnum.HAVE_REMOTE_OFFER:
+      break;
+    case RtcSignallingStateEnum.HAVE_REMOTE_ANSWER:
+      break;
+    case RtcSignallingStateEnum.CLOSED:
+      break;
+    case RtcSignallingStateEnum.STABLE:
+      break;
+    default:
+      break;
+  }
+  console.log(`[!] SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`);
+}
 
 /**
  * Event is sent on an RTCPeerConnection object after a new track has been added to an RTCRtpReceiver
  * which is part of the connection.
  * The new connection state can be found in connectionState
  * and is one of the string values: new, connecting, connected, disconnected, failed, or closed.
- * @param {Event} event
+ * @module events
  * @param {RTCPeerConnection} peer
  * @return void
  */
-export const onConnectionStateChange = (event: Event, peer: RTCPeerConnection): void => {
+export const onConnectionStateChange = (peer: RTCPeerConnection): void => {
   switch (peer.connectionState) {
     case RtcConnectionStateEnum.NEW:
-      console.log('[!] PEER CONNECTION STATE: NEW', peer);
       break;
     case RtcConnectionStateEnum.CONNECTING:
-      console.log('[!] PEER CONNECTION STATE: CONNECTING', peer);
       break;
     case RtcConnectionStateEnum.CONNECTED:
-      console.log('[!] PEER CONNECTION STATE: CONNECTED', peer);
       break;
     case RtcConnectionStateEnum.DISCONNECTED:
-      console.log('[!] PEER CONNECTION STATE: DISCONNECTED', peer);
       break;
     case RtcConnectionStateEnum.CLOSED:
-      console.log('[!] PEER CONNECTION STATE: CLOSED', peer);
       break;
     case RtcConnectionStateEnum.FAILED:
-      console.log('[!] PEER CONNECTION STATE: FAILED', peer);
       peer.restartIce();
       break;
     default:
       break;
   }
+  console.log(`[!] PEER CONNECTION STATE: ${peer.connectionState}`);
 }
 
 /**
@@ -62,33 +111,6 @@ export const onDataChannel = (event: RTCDataChannelEvent): void => {
 export const onIceCandidateError = (error: RTCPeerConnectionIceErrorEvent): void => {
   console.info('iceCandidateErrorHandler', error);
   notifyError('Peer', error.errorText);
-}
-
-/**
- * RTC signaling state change handler
- * @param {RTCPeerConnection} peer
- * @param {Event} event
- * @return void
- */
-// eslint-disable-next-line no-unused-vars
-export function onSignalingStateChange(peer: RTCPeerConnection, event: Event): void {
-  switch (peer.signalingState) {
-    case RtcSignallingStateEnum.HAVE_LOCAL_OFFER:
-      break;
-    case RtcSignallingStateEnum.HAVE_LOCAL_ANSWER:
-      break;
-    case RtcSignallingStateEnum.HAVE_REMOTE_OFFER:
-      break;
-    case RtcSignallingStateEnum.HAVE_REMOTE_ANSWER:
-      break;
-    case RtcSignallingStateEnum.CLOSED:
-      break;
-    case RtcSignallingStateEnum.STABLE:
-      break;
-    default:
-      break;
-  }
-  console.log(`[!] SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`, peer);
 }
 
 /**

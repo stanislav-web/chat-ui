@@ -6,7 +6,7 @@ import { type IBasePeerConnect } from '@interfaces/base/i.base-peer-connect';
 import { type IBasePeerElement } from '@interfaces/base/i.base-peer-element';
 
 /**
- * @typedef ISelectLocalDeviceProp SelectLocalDevice.tsx props
+ * @typedef ISelectLocalDeviceProp SelectRemoteCountry.tsx props
  * @module interfaces/component/select-local-device
  * @extends i18n
  * @extends IBasePeerSteam

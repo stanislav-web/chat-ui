@@ -4,12 +4,15 @@
 
 import { type i18n } from 'i18next';
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
+import { type IUser } from '@interfaces/user/i.user';
 
 /**
  * @typedef IPeerProp Peer.tsx properties
  * @module interfaces/component/peer
- * @extends i18n
  * @extends IBasePeerSteam
+ * @extends IUser
+ * @extends i18n
  */
 export interface IPeerProp extends IBasePeerSteam, Pick<i18n, 't'> {
+  user: IUser;
 }

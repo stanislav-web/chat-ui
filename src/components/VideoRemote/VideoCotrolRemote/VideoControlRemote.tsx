@@ -1,7 +1,8 @@
 import React from 'react';
 import './VideoControlRemote.css';
 import { type IVideoControlLocalState } from '@interfaces/component/video-control-local/i.video-control-local-state';
-import { type IVideoControlRemoteProp } from '@interfaces/peer/i.video-control-remote-prop';
+import { type IVideoControlRemoteProp } from '@interfaces/component/video-control-remote/i.video-control-remote-prop';
+import { withTranslation } from 'react-i18next';
 
 class VideoControlRemote extends React.Component<IVideoControlRemoteProp, IVideoControlLocalState> {
   /**
@@ -33,4 +34,4 @@ class VideoControlRemote extends React.Component<IVideoControlRemoteProp, IVideo
   }
 }
 
-export default VideoControlRemote;
+export default withTranslation(['VideoControlRemote', 'Errors', 'Exceptions'])(VideoControlRemote);

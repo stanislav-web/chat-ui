@@ -111,25 +111,25 @@ export const captureStream = (
 export function attachSinkId(element: HTMLMediaElement, sinkId: string): Promise<undefined> {
   if (typeof element.sinkId !== 'undefined') {
     return element.setSinkId(sinkId);
-  } else throw MediaDeviceException('Browser does not support output device selection.');
+  } else throw new MediaDeviceException('Browser does not support output device selection.');
 }
 
 /**
  * Camera switcher
  * @module functions
  * @param {Pick<IMediaConfig, 'audio' | 'video'>} constraints
- * @param {RTCPeerConnection} peer
  * @param {HTMLVideoElement} videoElement
+ * @param {RTCPeerConnection} [peer]
  * @return Promise<MediaStream>
  */
 export const switchCamera = (
   constraints: Pick<IMediaConfig, 'audio' | 'video'>,
-  peer: RTCPeerConnection,
-  videoElement: HTMLVideoElement
+  videoElement: HTMLVideoElement,
+  peer?: RTCPeerConnection
 ): Promise<MediaStream> => getUserMedia(constraints.audio, constraints.video)
   .then(stream => {
     videoElement.srcObject = stream;
-    const videoSender = peer.getSenders().find(sender => sender.track.kind === 'video');
+    const videoSender = peer?.getSenders().find(sender => sender.track.kind === 'video');
     return Promise.all([...stream.getVideoTracks().map(track => videoSender.replaceTrack(track))])
       .then(() => Promise.resolve(stream));
   })
@@ -138,15 +138,15 @@ export const switchCamera = (
  * Microphone switcher
  * @module functions
  * @param {Pick<IMediaConfig, 'audio' | 'video'>} constraints
- * @param {RTCPeerConnection} peer
+ * @param {RTCPeerConnection} [peer]
  * @return Promise<MediaStream>
  */
 export const switchMicrophone = (
   constraints: Pick<IMediaConfig, 'audio' | 'video'>,
-  peer: RTCPeerConnection
+  peer?: RTCPeerConnection
 ): Promise<MediaStream> => getUserMedia(constraints.audio, constraints.video)
   .then(stream => {
-    const audioSender = peer.getSenders().find(sender => sender.track.kind === 'audio');
+    const audioSender = peer?.getSenders().find(sender => sender.track.kind === 'audio');
     return Promise.all([...stream.getAudioTracks().map(track => audioSender.replaceTrack(track))])
       .then(() => Promise.resolve(stream));
   })
