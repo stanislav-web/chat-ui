@@ -11,6 +11,8 @@ import { UserFingerprintException } from '@exceptions/user-fingerprint.exception
 import { UserBrowserException } from '@exceptions/user-browser.exception';
 import { AppConfig } from '@configuration/app.config';
 import { UserException } from '@exceptions/user.exception';
+import { refreshAuth } from '@functions/auth.function';
+import { redirectPage } from '@functions/window.function';
 
 /**
  * Get user browser
@@ -35,7 +37,8 @@ export const getUserBrowser = async (): Promise<IUserBrowser> => {
  * Get user fingerprint
  * @module functions
  * @param {boolean} extendedResult
- * @param {string} linkedId
+ * @param {string} [linkedId]
+ * @throws UserFingerprintException
  * @return Promise<IUserFingerprint>
  */
 export const getUserFingerprint = async (extendedResult: boolean = true, linkedId?: string): Promise<IUserFingerprint> => {
@@ -72,7 +75,14 @@ export const getUserAccount = async (payload: IUserRequest): Promise<IUserRespon
     return await axios.post(process.env.REACT_APP_HTTP_USER_PATH, payload);
   } catch (error: any) {
     if (error instanceof AxiosError) {
-      throw new UserException(error.name, error.message);
+      try {
+        await refreshAuth('/auth/refresh');
+        redirectPage();
+      } catch (error: any) {
+        if (error instanceof AxiosError) {
+          throw new UserException(error.name, error.message);
+        }
+      }
     } else {
       const typedError = error as Error;
       throw new UserException(typedError.name, typedError.message);

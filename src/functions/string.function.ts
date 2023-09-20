@@ -16,3 +16,20 @@ export const replace = (sentence: string, data: object): string => {
   }
   return sentence;
 };
+
+/**
+ * Counter
+ */
+export const counter = (function() {
+  let count = 0;
+  return function() {
+    return ++count;
+  }
+}());
+
+/**
+ * Check if data is null, empty, undefined
+ * @param {any} obj
+ * @return boolean
+ */
+export const isNullUndefEmptyStr = (obj: any): boolean => Object.values(obj).every(value => value === null || value === undefined || value === '');

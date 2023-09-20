@@ -18,6 +18,7 @@ import FooterWithSocialMediaIcons from '@components/Footer/Footer';
 import Init from '@components/Init/Init';
 import { I18nextProvider } from 'react-i18next';
 import { i18n } from './utils';
+import HeaderNav from '@components/Header/HeaderNav/HeaderNav';
 
 adapter.disableWarnings(AppConfig.isProduction)
 adapter.disableLog(AppConfig.isProduction)
@@ -26,15 +27,20 @@ AppConfig.isProduction && GlobalDebug(false);
 checkAuth();
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
-const { index, about, agreement, rules, payments, notFound } = AppConfig.routes;
+const {
+  index, about, agreement,
+  rules, payments, notFound
+} = AppConfig.routes;
+
 const Index = (): React.JSX.Element =>
    <BrowserRouter>
+    <HeaderNav navItems={AppConfig.routes}/>
     <Routes>
-        <Route path={index} element={<Init />} />
-        <Route path={about} element={<About />} />
-        <Route path={agreement} element={<Agreement />} />
-        <Route path={rules} element={<Rules />} />
-        <Route path={payments} element={<Payments />} />
+        <Route path={index.href} element={<Init />} />
+        <Route path={about.href} element={<About />} />
+        <Route path={agreement.href} element={<Agreement />} />
+        <Route path={rules.href} element={<Rules />} />
+        <Route path={payments.href} element={<Payments />} />
         <Route path={notFound} element={<NotFound />} />
     </Routes>
   </BrowserRouter>
@@ -43,9 +49,9 @@ const Index = (): React.JSX.Element =>
 root.render(
     <I18nextProvider i18n={i18n}>
         <ErrorBoundary>
-            <Header />
+            <Header navItems={AppConfig.routes} />
             <Index />
-            <FooterWithSocialMediaIcons />
+            <FooterWithSocialMediaIcons navItems={AppConfig.routes}/>
         </ErrorBoundary>
     </I18nextProvider>
 );

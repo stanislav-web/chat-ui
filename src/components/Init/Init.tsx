@@ -93,15 +93,15 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
         }
         console.log('[!] USER', user?.data);
 
-        if (user !== null) {
-          if (user.data.id === '') {
+        if (user?.data) {
+          if (user.data?.id === '') {
             notifyError(this.props.t('Authorization', {
               ns: 'Errors'
             }), this.props.t('Not authorized', {
               ns: 'Errors'
             }));
           }
-          if (user.data.ban !== null) {
+          if (user.data?.ban !== null) {
             notifyError(this.props.t('Ban', {
               ns: 'Errors'
             }), this.props.t('Banned', {
@@ -109,8 +109,13 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
             }));
           }
           this.setState({
-            isUserLogin: user.data.ban === null,
+            isUserLogin: user.data?.ban === null,
             user: user.data ?? null
+          });
+        } else {
+          this.setState({
+            isUserLogin: false,
+            user: null
           });
         }
       } catch (error: Error) {
@@ -140,8 +145,8 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
           {stream && isUserAgree === true && isUserLogin === true && user !== null
             ? <Peer stream={stream} user={user}>
               </Peer>
-            : <Peer>
-              </Peer>}
+            : <>
+              </>}
         </div>
     );
   }

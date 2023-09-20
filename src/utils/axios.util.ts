@@ -15,5 +15,4 @@ axios.interceptors.request.use((config) => {
   config.headers['X-Language'] = getItem('lang') ? AppConfig.defaultLanguage : '';
   return config;
 });
-
 export default axios;
