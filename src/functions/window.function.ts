@@ -1,6 +1,16 @@
 import { removeItem } from './localstorage.function';
 
 /**
+ * Redirect to page with reloading
+ * @module functions
+ * @param {string} [location]
+ * @return void
+ */
+export const redirectPage = (location?: string): void => {
+  if (location) window.location.href = location;
+  window.location.reload();
+}
+/**
  * Prevent double tab opener
  * @module functions
  * @return void
@@ -16,15 +26,6 @@ export const preventOpener = (): void => {
     }
   }, false);
 }
-
-/**
- * Custom popup
- * @param {string} url
- * @param {string} title
- * @param {number} w
- * @param {number} h
- * @return Window
- */
 
 /**
  * Custom popup

@@ -3,7 +3,7 @@ import './Peer.css';
 import VideoRemote from '@components/VideoRemote/VideoRemote';
 import VideoLocal from '@components/VideoLocal/VideoLocal';
 import { type IPeerProp } from '@interfaces/component/peer/i.peer-prop';
-import { notifyError, notifyInfo, notifySuccess } from '@functions/notification.function';
+import { notifyError, notifySuccess } from '@functions/notification.function';
 import { type IPeerState } from '@interfaces/component/peer/i.peer-state';
 import { getSocketInstance } from '@functions/socket.function';
 import { type Socket } from 'socket.io-client';
@@ -23,7 +23,8 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
   constructor(props: IPeerProp) {
     super(props);
     this.state = {
-      socket: null
+      socket: null,
+      connected: false
     };
   }
 
@@ -32,46 +33,59 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
    * @return Promise<void>
    */
   componentDidMount(): void {
-    const socket: Socket = getSocketInstance();
-    if (!socket.connected) socket.connect();
-    socket.on('connect', (): void => {
-      notifySuccess(this.props.t('Connected', {
-        ns: 'Base'
-      }), this.props.t('Welcome', {
-        ns: 'Base'
-      }), 2000);
-    });
-    socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
-      console.log('[!] Socket disconnected: ', socket.disconnected)
-      notifyInfo(this.props.t('Disconnected', {
-        ns: 'Base'
-      }), reason, 2000);
-    });
-    socket.on('connect_error', (error: Error): void => {
-      console.log('[!] Socket connect error:', { error })
-      notifyError(this.props.t('Disconnected', {
-        ns: 'Base'
-      }), error.message, 2000);
-    });
-    socket.on('exception', (data: IException): void => {
-      console.log('[!] Socket exception:', { data })
-      notifyError(this.props.t('Exception', {
-        ns: 'Exceptions'
-      }), this.props.t(data.message, {
-        ns: 'Exceptions'
-      }), 2000);
-    });
-    this.setState({
-      socket
-    });
+    const { user, stream } = this.props;
+    if (user && stream) {
+      const socket: Socket = getSocketInstance();
+      if (!socket.connected) socket.connect();
+      socket.on('connect', (): void => {
+        this.setState({
+          socket,
+          connected: true
+        });
+        notifySuccess(this.props.t('Connected', {
+          ns: 'Base'
+        }), this.props.t('Welcome', {
+          ns: 'Base'
+        }), 2000);
+      });
+      socket.on('disconnect', (reason: Socket.DisconnectReason): void => {
+        console.log('[!] Socket disconnected: ', socket.disconnected, { reason });
+        this.setState({
+          socket,
+          connected: false
+        });
+      });
+      socket.on('connect_error', (error: Error): void => {
+        console.log('[!] Socket connect error:', { error })
+        this.setState({
+          socket,
+          connected: false
+        });
+        notifyError(this.props.t('Disconnected', {
+          ns: 'Base'
+        }), error.message, 2000);
+      });
+      socket.on('exception', (data: IException): void => {
+        console.log('[!] Socket exception:', { data })
+        this.setState({
+          socket,
+          connected: true
+        });
+        notifyError(this.props.t('Exception', {
+          ns: 'Exceptions'
+        }), this.props.t(data.message, {
+          ns: 'Exceptions'
+        }), 2000);
+      });
+    }
   }
 
   render(): React.JSX.Element {
-    const { socket } = this.state;
+    const { connected, socket } = this.state;
     const { stream, user } = this.props;
     return (
         <div className="peer-container">
-            {stream && socket.connected
+            {stream && user && connected
               ? <div className="peer-output">
                   <VideoLocal socket={socket} stream={stream} user={user} />
                   <VideoRemote socket={socket} user={user} />

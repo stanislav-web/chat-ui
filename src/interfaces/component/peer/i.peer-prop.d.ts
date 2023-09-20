@@ -14,5 +14,5 @@ import { type IUser } from '@interfaces/user/i.user';
  * @extends i18n
  */
 export interface IPeerProp extends IBasePeerSteam, Pick<i18n, 't'> {
-  user: IUser;
+  readonly user: IUser;
 }

@@ -12,11 +12,26 @@ export const AppConfig = {
   isCommandAllowed: process.env.REACT_APP_USER_COMMAND_ALLOWED === 'true',
   isMultiTabAllowed: process.env.REACT_APP_USER_MULTITAB_ALLOWED === 'true',
   routes: {
-    index: '/',
-    about: '/about',
-    agreement: '/agreement',
-    rules: '/rules',
-    payments: '/payments',
+    index: {
+      href: '/',
+      title: 'Home'
+    },
+    about: {
+      href: '/about',
+      title: 'About'
+    },
+    agreement: {
+      href: '/agreement',
+      title: 'Agreement'
+    },
+    rules: {
+      href: '/rules',
+      title: 'Rules'
+    },
+    payments: {
+      href: '/payments',
+      title: 'Payments'
+    },
     notFound: '/*'
   }
 }

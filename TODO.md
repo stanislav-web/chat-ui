@@ -9,6 +9,9 @@
 5. [] Video Remote
    1. [] Add Country flags
    2. [] Add Socket emit to server to keep countries
-6. [] Axios
-   1. [] Intercept to error statuses !=401
+6. [v] Axios
+   1. [v] Intercept to error statuses !=401
    2. [] Make request for refresh token
+6. [v] NavBar
+   1. [v] Control from config 
+   2. [v] Implementation via router
