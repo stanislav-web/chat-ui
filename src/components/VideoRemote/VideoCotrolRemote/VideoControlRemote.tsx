@@ -1,10 +1,17 @@
 import React from 'react';
 import './VideoControlRemote.css';
-import { type IVideoControlLocalState } from '@interfaces/component/video-control-local/i.video-control-local-state';
 import { type IVideoControlRemoteProp } from '@interfaces/component/video-control-remote/i.video-control-remote-prop';
 import { withTranslation } from 'react-i18next';
+import SelectRemoteCountry from '@components/VideoRemote/VideoCotrolRemote/SelectRemoteCountry/SelectRemoteCountry';
+import { type IVideoControlRemoteState } from '@interfaces/component/video-control-remote/i.video-control-remote-state';
 
-class VideoControlRemote extends React.Component<IVideoControlRemoteProp, IVideoControlLocalState> {
+/**
+ * VideoControlRemote app class
+ * @module components
+ * @extends React.Component<IVideoControlRemoteProp, IVideoControlRemoteState>
+ * @implements VideoControlRemote
+ */
+class VideoControlRemote extends React.Component<IVideoControlRemoteProp, IVideoControlRemoteState> {
   /**
      * Constructor
      * @param {IVideoControlRemoteProp} props
@@ -12,9 +19,7 @@ class VideoControlRemote extends React.Component<IVideoControlRemoteProp, IVideo
   constructor(props: IVideoControlRemoteProp) {
     super(props);
     this.state = {
-      callBtn: null,
-      recallBtn: null,
-      breakBtn: null
+      socket: null
     };
   }
 
@@ -23,12 +28,20 @@ class VideoControlRemote extends React.Component<IVideoControlRemoteProp, IVideo
      * @return void
      */
   componentDidMount(): void {
-
+    this.setState({
+      socket: this.props.socket
+    })
   }
 
   render(): React.JSX.Element {
+    const { video } = this.props;
+    const { socket } = this.state;
     return (
         <div className="peer-control-remote">
+          { video && socket?.connected
+            ? <SelectRemoteCountry video={video} />
+            : <></>
+          }
         </div>
     )
   }

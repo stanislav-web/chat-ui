@@ -11,7 +11,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
-
+import * as process from 'process';
 dotenv.config({
   debug: process.env.DOTENV_CONFIG_DEBUG === 'true',
   override: true,

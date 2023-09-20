@@ -36,8 +36,8 @@ interface IVideoContainer {
 /**
  * @typedef IControlContainer Media config interface
  * @module interfaces/config
- * @prop {UniqueId} videoSelector
- * @prop {UniqueId} audioSelector
+ * @prop {UniqueId} videoSelectorId
+ * @prop {UniqueId} audioSelectorId
  * @prop {UniqueId} callBtnId
  * @prop {UniqueId} breakBtnId
  * @prop {UniqueId} recallBtnId

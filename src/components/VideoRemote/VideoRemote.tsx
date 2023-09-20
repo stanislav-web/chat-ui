@@ -1,7 +1,7 @@
 import React from 'react';
 import './VideoRemote.css';
 import { MediaConfig } from '@configuration/media.config';
-import { addCandidate, createPeerAnswer, createPeerConnection, isPeerAvailable } from '@functions/webrtc.function';
+import { addCandidate, createPeerAnswer, createPeerConnection } from '@functions/webrtc.function';
 import { notifyError } from '@functions/notification.function';
 import {
   onConnectionStateChange,
@@ -23,6 +23,7 @@ import { type IVideoRemoteState } from '@interfaces/component/video-remote/i.vid
 import VideoControlRemote from '@components/VideoRemote/VideoCotrolRemote/VideoControlRemote';
 import { type IVideoRemoteProp } from '@interfaces/component/video-remote/i.video-remote-prop';
 import { withTranslation } from 'react-i18next';
+import { type UniqueId } from '@types/base.type';
 
 /**
  * VideoRemote app class
@@ -30,7 +31,7 @@ import { withTranslation } from 'react-i18next';
  * @extends React.Component<IVideoRemoteProp, IVideoRemoteState>
  */
 class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> {
-  private readonly containerId: string = MediaConfig.remote.containerId;
+  private readonly containerId: UniqueId = MediaConfig.remote.containerId;
   private readonly poster: string = MediaConfig.poster ?? '';
 
   /**
@@ -111,14 +112,17 @@ class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> {
 
   render(): React.JSX.Element {
     const { video } = this.state;
-
+    const { socket } = this.props;
     return (
         <div className="video-remote">
           <div className="video-remote-container">
             <video id={this.containerId} disablePictureInPicture autoPlay playsInline poster={this.poster}/>
           </div>
           <div className="video-remote-control">
-            <VideoControlRemote video={video}/>
+            {video
+              ? <VideoControlRemote socket={socket} video={video} />
+              : <></>
+            }
           </div>
         </div>
     )

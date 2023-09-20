@@ -1,162 +1,113 @@
-import React, { type SyntheticEvent } from 'react';
+import React from 'react';
 import './SelectRemoteCountry.css';
-import { type ISelectLocalDeviceProp } from '@interfaces/component/select-local-device/i.select-local-device-prop';
-import { filterUserDevicesByType, findUserDeviceByLabel, getUserDevices, switchCamera, switchMicrophone } from '@functions/media.function';
-import { notifyError } from '@functions/notification.function';
-import { type ISelectLocalDevice } from '@interfaces/component/select-local-device/i.select-local-device';
-import { MediaDeviceTypeEnum } from '@enums/media-device-type.enum';
-import { type ISelectLocalDeviceState } from '@interfaces/component/select-local-device/i.select-local-device-state';
-import { BsCameraVideo } from 'react-icons/bs';
-import { BiSolidMicrophone } from 'react-icons/bi';
 import { withTranslation } from 'react-i18next';
-import { MediaConfig } from '@configuration/media.config';
+import { type ISelectRemoteCountry } from '@interfaces/component/select-reomote-country/i.select-remote-country';
+import { type ISelectRemoteCountryProp } from '@interfaces/component/select-reomote-country/i.select-remote-country-prop';
+import { type ISelectRemoteCountryState } from '@interfaces/component/select-reomote-country/i.select-remote-country-state';
+import { countries } from '@utils/countries';
+import { MultiSelect, type MultiSelectChangeEvent } from 'primereact/multiselect';
+import { type LanguageType } from '@types/language.type';
+import { type JSX } from 'typedoc';
 
 /**
  * SelectRemoteCountry app class
  * @module components
- * @extends React.Component<ISelectLocalDeviceProp, ISelectLocalDeviceState>
- * @implements ISelectLocalDevice
+ * @extends React.Component<ISelectRemoteCountryProp, ISelectRemoteCountryState>
+ * @implements ISelectRemoteCountry
  */
-class SelectRemoteCountry extends React.Component<ISelectLocalDeviceProp, ISelectLocalDeviceState> implements ISelectLocalDevice {
-  /**
-     * @type UniqueId videoSelectorId
-     * @private
-     */
-  private readonly videoSelectorId: string = MediaConfig.control.videoSelectorId;
-
-  /**
-     * @type UniqueId audioSelectorId
-     * @private
-     */
-  private readonly audioSelectorId: string = MediaConfig.control.audioSelectorId;
-
+class SelectRemoteCountry extends React.Component<ISelectRemoteCountryProp, ISelectRemoteCountryState> implements ISelectRemoteCountry {
   /**
      * Constructor
-     * @param {ISelectLocalDeviceProp} props
+     * @param {ISelectRemoteCountryProp} props
      */
-  constructor(props: ISelectLocalDeviceProp) {
+  constructor(props: ISelectRemoteCountryProp) {
     super(props);
     this.state = {
       stream: null,
-      audioDevices: [],
-      videoDevices: []
+      countries
     }
   }
 
   async componentDidMount(): void {
-    const { stream } = this.props;
-    if (stream !== null) {
-      const devices = await getUserDevices();
-      this.setState({
-        stream,
-        audioDevices: filterUserDevicesByType(devices, MediaDeviceTypeEnum.AUDIO_INPUT),
-        videoDevices: filterUserDevicesByType(devices, MediaDeviceTypeEnum.VIDEO)
-      });
-    }
+    // const { stream } = this.props;
+    // if (stream !== null) {
+    //   const devices = await getUserDevices();
+    //   this.setState({
+    //     stream,
+    //     audioDevices: filterUserDevicesByType(devices, MediaDeviceTypeEnum.AUDIO_INPUT),
+    //     videoDevices: filterUserDevicesByType(devices, MediaDeviceTypeEnum.VIDEO)
+    //   });
+    // }
   };
 
   /**
      * On audio device change event handler
-     * @param {SyntheticEvent<EventTarget>} event
+     * @param {MultiSelectChangeEvent} event
      * @return void
      */
-  async onAudioChange(event: SyntheticEvent<EventTarget>): void {
-    const { peer } = this.props;
-    const audioDeviceLabel = (event.target as HTMLInputElement).value;
-    const videoDeviceLabel = (document.getElementById(this.videoSelectorId) as HTMLInputElement).value;
-    const audioDevice = findUserDeviceByLabel(this.state.audioDevices, audioDeviceLabel);
-    const videoDevice = findUserDeviceByLabel(this.state.videoDevices, videoDeviceLabel);
-    if (audioDevice && videoDevice) {
-      const audio = Object.assign({}, MediaConfig.audio, { deviceId: { exact: audioDevice.deviceId } });
-      const video = Object.assign({}, MediaConfig.video, { deviceId: { exact: videoDevice.deviceId } });
-      try {
-        const stream = await switchMicrophone(
-          {
-            audio,
-            video
-          },
-          peer
-        );
-        this.setState({
-          stream,
-          audioDevices: filterUserDevicesByType(this.state.audioDevices, MediaDeviceTypeEnum.AUDIO_INPUT)
-        });
-      } catch (error: Error) {
-        notifyError(error.name, error.message);
-      }
-    } else notifyError('Audio Device', 'Has not recognized');
-  }
-
-  /**
-     * On video device change event handler
-     * @param {SyntheticEvent<EventTarget>} event
-     * @return void
-     */
-  async onVideoChange(event: SyntheticEvent<EventTarget>): void {
-    const { peer, video: videoElement } = this.props;
-    const videoDeviceLabel = (event.target as HTMLInputElement).value;
-    const audioDeviceLabel = (document.getElementById(this.audioSelectorId) as HTMLInputElement).value;
-    const videoDevice = findUserDeviceByLabel(this.state.videoDevices, videoDeviceLabel);
-    const audioDevice = findUserDeviceByLabel(this.state.audioDevices, audioDeviceLabel);
-    if (videoDevice && audioDevice) {
-      const audio = Object.assign({}, MediaConfig.audio, { deviceId: { exact: audioDevice.deviceId } });
-      const video = Object.assign({}, MediaConfig.video, { deviceId: { exact: videoDevice.deviceId } });
-      try {
-        const stream = await switchCamera(
-          {
-            audio,
-            video
-          },
-          peer,
-          videoElement
-        );
-        this.setState({
-          stream,
-          videoDevices: filterUserDevicesByType(this.state.videoDevices, MediaDeviceTypeEnum.VIDEO)
-        });
-      } catch (error: Error) {
-        notifyError(error.name, error.message);
-      }
-    } else notifyError('Video Device', 'Has not recognized');
+  onCountryChange(event: MultiSelectChangeEvent): void {
+    const { video } = this.props;
+    console.log({ video, event });
+    this.setState({
+      selected: event
+    })
+    // const audioDevice = findUserDeviceByLabel(this.state.audioDevices, audioDeviceLabel);
+    // const videoDevice = findUserDeviceByLabel(this.state.videoDevices, videoDeviceLabel);
+    // if (audioDevice && videoDevice) {
+    //   const audio = Object.assign({}, MediaConfig.audio, { deviceId: { exact: audioDevice.deviceId } });
+    //   const video = Object.assign({}, MediaConfig.video, { deviceId: { exact: videoDevice.deviceId } });
+    //   try {
+    //     const stream = await switchMicrophone(
+    //       {
+    //         audio,
+    //         video
+    //       },
+    //       peer
+    //     );
+    //     this.setState({
+    //       stream,
+    //       audioDevices: filterUserDevicesByType(this.state.audioDevices, MediaDeviceTypeEnum.AUDIO_INPUT)
+    //     });
+    //   } catch (error: Error) {
+    //     notifyError(error.name, error.message);
+    //   }
+    // } else notifyError('Audio Device', 'Has not recognized');
   }
 
   render(): React.JSX.Element {
-    const { videoDevices, audioDevices, stream } = this.state;
-    return <div className="select-local-device">
-            <div className="select-local-device-video">
-                <label htmlFor={this.videoSelectorId}>
-                    <BsCameraVideo />
-                    <select id={this.videoSelectorId} className="focus:outline-none"
-                            autoComplete="false"
-                            value={ stream?.getVideoTracks()[0].label }
-                            onChange={(event) => { this.onVideoChange(event); }}
-                        >
-                        {videoDevices?.map((option) =>
-                            <option key={option?.deviceId}
-                                    value={option?.label}>
-                                {option.label}
-                            </option>
-                        )}
-                    </select>
-                </label>
-            </div>
-            <div className="select-local-device-audio">
-                <label htmlFor={this.audioSelectorId}>
-                    <BiSolidMicrophone />
-                    <select id={this.audioSelectorId} className="focus:outline-none"
-                            autoComplete="false"
-                            value={ stream?.getAudioTracks()[0].label }
-                            onChange={(event) => { this.onAudioChange(event); }}
-                    >
-                            {audioDevices?.map((option) =>
-                                <option key={option?.deviceId}
-                                    value={option?.label}>
-                                    {option.label}
-                                </option>
-                            )}
-                    </select>
-                </label>
-            </div>
+    const { countries, selected } = this.state;
+
+    const countryListTpl = (option: { code: string; name: string }): JSX.Element => {
+      let flag: LanguageType | string;
+      if (option.code === 'en_us') {
+        flag = 'gb';
+      } else {
+        flag = option.code;
+      }
+      return (
+          <div className="flex align-items-center">
+            <img alt={option.name}
+                 src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
+                 className={`mr-2 flag flag-${flag.toLowerCase()}`} style={{ width: '18px' }} />
+            <div>{option.name}</div>
+          </div>
+      )
+    }
+
+    return <div className="select-remote-country card flex justify-content-center">
+            <MultiSelect
+                filter
+                showClear
+                value={selected}
+                onChange={(event) => { this.onCountryChange(event.value); }}
+                options={countries}
+                itemTemplate={countryListTpl}
+                optionLabel="name"
+                optionValue="code"
+                display="chip"
+                placeholder="Select Countries"
+                maxSelectedLabels={3}
+                className="w-full md:w-30rem" />
           </div>;
   }
 }

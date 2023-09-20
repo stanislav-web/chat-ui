@@ -1,6 +1,8 @@
+import './flags.css';
 import './index.css';
 import adapter from 'webrtc-adapter';
 import React from 'react';
+import { PrimeReactContext, PrimeReactProvider } from 'primereact/api';
 import { createRoot } from 'react-dom/client';
 import { GlobalDebug } from '@functions/log.function';
 import { checkAuth } from '@functions/window.function';
@@ -18,7 +20,6 @@ import FooterWithSocialMediaIcons from '@components/Footer/Footer';
 import Init from '@components/Init/Init';
 import { I18nextProvider } from 'react-i18next';
 import { i18n } from './utils';
-import HeaderNav from '@components/Header/HeaderNav/HeaderNav';
 
 adapter.disableWarnings(AppConfig.isProduction)
 adapter.disableLog(AppConfig.isProduction)
@@ -32,9 +33,12 @@ const {
   rules, payments, notFound
 } = AppConfig.routes;
 
+PrimeReactContext.ripple = true;
+PrimeReactContext.inputStyle = 'filled';
+
 const Index = (): React.JSX.Element =>
    <BrowserRouter>
-    <HeaderNav navItems={AppConfig.routes}/>
+       <Header navItems={AppConfig.routes} />
     <Routes>
         <Route path={index.href} element={<Init />} />
         <Route path={about.href} element={<About />} />
@@ -49,9 +53,10 @@ const Index = (): React.JSX.Element =>
 root.render(
     <I18nextProvider i18n={i18n}>
         <ErrorBoundary>
-            <Header navItems={AppConfig.routes} />
-            <Index />
-            <FooterWithSocialMediaIcons navItems={AppConfig.routes}/>
+            <PrimeReactProvider>
+                <Index />
+                <FooterWithSocialMediaIcons navItems={AppConfig.routes}/>
+            </PrimeReactProvider>
         </ErrorBoundary>
     </I18nextProvider>
 );

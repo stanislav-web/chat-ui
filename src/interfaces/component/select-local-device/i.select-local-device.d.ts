@@ -1,6 +1,6 @@
-// i.select-local-device.d.ts
+// i.select-remote-country.d.ts
 
-import { type SyntheticEvent } from 'react';
+import { type DropdownChangeEvent } from 'primereact/dropdown';
 
 /**
  * @typedef ISelectLocalDevice SelectRemoteCountry.tsx
@@ -9,15 +9,15 @@ import { type SyntheticEvent } from 'react';
 export interface ISelectLocalDevice {
   /**
    * On video device change event handler
-   * @param {SyntheticEvent<EventTarget>} event
+   * @param {DropdownChangeEvent} value
    * @return void
    */
-  onVideoChange: (event: SyntheticEvent<EventTarget>) => void;
+  onVideoChange: (value: DropdownChangeEvent) => void;
 
   /**
    * On audio device change event handler
-   * @param {SyntheticEvent<EventTarget>} event
+   * @param {DropdownChangeEvent} event
    * @return void
    */
-  onAudioChange: (event: SyntheticEvent<EventTarget>) => void;
+  onAudioChange: (value: DropdownChangeEvent) => void;
 }
