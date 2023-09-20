@@ -1,4 +1,4 @@
-// i.select-local-device-state.d.ts
+// i.select-remote-country-state.d.ts
 
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
 

@@ -1,6 +1,6 @@
 import { type MediaDevicesTypes } from '@types/media.type';
 import { type ISnapshot } from '@interfaces/video/i.snapshot';
-import { type Base64String, type UniqueId } from '@types/base.type';
+import { type Base64String } from '@types/base.type';
 import { type IMediaConfig } from '@interfaces/config/media-config.interface';
 import { MediaDeviceException } from '@exceptions/media-device.exception';
 
@@ -51,18 +51,6 @@ export const filterUserDevicesByType = (
 ): MediaDeviceInfo[] => devices.filter(device => device.kind === type)
 
 /**
- * Find selected user media device
- * @module functions
- * @param {MediaDeviceInfo[]} devices
- * @param {UniqueId} id
- * @return MediaDeviceInfo | undefined
- */
-export const findUserDeviceById = (
-  devices: MediaDeviceInfo[],
-  id: UniqueId
-): MediaDeviceInfo | undefined => devices.find(device => device.deviceId === id)
-
-/**
  * Find selected user media device by label
  * @module functions
  * @param {MediaDeviceInfo[]} devices
@@ -105,7 +93,7 @@ export const captureStream = (
  * @module functions
  * @param {HTMLMediaElement} element
  * @throws MediaDeviceException
- * @param {string}  sinkId
+ * @param {string} sinkId
  * @return Promise<undefined>
  */
 export function attachSinkId(element: HTMLMediaElement, sinkId: string): Promise<undefined> {
@@ -130,8 +118,10 @@ export const switchCamera = (
   .then(stream => {
     videoElement.srcObject = stream;
     const videoSender = peer?.getSenders().find(sender => sender.track.kind === 'video');
-    return Promise.all([...stream.getVideoTracks().map(track => videoSender.replaceTrack(track))])
-      .then(() => Promise.resolve(stream));
+    return videoSender
+      ? Promise.all([...stream.getVideoTracks().map(track => videoSender.replaceTrack(track))])
+        .then(() => Promise.resolve(stream))
+      : Promise.resolve(stream);
   })
 
 /**
@@ -147,6 +137,8 @@ export const switchMicrophone = (
 ): Promise<MediaStream> => getUserMedia(constraints.audio, constraints.video)
   .then(stream => {
     const audioSender = peer?.getSenders().find(sender => sender.track.kind === 'audio');
-    return Promise.all([...stream.getAudioTracks().map(track => audioSender.replaceTrack(track))])
-      .then(() => Promise.resolve(stream));
+    return audioSender
+      ? Promise.all([...stream.getAudioTracks().map(track => audioSender.replaceTrack(track))])
+        .then(() => Promise.resolve(stream))
+      : Promise.resolve(stream)
   })

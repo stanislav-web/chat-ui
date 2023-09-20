@@ -1,6 +1,5 @@
 export const countries: CountryListItem[] = [
   { name: 'Afghanistan', code: 'AF', flag: '🇦🇫' },
-  { name: 'Åland Islands', code: 'AX', flag: '🇦🇽' },
   { name: 'Albania', code: 'AL', flag: '🇦🇱' },
   { name: 'Algeria', code: 'DZ', flag: '🇩🇿' },
   {
@@ -127,7 +126,7 @@ export const countries: CountryListItem[] = [
     flag: '🇫🇰'
   },
   { name: 'Faroe Islands', code: 'FO', flag: '🇫🇴' },
-  { name: 'England', code: 'EN', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  // { name: 'England', code: 'GB', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
   { name: 'Fiji', code: 'FJ', flag: '🇫🇯' },
   { name: 'Finland', code: 'FI', flag: '🇫🇮' },
   { name: 'France', code: 'FR', flag: '🇫🇷' },
@@ -182,7 +181,7 @@ export const countries: CountryListItem[] = [
   },
   { name: 'Iraq', code: 'IQ', flag: '🇮🇶' },
   { name: 'Ireland', code: 'IE', flag: '🇮🇪' },
-  { name: 'Isle of Man', code: 'IM', flag: '🇮🇲' },
+  // { name: 'Isle of Man', code: 'IM', flag: '🇮🇲' },
   { name: 'Israel', code: 'IL', flag: '🇮🇱' },
   { name: 'Italy', code: 'IT', flag: '🇮🇹' },
   { name: 'Jamaica', code: 'JM', flag: '🇯🇲' },
@@ -202,7 +201,7 @@ export const countries: CountryListItem[] = [
     code: 'KR',
     flag: '🇰🇷'
   },
-  { name: 'Kosovo', code: 'XK', flag: '🇽🇰' },
+  // { name: 'Kosovo', code: 'XK', flag: '🇽🇰' },
   { name: 'Kuwait', code: 'KW', flag: '🇰🇼' },
   { name: 'Kyrgyzstan', code: 'KG', flag: '🇰🇬' },
   { name: 'Laos', code: 'LA', flag: '🇱🇦' },
@@ -234,7 +233,7 @@ export const countries: CountryListItem[] = [
   { name: 'Martinique', code: 'MQ', flag: '🇲🇶' },
   { name: 'Mauritania', code: 'MR', flag: '🇲🇷' },
   { name: 'Mauritius', code: 'MU', flag: '🇲🇺' },
-  { name: 'Mayotte', code: 'YT', flag: '🇾🇹' },
+  // { name: 'Mayotte', code: 'YT', flag: '🇾🇹' },
   { name: 'Mexico', code: 'MX', flag: '🇲🇽' },
   {
     name: 'Micronesia, Federated States of Micronesia',
@@ -274,11 +273,11 @@ export const countries: CountryListItem[] = [
   { name: 'Oman', code: 'OM', flag: '🇴🇲' },
   { name: 'Pakistan', code: 'PK', flag: '🇵🇰' },
   { name: 'Palau', code: 'PW', flag: '🇵🇼' },
-  {
-    name: 'Palestinian Territory, Occupied',
-    code: 'PS',
-    flag: '🇵🇸'
-  },
+  // {
+  //   name: 'Palestinian Territory, Occupied',
+  //   code: 'PS',
+  //   flag: '🇵🇸'
+  // },
   { name: 'Panama', code: 'PA', flag: '🇵🇦' },
   {
     name: 'Papua New Guinea',
@@ -297,11 +296,11 @@ export const countries: CountryListItem[] = [
   { name: 'Russia', code: 'RU', flag: '🇷🇺' },
   { name: 'Rwanda', code: 'RW', flag: '🇷🇼' },
   { name: 'Reunion', code: 'RE', flag: '🇫🇷' },
-  {
-    name: 'Saint Barthelemy',
-    code: 'BL',
-    flag: '🇧🇱'
-  },
+  // {
+  //   name: 'Saint Barthelemy',
+  //   code: 'BL',
+  //   flag: '🇧🇱'
+  // },
   {
     name: 'Saint Helena, Ascension and Tristan Da Cunha',
     code: 'SH',
@@ -313,7 +312,7 @@ export const countries: CountryListItem[] = [
     flag: '🇰🇳'
   },
   { name: 'Saint Lucia', code: 'LC', flag: '🇱🇨' },
-  { name: 'Saint Martin', code: 'MF', flag: '🏳' },
+  // { name: 'Saint Martin', code: 'MF', flag: '🏳' },
   {
     name: 'Saint Pierre and Miquelon',
     code: 'PM',

@@ -1,5 +1,6 @@
 import React from 'react';
 import './AgreementText.css';
+import { withTranslation } from 'react-i18next';
 
 class AgreementText extends React.Component<any, any> {
   /**
@@ -25,4 +26,4 @@ class AgreementText extends React.Component<any, any> {
             </div>);
   }
 }
-export default AgreementText;
+export default withTranslation()(AgreementText);

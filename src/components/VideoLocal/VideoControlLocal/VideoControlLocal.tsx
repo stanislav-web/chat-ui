@@ -8,6 +8,7 @@ import SelectLocalDevice from '@components/VideoLocal/VideoControlLocal/SelectLo
 import { withTranslation } from 'react-i18next';
 import { addMediaTracks, createPeerConnection } from '@functions/webrtc.function';
 import { onConnectionStateChange, onNegotiationNeeded, onSignalingStateChange } from '@events/peer.event';
+import { type UniqueId } from '@types/base.type';
 
 /**
  * VideoControlLocal app class
@@ -20,19 +21,19 @@ class VideoControlLocal extends React.Component<IVideoControlLocalProp, IVideoCo
      * @type UniqueId callBtnId
      * @private
      */
-  private readonly callBtnId: string = MediaConfig.control.callBtnId;
+  private readonly callBtnId: UniqueId = MediaConfig.control.callBtnId;
 
   /**
      * @type UniqueId recallBtnId
      * @private
      */
-  private readonly recallBtnId: string = MediaConfig.control.recallBtnId;
+  private readonly recallBtnId: UniqueId = MediaConfig.control.recallBtnId;
 
   /**
      * @type UniqueId breakBtnId
      * @private
      */
-  private readonly breakBtnId: string = MediaConfig.control.breakBtnId;
+  private readonly breakBtnId: UniqueId = MediaConfig.control.breakBtnId;
 
   /**
      * Constructor
@@ -121,7 +122,7 @@ class VideoControlLocal extends React.Component<IVideoControlLocalProp, IVideoCo
 
     return (
         <div className="video-local-control">
-            { stream && socket.connected
+            { stream && socket?.connected
               ? <SelectLocalDevice stream={stream} peer={peer} video={video} />
               : <></>
             }

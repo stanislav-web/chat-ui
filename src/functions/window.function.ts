@@ -1,4 +1,5 @@
 import { removeItem } from './localstorage.function';
+import { isNullUndefEmptyStr } from '@functions/string.function';
 
 /**
  * Redirect to page with reloading
@@ -37,8 +38,8 @@ export const preventOpener = (): void => {
  * @return Window
  */
 export const openPopUp = (url: string, title: string, w: number, h: number): Window => {
-  const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-  const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+  const dualScreenLeft = window.screenLeft ? window.screenLeft : window.screenX;
+  const dualScreenTop = window.screenTop ? window.screenTop : window.screenY;
   const width = window.innerWidth
     ? window.innerWidth
     : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
@@ -68,7 +69,7 @@ export const openPopUp = (url: string, title: string, w: number, h: number): Win
  */
 export const checkAuth = (): void => {
   const handler = function(event: StorageEvent): void {
-    if (event.key === 'auth' && event.newValue === null) {
+    if (event.key === 'auth' && isNullUndefEmptyStr(event.newValue)) {
       window.removeEventListener('storage', handler, false)
       window.location.reload();
     }

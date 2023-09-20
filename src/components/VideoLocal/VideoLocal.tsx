@@ -3,26 +3,12 @@ import React from 'react';
 import './VideoLocal.css';
 import { MediaConfig } from '@configuration/media.config';
 import { notifyError } from '@functions/notification.function';
-import {
-  addCandidate,
-  createPeerConnection
-} from '@functions/webrtc.function';
 import { onLoadedVideoMetadata, onPlay, onResizeVideo, onVolumeChange } from '@events/media.event';
-import {
-  onDataChannel,
-  onIceCandidateError,
-  onLocalIceCandidate
-} from '@events/peer.event';
-import { on } from '@functions/socket.function';
-import { type SocketListenType } from '@types/socket.type';
-import { EventEmitEnum } from '@enums/event-emit.enum';
-import { PeerException } from '@exceptions/peer.exception';
-import { type IEventListenCandidate, type IEventListenOffer } from '@interfaces/socket/i.event-listen';
-import { EventListenEnum } from '@enums/event-listen.enum';
 import VideoControlLocal from '@components/VideoLocal/VideoControlLocal/VideoControlLocal';
 import { type IVideoLocalState } from '@interfaces/component/video-local/i.video-local-state';
 import { type IVideoLocalProp } from '@interfaces/component/video-local/i.video-local-prop';
 import { withTranslation } from 'react-i18next';
+import { type UniqueId } from '@types/base.type';
 
 /**
  * VideoLocal app class
@@ -34,13 +20,13 @@ class VideoLocal extends React.Component<IVideoLocalProp, IVideoLocalState> {
    * @type string containerId
    * @private
    */
-  private readonly containerId: string = MediaConfig.local.containerId;
+  private readonly containerId: UniqueId = MediaConfig.local.containerId;
 
   /**
    * @type string [poster]
    * @private
    */
-  private readonly poster: string = MediaConfig.poster ?? '';
+  private readonly poster: UniqueId = MediaConfig.poster ?? '';
 
   /**
      * Constructor

@@ -1,14 +1,14 @@
-// i.header-nav.prop.d.ts
+// i.navbar.prop.d.ts
 
 import { type i18n } from 'i18next';
 import { type INavigationConfig } from '@interfaces/config/i.navigation-config';
 
 /**
- * @typedef IHeaderProp Header.tsx properties
- * @module interfaces/component/header
+ * @typedef INavbarProp Navbar.tsx properties
+ * @module interfaces/component/navbar
  * @param {Record<string, INavigationConfig>} navItems
  * @extends i18n
  */
-export interface IHeaderNavProp extends Pick<i18n, 't'> {
+export interface INavbarProp extends Pick<i18n, 't'> {
   navItems: Record<string, INavigationConfig>;
 }

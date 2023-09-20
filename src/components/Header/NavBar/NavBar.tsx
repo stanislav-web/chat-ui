@@ -1,25 +1,25 @@
 import React from 'react';
-import './HeaderNav.css';
+import './NavBar.css';
 import { NavLink } from 'react-router-dom';
-import { type IHeaderNav } from '@interfaces/component/header-nav/i.header-nav';
-import { type IHeaderNavProp } from '@interfaces/component/header-nav/i.header-nav.prop';
+import { type INavbar } from '@interfaces/component/navbar/i.navbar';
+import { type INavbarProp } from '@interfaces/component/navbar/i.navbar.prop';
 import { logout } from '@functions/auth.function';
 import { notifyError } from '@functions/notification.function';
 import { withTranslation } from 'react-i18next';
 import { redirectPage } from '@functions/window.function';
 
 /**
- * HeaderNav app class
+ * NavBar app class
  * @module components
- * @extends React.Component<IHeaderNavProp, any>
- * @implements IHeaderNav
+ * @extends React.Component<INavbarProp, any>
+ * @implements INavbar
  */
-class HeaderNav extends React.Component<IHeaderNavProp, any> implements IHeaderNav {
+class NavBar extends React.Component<INavbarProp, any> implements INavbar {
   /**
      * Constructor
-     * @param {IHeaderNavProp} props
+     * @param {INavbarProp} props
      */
-  constructor(props: IHeaderNavProp) {
+  constructor(props: INavbarProp) {
     super(props);
   }
 
@@ -57,4 +57,4 @@ class HeaderNav extends React.Component<IHeaderNavProp, any> implements IHeaderN
   }
 }
 
-export default withTranslation()(HeaderNav);
+export default withTranslation()(NavBar);

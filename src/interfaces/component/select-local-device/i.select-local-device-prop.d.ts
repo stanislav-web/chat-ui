@@ -1,4 +1,4 @@
-// i.select-local-device-prop.d.ts
+// i.select-remote-country-prop.d.ts
 
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
 import { type i18n } from 'i18next';

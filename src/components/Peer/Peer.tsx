@@ -9,6 +9,7 @@ import { getSocketInstance } from '@functions/socket.function';
 import { type Socket } from 'socket.io-client';
 import { type IException } from '@interfaces/socket/i.exception';
 import { withTranslation } from 'react-i18next';
+import { Splitter, SplitterPanel } from 'primereact/splitter';
 
 /**
  * Peer app class
@@ -87,8 +88,14 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
         <div className="peer-container">
             {stream && user && connected
               ? <div className="peer-output">
-                  <VideoLocal socket={socket} stream={stream} user={user} />
-                  <VideoRemote socket={socket} user={user} />
+                  <Splitter style={{ height: '300px' }} className="mb-5">
+                    <SplitterPanel className="flex align-items-center justify-content-center">
+                      <VideoRemote socket={socket} user={user} />
+                    </SplitterPanel>
+                    <SplitterPanel className="flex align-items-center justify-content-center">
+                      <VideoLocal socket={socket} stream={stream} user={user} />
+                    </SplitterPanel>
+                  </Splitter>
                 </div>
               : <div className="peer-error">TODO: Error connection</div>
             }

@@ -1,13 +1,18 @@
-@import url('https://rsms.me/inter/inter.css');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://unpkg.com/primeicons/primeicons.css');
+@import url('https://unpkg.com/primereact/resources/themes/lara-light-indigo/theme.css');
+@import url('https://unpkg.com/primereact/resources/primereact.min.css');
+@import url('https://unpkg.com/primeflex@3.2.1/primeflex.min.css');
 
 @media print {
     html, body {
         display: none;
     }
+}
+
+body {
+    font-family: var(--font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 video {
