@@ -100,7 +100,7 @@
       },
       "typescript": {},
       "node": {
-        "paths": ["src", "webpack.config.ts", "tailwind.config.ts"],
+        "paths": ["src", "webpack.config.ts"],
         "extensions": [".ts", ".tsx"]
       }
     },

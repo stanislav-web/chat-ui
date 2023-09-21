@@ -40,7 +40,7 @@
       "module": "CommonJS"
     }
   },
-  "include": ["src", "webpack.config.ts", "tailwind.config.ts"],
+  "include": ["src", "webpack.config.ts"],
   "extends": "./tsconfig.paths.json"
 }
 

@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import React from 'react';
 import './Header.css';
 import Language from './Language/Language';
@@ -6,8 +5,8 @@ import ReactGA from 'react-ga4';
 import { AnalyticConfig } from '@configuration/analytic.config';
 import { v4 as uuidv4 } from 'uuid';
 import { type IHeaderProp } from '@interfaces/component/header/i.header-prop';
-import HeaderNav from '@components/Header/NavBar/NavBar';
 import { withTranslation } from 'react-i18next';
+import NavBar from '@components/Header/NavBar/NavBar';
 
 /**
  * Header app class
@@ -37,14 +36,13 @@ class Header extends React.Component<IHeaderProp, any> {
                 <a href="#">
                     <img src="https://flowbite.com/docs/images/logo.svg" className="mr-3 h-6 sm:h-9"
                          alt="Logo"/>
-                    <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
                 </a>
             </div>
             <div className="header-language">
                 <Language />
             </div>
             <nav className="header-navbar">
-                <HeaderNav navItems={navItems} />
+                <NavBar navItems={navItems} />
             </nav>
         </header>
     )

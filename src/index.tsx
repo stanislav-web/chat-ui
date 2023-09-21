@@ -16,10 +16,10 @@ import Payments from '@components/Payments/Payments';
 import Rules from '@components/Rules/Rules';
 import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary';
 import Header from '@components/Header/Header';
-import FooterWithSocialMediaIcons from '@components/Footer/Footer';
 import Init from '@components/Init/Init';
 import { I18nextProvider } from 'react-i18next';
 import { i18n } from './utils';
+import Footer from '@components/Footer/Footer';
 
 adapter.disableWarnings(AppConfig.isProduction)
 adapter.disableLog(AppConfig.isProduction)
@@ -47,15 +47,15 @@ const Index = (): React.JSX.Element =>
         <Route path={payments.href} element={<Payments />} />
         <Route path={notFound} element={<NotFound />} />
     </Routes>
-  </BrowserRouter>
+       <Footer navItems={AppConfig.routes} />
+   </BrowserRouter>
 ;
 
 root.render(
     <I18nextProvider i18n={i18n}>
         <ErrorBoundary>
             <PrimeReactProvider>
-                <Index />
-                <FooterWithSocialMediaIcons navItems={AppConfig.routes}/>
+                <Index className="card flex justify-content-center" />
             </PrimeReactProvider>
         </ErrorBoundary>
     </I18nextProvider>

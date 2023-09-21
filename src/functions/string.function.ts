@@ -18,18 +18,12 @@ export const replace = (sentence: string, data: object): string => {
 };
 
 /**
- * Counter
- */
-export const counter = (function() {
-  let count = 0;
-  return function() {
-    return ++count;
-  }
-}());
-
-/**
  * Check if data is null, empty, undefined
- * @param {any} obj
+ * @param {any} value
  * @return boolean
  */
-export const isNullUndefEmptyStr = (obj: any): boolean => Object.values(obj).every(value => value === null || value === undefined || value === '');
+export const isNullUndefEmptyStr = (value: any): boolean => {
+  if (typeof value === 'object' && value !== null) {
+    return Object.values(value).every(value => value === null || value === undefined || value === '');
+  } else return value === null || value === undefined || value === '';
+}
