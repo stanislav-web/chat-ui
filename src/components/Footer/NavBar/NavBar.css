@@ -1,0 +1,9 @@
+.footer-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-navbar .footer-nav-links {
+    display: flex;
+}

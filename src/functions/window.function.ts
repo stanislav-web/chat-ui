@@ -69,7 +69,7 @@ export const openPopUp = (url: string, title: string, w: number, h: number): Win
  */
 export const checkAuth = (): void => {
   const handler = function(event: StorageEvent): void {
-    if (event.key === 'auth' && isNullUndefEmptyStr(event.newValue)) {
+    if (event.key === 'auth' && isNullUndefEmptyStr(event?.newValue)) {
       window.removeEventListener('storage', handler, false)
       window.location.reload();
     }

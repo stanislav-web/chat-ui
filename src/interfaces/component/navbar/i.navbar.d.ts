@@ -9,5 +9,5 @@ export interface INavbar {
    * On Logout
    * @return void
    */
-  readonly onLogout: () => void;
+  readonly onLogout?: () => void;
 }

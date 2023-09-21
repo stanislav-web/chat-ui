@@ -7,7 +7,7 @@
    2. [] WebSockets pack
 4. [V] Decrypt sensitive data REACT_APP_SENSITIVE_DATA_DECRYPTION=true REACT_APP_DATA_CRYPTO_KEY
 5. [] Video Remote
-   1. [] Add Country flags
+   1. [v] Add Country flags
    2. [] Add Socket emit to server to keep countries
 6. [v] Axios
    1. [v] Intercept to error statuses !=401

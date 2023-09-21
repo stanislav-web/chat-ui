@@ -10,18 +10,27 @@ import {
 } from 'react-social-login-buttons';
 import { type AuthProviderPath, type AuthProviderType } from '@types/auth-provider.type';
 import { auth } from '@functions/auth.function';
-import { Modal, type ModalProps } from 'flowbite-react';
+import { type ILoginProps } from '@interfaces/component/login/i.login-props';
+import { withTranslation } from 'react-i18next';
+import { type ILoginState } from '@interfaces/component/login/i.login-state';
+import { type ILogin } from '@interfaces/component/login/i.login';
+import { Dialog } from 'primereact/dialog';
 
-class Login extends React.Component<any, any> {
+/**
+ * Login app class
+ * @module components
+ * @extends React.Component<ILoginProps, ILoginState>
+ * @implements ILogin
+ */
+class Login extends React.Component<ILoginProps, ILoginState> implements ILogin {
   /**
      * Constructor
-     * @param {any} props
+     * @param {ILoginProps} props
      */
-  constructor(props: ModalProps | any) {
+  constructor(props: ILoginProps) {
     super(props);
     this.state = {
-      setOpenModal: 'default' as string | undefined,
-      openModal: 'default' as string | undefined
+      open: {}
     };
   }
 
@@ -31,42 +40,54 @@ class Login extends React.Component<any, any> {
      * @param {AuthProviderPath} path
      * @return Promise<void>
      */
-  handleAuth (provider: AuthProviderType, path: AuthProviderPath): any {
+  onLogin (provider: AuthProviderType, path: AuthProviderPath): any {
     auth(provider, path);
+    this.state.open[provider] = true;
+    this.setState({ open: this.state.open });
   }
 
   render(): React.JSX.Element {
-    const { openModal } = this.state;
+    const Header: React.ReactNode =
+        <div className="modal-header">
+            <span icon="pi pi-user">Login to Chat</span>
+        </div>;
+    const Footer: React.ReactNode = <div className="modal-footer">
+      </div>;
+
     return (
-        <Modal show={openModal === 'default'}>
-            <Modal.Header>Login</Modal.Header>
-            <Modal.Body>
-                <div className="space-y-6 social-logins">
-                        <FacebookLoginButton onClick={ () => {
-                          this.handleAuth('facebook', '/auth/facebook')
-                        }} crossorigin="anonymous" />
-                        <GoogleLoginButton onClick={ () => {
-                          this.handleAuth('google', '/auth/google')
-                        }} />
-                        <GithubLoginButton onClick={ () => {
-                          this.handleAuth('github', '/auth/github')
-                        }} />
-                        <TwitterLoginButton onClick={ () => {
-                          this.handleAuth('twitter', '/auth/twitter')
-                        }} />
-                        <LinkedInLoginButton onClick={ () => {
-                          this.handleAuth('linkedin', '/auth/linkedin')
-                        }} />
-                        <AppleLoginButton onClick={ () => {
-                          this.handleAuth('apple', '/auth/apple')
-                        }} />
-                </div>
-            </Modal.Body>
-            <Modal.Footer>
-            </Modal.Footer>
-        </Modal>
+        <Dialog
+            header={Header}
+            closable={false}
+            closeOnEscape={false}
+            draggable={false}
+            modal={true}
+            visible={true}
+            style={{ width: '35vw' }}
+            onHide={() => { }}
+            footer={Footer}>
+            <div className="space-y-6 social-logins">
+                <FacebookLoginButton onClick={ () => {
+                  this.onLogin('facebook', '/auth/facebook')
+                }} crossorigin="anonymous" />
+                <GoogleLoginButton onClick={ () => {
+                  this.onLogin('google', '/auth/google')
+                }} />
+                <GithubLoginButton onClick={ () => {
+                  this.onLogin('github', '/auth/github')
+                }} />
+                <TwitterLoginButton onClick={ () => {
+                  this.onLogin('twitter', '/auth/twitter')
+                }} />
+                <LinkedInLoginButton onClick={ () => {
+                  this.onLogin('linkedin', '/auth/linkedin')
+                }} />
+                <AppleLoginButton onClick={ () => {
+                  this.onLogin('apple', '/auth/apple')
+                }} />
+            </div>
+        </Dialog>
     )
   }
 }
 
-export default Login;
+export default withTranslation()(Login);

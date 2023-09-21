@@ -34,7 +34,7 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
     super(props);
     this.state = {
       stream: null,
-      isUserAgree: getItem('isUserAgree') !== null ?? false,
+      isUserAgree: getItem('isUserAgree') === true,
       isUserLogin: undefined,
       user: null
     };
@@ -129,7 +129,7 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
   }
 
   /**
-   * On Rules change
+   * On Agreement change
    * @param {boolean} state
    */
   onAgreementChange = (state: boolean): void => {
@@ -137,12 +137,13 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
   }
 
   render(): React.JSX.Element {
-    const { stream, isUserAgree, isUserLogin, user } = this.state;
+    const { stream, isUserAgree, user } = this.state;
+    console.log({ stream, isUserAgree, user })
     return (
         <div className="init">
-          {isUserAgree === true ? <></> : <Agreement onAgreementChange={this.onAgreementChange} />}
-          {stream && isUserAgree === true && isUserLogin === false ? <Login /> : <></>}
-          {stream && isUserAgree === true && isUserLogin === true && user !== null
+          {stream && isUserAgree === false ? <Agreement onAgreementChange={this.onAgreementChange} /> : <></> }
+          {stream && isUserAgree === true && user == null ? <Login /> : <></>}
+          {stream && isUserAgree === true && user !== null
             ? <Peer stream={stream} user={user}>
               </Peer>
             : <>
