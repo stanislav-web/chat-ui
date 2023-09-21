@@ -12,5 +12,5 @@ export interface ISelectRemoteCountry {
    * @param {MultiSelectChangeEvent} event
    * @return void
    */
-  onCountryChange: (event: MultiSelectChangeEvent) => void;
+  readonly onCountryChange: (event: MultiSelectChangeEvent) => void;
 }

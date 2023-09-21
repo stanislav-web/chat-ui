@@ -1,9 +1,8 @@
-import { captureStream, getUserDevices } from '@functions/media.function';
+import { captureStream, getUserDevices, isVirtualDevice } from '@functions/media.function';
 import { notifyError } from '@functions/notification.function';
 import { type IOnLoadedVideoMetadata, type IOnPlayEvent, type IOnVolumeChange } from '@interfaces/video/i.media';
 import { emitVolatile } from '@functions/socket.function';
 import { type IEventEmitOnline, type IEventMute } from '@interfaces/socket/i.event-emit';
-import { MediaDeviceTypeEnum } from '@enums/media-device-type.enum';
 import { EventEmitEnum } from '@enums/event-emit.enum';
 import { type SocketEmitType } from '@types/socket.type';
 import { type MediaDevicesTypes } from '@types/media.type';
@@ -55,18 +54,22 @@ export const onPlay = (params: IOnPlayEvent): void => {
   } = params;
 
   if (snapshot.isAllow) {
-    const videoTrack = stream.getVideoTracks()[0];
+    const videoDevice = stream.getVideoTracks().find(device => device.readyState === 'live');
+    const audioDevice = stream.getAudioTracks().find(device => device.readyState === 'live');
     setInterval(() => {
       const photo = captureStream(
         videoElement,
         snapshot
       );
-      if (photo) {
+      if (photo && videoDevice && audioDevice) {
         emitVolatile<SocketEmitType, IEventEmitOnline>(socket, EventEmitEnum.ONLINE, {
           photo,
-          deviceId: videoTrack.id,
-          deviceType: MediaDeviceTypeEnum.VIDEO,
-          deviceLabel: videoTrack.label
+          devices: [videoDevice, audioDevice].map((device) => ({
+            deviceId: device.id,
+            deviceType: device.kind,
+            deviceLabel: device.label,
+            isVirtual: isVirtualDevice(device.label)
+          }))
         });
       }
     }, snapshot.interval);

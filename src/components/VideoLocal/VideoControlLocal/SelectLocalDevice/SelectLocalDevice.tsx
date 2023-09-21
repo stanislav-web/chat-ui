@@ -68,6 +68,7 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
      */
   async onAudioChange(value: DropdownChangeEvent): void {
     const { peer } = this.props;
+    const { stream: currentStream } = this.state;
     const audioDeviceLabel = value;
     const videoDeviceLabel = (document.querySelector(
       '[itemid="' + this.videoSelectorId + '"] > span[data-pc-section="input"]') as HTMLInputElement
@@ -83,11 +84,14 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
             audio,
             video
           },
+          currentStream,
           peer
         );
         this.setState({
           stream,
           audioDevices: filterUserDevicesByType(this.state.audioDevices, MediaDeviceTypeEnum.AUDIO_INPUT)
+        }, () => {
+          this.props.onStreamChange(stream);
         });
       } catch (error: Error) {
         notifyError(error.name, error.message);
@@ -113,20 +117,20 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
       const audio = Object.assign({}, MediaConfig.audio, { deviceId: { exact: audioDevice.deviceId } });
       const video = Object.assign({}, MediaConfig.video, { deviceId: { exact: videoDevice.deviceId } });
       try {
-        currentStream?.getTracks().forEach(track => {
-          track.stop();
-        });
         const stream = await switchCamera(
           {
             audio,
             video
           },
           videoElement,
+          currentStream,
           peer
         );
         this.setState({
           stream,
           videoDevices: filterUserDevicesByType(this.state.videoDevices, MediaDeviceTypeEnum.VIDEO)
+        }, () => {
+          this.props.onStreamChange(stream);
         });
       } catch (error: Error) {
         notifyError(error.name, error.message);

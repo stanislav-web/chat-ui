@@ -12,6 +12,7 @@
 6. [v] Axios
    1. [v] Intercept to error statuses !=401
    2. [v] Make request for refresh token
-6. [v] NavBar
+7. [v] NavBar
    1. [v] Control from config 
    2. [v] Implementation via router
+8. [] Fallback peer servers to gooogle if not available

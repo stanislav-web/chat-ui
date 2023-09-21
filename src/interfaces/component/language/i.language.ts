@@ -17,5 +17,5 @@ export interface ILanguage {
    * Change language
    * @param {BaseSyntheticEvent} event
    */
-  onChange: (event: BaseSyntheticEvent) => void;
+  readonly onChange: (event: BaseSyntheticEvent) => void;
 }

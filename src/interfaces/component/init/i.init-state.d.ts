@@ -12,6 +12,7 @@ import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
  * @prop {IUser | null} user
  */
 export interface IInitState extends IBasePeerSteam {
+  readonly isLoaded: boolean;
   readonly isUserAgree: boolean;
   readonly isUserLogin: boolean;
   readonly user: IUser | null;

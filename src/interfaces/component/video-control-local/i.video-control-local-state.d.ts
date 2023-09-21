@@ -8,12 +8,12 @@ import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
  * @module interfaces/component/video-control-local
  * @extends IBasePeerConnect
  * @extends IBasePeerSteam
- * @prop {HTMLButtonElement} callBtn
- * @prop {HTMLButtonElement} recallBtn
- * @prop {HTMLButtonElement} breakBtn
+ * @prop {Boolean} callBtnLoading
+ * @prop {Boolean} breakBtnLoading
+ * @prop {Boolean} recallBtnLoading
  */
 export interface IVideoControlLocalState extends IBasePeerConnect, IBasePeerSteam {
-  readonly callBtn: HTMLButtonElement;
-  readonly recallBtn: HTMLButtonElement;
-  readonly breakBtn: HTMLButtonElement;
+  callBtnLoading: boolean;
+  breakBtnLoading: boolean;
+  recallBtnLoading: boolean;
 }

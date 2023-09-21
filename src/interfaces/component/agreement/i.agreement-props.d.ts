@@ -14,5 +14,5 @@ export interface IAgreementProps extends Pick<i18n, 't'> {
      * @param {boolean} state
      * @return boolean
      */
-  onAgreementChange: (state: boolean) => boolean;
+  readonly onAgreementChange: (state: boolean) => boolean;
 }

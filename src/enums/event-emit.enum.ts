@@ -4,6 +4,7 @@
  * @enum {string}
  */
 export enum EventEmitEnum {
+  START = 'start',
   ONLINE = 'online',
   MUTE = 'mute',
   OFFER = 'offer',

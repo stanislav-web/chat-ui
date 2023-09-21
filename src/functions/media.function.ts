@@ -3,6 +3,7 @@ import { type ISnapshot } from '@interfaces/video/i.snapshot';
 import { type Base64String } from '@types/base.type';
 import { type IMediaConfig } from '@interfaces/config/media-config.interface';
 import { MediaDeviceException } from '@exceptions/media-device.exception';
+import { MediaConfig } from '@configuration/media.config';
 
 /**
  * Get user media
@@ -107,38 +108,63 @@ export function attachSinkId(element: HTMLMediaElement, sinkId: string): Promise
  * @module functions
  * @param {Pick<IMediaConfig, 'audio' | 'video'>} constraints
  * @param {HTMLVideoElement} videoElement
+ * @param {MediaStream} currentStream
  * @param {RTCPeerConnection} [peer]
  * @return Promise<MediaStream>
  */
 export const switchCamera = (
   constraints: Pick<IMediaConfig, 'audio' | 'video'>,
   videoElement: HTMLVideoElement,
+  currentStream: MediaStream,
   peer?: RTCPeerConnection
-): Promise<MediaStream> => getUserMedia(constraints.audio, constraints.video)
-  .then(stream => {
-    videoElement.srcObject = stream;
-    const videoSender = peer?.getSenders().find(sender => sender.track.kind === 'video');
-    return videoSender
-      ? Promise.all([...stream.getVideoTracks().map(track => videoSender.replaceTrack(track))])
-        .then(() => Promise.resolve(stream))
-      : Promise.resolve(stream);
-  })
+): Promise<MediaStream> => {
+  currentStream.getVideoTracks().forEach(track => {
+    track.stop();
+  });
+  return getUserMedia(constraints.audio, constraints.video)
+    .then(stream => {
+      videoElement.srcObject = stream;
+      const videoSender = peer?.getSenders().find(sender => sender.track.kind === 'video');
+      return videoSender
+        ? Promise.all([...stream.getVideoTracks().map(track => videoSender.replaceTrack(track))])
+          .then(() => Promise.resolve(stream))
+        : Promise.resolve(stream);
+    })
+}
 
 /**
  * Microphone switcher
  * @module functions
  * @param {Pick<IMediaConfig, 'audio' | 'video'>} constraints
+ * @param {MediaStream} currentStream
  * @param {RTCPeerConnection} [peer]
  * @return Promise<MediaStream>
  */
 export const switchMicrophone = (
   constraints: Pick<IMediaConfig, 'audio' | 'video'>,
+  currentStream: MediaStream,
   peer?: RTCPeerConnection
-): Promise<MediaStream> => getUserMedia(constraints.audio, constraints.video)
-  .then(stream => {
-    const audioSender = peer?.getSenders().find(sender => sender.track.kind === 'audio');
-    return audioSender
-      ? Promise.all([...stream.getAudioTracks().map(track => audioSender.replaceTrack(track))])
-        .then(() => Promise.resolve(stream))
-      : Promise.resolve(stream)
-  })
+): Promise<MediaStream> => {
+  currentStream.getAudioTracks().forEach(track => {
+    track.stop();
+  });
+  return getUserMedia(constraints.audio, constraints.video)
+    .then(stream => {
+      const audioSender = peer?.getSenders().find(sender => sender.track.kind === 'audio');
+      return audioSender
+        ? Promise.all([...stream.getAudioTracks().map(track => audioSender.replaceTrack(track))])
+          .then(() => Promise.resolve(stream))
+        : Promise.resolve(stream)
+    });
+}
+
+/**
+ * Check for virtual media device
+ * @module functions
+ * @param {MediaDeviceInfo['label']} label
+ * @return boolean
+ */
+export const isVirtualDevice = (label: MediaDeviceInfo['label']): boolean => {
+  const regex = new RegExp(MediaConfig.virtualDevicesRegex, 'i')
+  return regex.test(label);
+}

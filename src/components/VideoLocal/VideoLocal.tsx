@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React from 'react';
 import './VideoLocal.css';
 import { MediaConfig } from '@configuration/media.config';
@@ -12,6 +11,7 @@ import { type UniqueId } from '@types/base.type';
 
 /**
  * VideoLocal app class
+ * @TODO
  * @module components
  * @extends React.Component<IVideoLocalProp, IVideoLocalState>
  */
@@ -26,7 +26,7 @@ class VideoLocal extends React.Component<IVideoLocalProp, IVideoLocalState> {
    * @type string [poster]
    * @private
    */
-  private readonly poster: UniqueId = MediaConfig.poster ?? '';
+  private readonly poster: string = MediaConfig.poster ?? '';
 
   /**
      * Constructor
@@ -56,10 +56,10 @@ class VideoLocal extends React.Component<IVideoLocalProp, IVideoLocalState> {
       const { socket, stream } = this.props;
       const { snapshot } = MediaConfig;
       videoElement.srcObject = stream;
-      videoElement.onloadedmetadata = (event: Event) => { onLoadedVideoMetadata({ videoElement }); };
-      videoElement.onresize = (event: Event) => { onResizeVideo(videoElement); };
-      videoElement.onvolumechange = (event: Event) => { onVolumeChange({ videoElement, stream, socket }); };
-      videoElement.onplay = (event: Event) => {
+      videoElement.onloadedmetadata = () => { onLoadedVideoMetadata({ videoElement }); };
+      videoElement.onresize = () => { onResizeVideo(videoElement); };
+      videoElement.onvolumechange = () => { onVolumeChange({ videoElement, stream, socket }); };
+      videoElement.onplay = () => {
         onPlay({
           videoElement,
           stream,
@@ -69,9 +69,6 @@ class VideoLocal extends React.Component<IVideoLocalProp, IVideoLocalState> {
       };
 
       // const peer = createPeerConnection();
-      // peer.ondatachannel = (event: RTCDataChannelEvent) => {
-      //   onDataChannel(event);
-      // };
       // peer.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
       //   onLocalIceCandidate(socket, event, EventEmitEnum.CANDIDATE);
       // }

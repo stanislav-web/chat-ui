@@ -10,6 +10,7 @@ import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
 import { type IEventListenAnswer, type IEventListenOffer } from '@interfaces/socket/i.event-listen';
 import { EventListenEnum } from '@enums/event-listen.enum';
 import { EventEmitEnum } from '@enums/event-emit.enum';
+import { RtcIceGatheringStateEnum } from '@enums/rtc-ice-gathering-state.enum';
 
 /**
  * RTC Negotiation start event handler
@@ -54,13 +55,35 @@ export function onSignalingStateChange(peer: RTCPeerConnection): void {
     case RtcSignallingStateEnum.HAVE_REMOTE_ANSWER:
       break;
     case RtcSignallingStateEnum.CLOSED:
+      console.log(`[X] -> SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`);
       break;
     case RtcSignallingStateEnum.STABLE:
       break;
     default:
       break;
   }
-  console.log(`[!] SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`);
+}
+
+/**
+ * RTC ICE gathering state change handler
+ * @module events
+ * @param {RTCPeerConnection} peer
+ * @return void
+ */
+export function onIceGatheringStateChange(peer: RTCPeerConnection): void {
+  switch (peer.iceGatheringState) {
+    case RtcIceGatheringStateEnum.NEW:
+      console.log(`[!] -> ICE GATHERING STATE: ${peer.iceGatheringState}`);
+      break;
+    case RtcIceGatheringStateEnum.GATHERING:
+      console.log(`[!] -> ICE GATHERING STATE: ${peer.iceGatheringState}`);
+      break;
+    case RtcIceGatheringStateEnum.COMPLETE:
+      console.log(`[!] -> ICE GATHERING STATE: ${peer.iceGatheringState}`);
+      break;
+    default:
+      break;
+  }
 }
 
 /**

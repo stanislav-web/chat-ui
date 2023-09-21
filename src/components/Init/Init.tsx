@@ -22,10 +22,10 @@ import { MediaConfig } from '@configuration/media.config';
 /**
  * Init app class
  * @module components
- * @extends React.Component<IInitProp, Partial<IInitState>>
+ * @extends React.Component<IInitProp, IInitState>
  * @implements IInit
  */
-class Init extends React.Component<IInitProp, Partial<IInitState>> implements IInit {
+class Init extends React.Component<IInitProp, IInitState> implements IInit {
   /**
    * Constructor
    * @param {IInitProp} props
@@ -33,6 +33,7 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
   constructor(props: IInitProp) {
     super(props);
     this.state = {
+      isLoaded: false,
       stream: null,
       isUserAgree: getItem('isUserAgree') === true,
       isUserLogin: undefined,
@@ -72,7 +73,7 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
       return;
     }
 
-    if (this.state.isUserAgree === true) {
+    if (this.state.isUserAgree) {
       try {
         let user: IUserResponse | null;
         const devices = await getUserDevices();
@@ -137,13 +138,13 @@ class Init extends React.Component<IInitProp, Partial<IInitState>> implements II
   }
 
   render(): React.JSX.Element {
-    const { stream, isUserAgree, user } = this.state;
-    console.log({ stream, isUserAgree, user })
+    const { stream, isUserAgree, isUserLogin, user, isLoaded } = this.state;
+    setTimeout(() => { this.setState({ isLoaded: true }); }, 800);
     return (
         <div className="init">
-          {stream && isUserAgree === false ? <Agreement onAgreementChange={this.onAgreementChange} /> : <></> }
-          {stream && isUserAgree === true && user == null ? <Login /> : <></>}
-          {stream && isUserAgree === true && user !== null
+          {!isUserAgree ? <Agreement onAgreementChange={this.onAgreementChange} /> : <></> }
+          {isLoaded && stream && isUserAgree && !isUserLogin ? <Login /> : <></>}
+          {isLoaded && stream && isUserAgree && isUserLogin && user !== null
             ? <Peer stream={stream} user={user}>
               </Peer>
             : <>

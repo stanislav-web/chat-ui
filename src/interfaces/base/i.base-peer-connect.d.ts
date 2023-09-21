@@ -7,4 +7,5 @@
  */
 export interface IBasePeerConnect {
   readonly peer: RTCPeerConnection | null;
+  readonly channel: RTCDataChannel | null;
 }

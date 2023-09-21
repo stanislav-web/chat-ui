@@ -7,7 +7,6 @@ import { type ISelectRemoteCountryState } from '@interfaces/component/select-reo
 import { countries } from '@utils/countries';
 import { MultiSelect, type MultiSelectChangeEvent } from 'primereact/multiselect';
 import { type LanguageType } from '@types/language.type';
-import { type JSX } from 'typedoc';
 
 /**
  * SelectRemoteCountry app class
@@ -77,7 +76,7 @@ class SelectRemoteCountry extends React.Component<ISelectRemoteCountryProp, ISel
   render(): React.JSX.Element {
     const { countries, selected } = this.state;
 
-    const countryListTpl = (option: { code: string; name: string }): JSX.Element => {
+    const countryListTpl = (option: { code: string; name: string }): React.JSX.Element => {
       let flag: LanguageType | string;
       if (option.code === 'en_us') {
         flag = 'gb';

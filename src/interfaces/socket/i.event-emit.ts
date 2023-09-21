@@ -5,10 +5,27 @@ import { type MediaDeviceTypeEnum } from '@enums/media-device-type.enum';
  */
 export interface IEventEmitOnline {
   readonly photo: string;
-  readonly countries?: string[];
-  readonly deviceId: string;
-  readonly deviceType: MediaDeviceTypeEnum;
-  readonly deviceLabel: string;
+  readonly countries?: Array<CountryListItem['code']> | [];
+  readonly devices: Array<{
+    deviceId: string;
+    deviceType: MediaDeviceTypeEnum;
+    deviceLabel: string;
+    isVirtual: boolean;
+  }>;
+}
+
+/**
+ * Emit 'start'
+ */
+export interface IEventEmitStart {
+  readonly photo: string;
+  readonly countries: Array<CountryListItem['code']>;
+  readonly devices: Array<{
+    deviceId: string;
+    deviceType: MediaDeviceTypeEnum;
+    deviceLabel: string;
+    isVirtual: boolean;
+  }>;
 }
 
 /**
