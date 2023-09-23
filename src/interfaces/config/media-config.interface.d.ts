@@ -65,6 +65,7 @@ export interface IMediaConfig {
   audio: boolean | MediaTrackConstraints;
   video: boolean | MediaTrackConstraints;
   poster?: string;
+  virtualDevicesRegex: RegExp;
   snapshot: ISnapshot;
   local: IVideoContainer;
   remote: IVideoContainer;

@@ -1,9 +1,9 @@
 /**
  * SocketEmit type
- * @type {string|string|string|string|string}
+ * @type {string|string|string|string|string|string}
  * @const
  */
- type SocketEmitType = 'online' | 'mute' | 'offer' | 'answer' | 'candidate';
+ type SocketEmitType = 'start' | 'online' | 'mute' | 'offer' | 'answer' | 'candidate';
 
 /**
  * SocketListen type

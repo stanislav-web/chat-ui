@@ -5,6 +5,5 @@
  */
 export enum MediaDeviceTypeEnum {
   AUDIO_INPUT = 'audioinput',
-  AUDIO_OUTPUT = 'audiooutput',
   VIDEO = 'videoinput'
 }

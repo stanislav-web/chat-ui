@@ -8,9 +8,13 @@ export const MediaConfig: IMediaConfig = {
     channelCount: 1
   },
   video: {
-    advanced: [{ frameRate: 30 }]
+    facingMode: 'user',
+    width: { min: 320, max: 640, ideal: 640 },
+    height: { min: 240, max: 480, ideal: 480 },
+    advanced: [{ frameRate: 30, torch: false }]
   },
   poster: 'assets/noise.gif',
+  virtualDevicesRegex: /Virtual|OBS|MeetCam|Soundflower|BlackHole/i,
   snapshot: {
     isAllow: true,
     interval: 180000,

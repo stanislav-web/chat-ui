@@ -10,6 +10,7 @@ import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
 import { type IEventListenAnswer, type IEventListenOffer } from '@interfaces/socket/i.event-listen';
 import { EventListenEnum } from '@enums/event-listen.enum';
 import { EventEmitEnum } from '@enums/event-emit.enum';
+import { RtcIceGatheringStateEnum } from '@enums/rtc-ice-gathering-state.enum';
 
 /**
  * RTC Negotiation start event handler
@@ -20,8 +21,11 @@ import { EventEmitEnum } from '@enums/event-emit.enum';
  */
 export const onNegotiationNeeded = async (socket: Socket, peer: RTCPeerConnection): void => {
   try {
-    const offer = await createPeerOffer(peer);
-    emit<SocketEmitType, IEventEmitOffer>(socket, EventEmitEnum.OFFER, offer);
+    if (peer.connectionState === RtcConnectionStateEnum.NEW &&
+        peer.signalingState === RtcSignallingStateEnum.STABLE) {
+      const offer = await createPeerOffer(peer);
+      emit<SocketEmitType, IEventEmitOffer>(socket, EventEmitEnum.OFFER, offer);
+    }
     on<SocketListenType, IEventListenOffer>(socket, EventListenEnum.ANSWER, async (event: IEventListenAnswer) => {
       try {
         if (event.type === EventListenEnum.ANSWER && isPeerAvailable(peer?.connectionState)) {
@@ -54,13 +58,36 @@ export function onSignalingStateChange(peer: RTCPeerConnection): void {
     case RtcSignallingStateEnum.HAVE_REMOTE_ANSWER:
       break;
     case RtcSignallingStateEnum.CLOSED:
+      console.log(`[X] -> SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`);
       break;
     case RtcSignallingStateEnum.STABLE:
       break;
     default:
       break;
   }
-  console.log(`[!] SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`);
+}
+
+/**
+ * RTC ICE gathering state change handler
+ * @module events
+ * @param {RTCPeerConnection} peer
+ * @return RTCIceGatheringState
+ */
+export function onIceGatheringStateChange(peer: RTCPeerConnection): RTCIceGatheringState {
+  switch (peer.iceGatheringState) {
+    case RtcIceGatheringStateEnum.NEW:
+      console.log(`[!] -> ICE GATHERING STATE: ${peer.iceGatheringState}`);
+      break;
+    case RtcIceGatheringStateEnum.GATHERING:
+      console.log(`[!] -> ICE GATHERING STATE: ${peer.iceGatheringState}`);
+      break;
+    case RtcIceGatheringStateEnum.COMPLETE:
+      console.log(`[!] -> ICE GATHERING STATE: ${peer.iceGatheringState}`);
+      break;
+    default:
+      break;
+  }
+  return peer.iceGatheringState;
 }
 
 /**
@@ -94,13 +121,12 @@ export const onConnectionStateChange = (peer: RTCPeerConnection): void => {
 }
 
 /**
- * Event is sent to an RTCPeerConnection instance when an RTCDataChannel has been added to the connection,
- * as a result of the remote peer calling
- * @param {RTCDataChannelEvent} event
+ * On Close data chanel
+ * @param {RTCPeerConnection} peer
  * @return void
  */
-export const onDataChannel = (event: RTCDataChannelEvent): void => {
-  console.info('onDataChannel', event);
+export const onCloseDataChannel = (peer: RTCPeerConnection): void => {
+  peer.close();
 }
 
 /**

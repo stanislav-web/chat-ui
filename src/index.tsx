@@ -53,10 +53,15 @@ const Index = (): React.JSX.Element =>
 
 root.render(
     <I18nextProvider i18n={i18n}>
-        <ErrorBoundary>
-            <PrimeReactProvider>
+        {!AppConfig.isProduction
+          ? <ErrorBoundary>
+                <PrimeReactProvider>
+                    <Index className="card flex justify-content-center" />
+                </PrimeReactProvider>
+            </ErrorBoundary>
+          : <PrimeReactProvider>
                 <Index className="card flex justify-content-center" />
             </PrimeReactProvider>
-        </ErrorBoundary>
+        }
     </I18nextProvider>
 );

@@ -9,11 +9,11 @@ export interface IAgreement {
    * On accept agreement
    * @return void
    */
-  onAccept: () => void;
+  readonly onAccept: () => void;
 
   /**
    * On decline agreement
    * @return void
    */
-  onDecline: () => void;
+  readonly onDecline: () => void;
 }

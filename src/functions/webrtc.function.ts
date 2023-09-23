@@ -42,7 +42,7 @@ export async function createPeerOffer(localConnection: RTCPeerConnection): Promi
       offerToReceiveVideo: true
     });
     console.log('[!] -> LOCAL: Peer offer', offer);
-    if (!isPeerConnected(localConnection)) {
+    if (!isRemotePeerConnected(localConnection)) {
       await localConnection.setLocalDescription(offer);
     }
     return offer;
@@ -75,11 +75,11 @@ export async function createPeerAnswer(remoteConnection: RTCPeerConnection): Pro
 }
 
 /**
- * Is Peer connected
+ * Is Remote Peer connected
  * @param {RTCPeerConnection} peer
  * @return boolean
  */
-export function isPeerConnected(peer: RTCPeerConnection): boolean {
+export function isRemotePeerConnected(peer: RTCPeerConnection): boolean {
   return peer.connectionState === RtcConnectionStateEnum.CONNECTED;
 }
 

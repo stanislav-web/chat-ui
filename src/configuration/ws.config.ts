@@ -2,6 +2,7 @@ import { type ManagerOptions } from 'socket.io-client/build/esm/manager';
 import { type SocketOptions } from 'socket.io-client/build/esm/socket';
 import * as MsgParser from 'socket.io-msgpack-parser';
 import { AppConfig } from '@configuration/app.config';
+import { getItem } from '@functions/localstorage.function';
 
 export const WsConfig: Partial<ManagerOptions & SocketOptions> = {
   transports: ['websocket', 'polling', 'webtransport'],
@@ -17,6 +18,9 @@ export const WsConfig: Partial<ManagerOptions & SocketOptions> = {
   reconnectionAttempts: 3,
   parser: AppConfig.isProduction && MsgParser,
   path: process.env.REACT_APP_WS_SERVER_PATH as string,
+  query: {
+    lang: getItem('lang') as string
+  },
   auth: {
     key: process.env.REACT_APP_WS_SERVER_KEY as string
   },

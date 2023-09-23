@@ -2,8 +2,6 @@
     display: inline-block;
     padding: 1rem 1rem;
     vertical-align: middle;
-    height: 100%;
-    width: 100%;
 }
 
 .video-local video {
@@ -11,6 +9,17 @@
     width: 640px;
 }
 
-.video-local-container {
+.video-local .video-local-container {
+
+}
+
+.video-local .video-local-control {
+
+}
+
+.video-local .video-local-control .video-local-device {
+
+}
+.video-local .video-local-control .video-local-buttons {
 
 }

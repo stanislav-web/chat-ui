@@ -13,5 +13,5 @@ export interface ILogin {
    * @param {AuthProviderPath} path
    * @return void
    */
-  onLogin: (provider: AuthProviderType, path: AuthProviderPath) => void;
+  readonly onLogin: (provider: AuthProviderType, path: AuthProviderPath) => void;
 }

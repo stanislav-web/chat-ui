@@ -1,9 +1,3 @@
-.header-navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-navbar .header-nav-links {
+.header-nav-links {
     display: flex;
 }

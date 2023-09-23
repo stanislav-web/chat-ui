@@ -5,7 +5,7 @@ import { addCandidate, createPeerAnswer, createPeerConnection } from '@functions
 import { notifyError } from '@functions/notification.function';
 import {
   onConnectionStateChange,
-  onDataChannel,
+  onCloseDataChannel,
   onIceCandidateError,
   onRemoteIceCandidate,
   onSignalingStateChange,
@@ -20,24 +20,27 @@ import { EventListenEnum } from '@enums/event-listen.enum';
 import { PeerException } from '@exceptions/peer.exception';
 import { onLoadedVideoMetadata, onResizeVideo } from '@events/media.event';
 import { type IVideoRemoteState } from '@interfaces/component/video-remote/i.video-remote-state';
-import VideoControlRemote from '@components/VideoRemote/VideoCotrolRemote/VideoControlRemote';
 import { type IVideoRemoteProp } from '@interfaces/component/video-remote/i.video-remote-prop';
 import { withTranslation } from 'react-i18next';
 import { type UniqueId } from '@types/base.type';
+import SelectRemoteCountry from '@components/VideoRemote/SelectRemoteCountry/SelectRemoteCountry';
+import { type IVideoRemote } from '@interfaces/component/video-remote/i.video-remote';
+import { setItem } from '@functions/localstorage.function';
 
 /**
  * VideoRemote app class
  * @module components
  * @extends React.Component<IVideoRemoteProp, IVideoRemoteState>
+ * @implements IVideoRemote
  */
-class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> {
+class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> implements IVideoRemote {
   private readonly containerId: UniqueId = MediaConfig.remote.containerId;
   private readonly poster: string = MediaConfig.poster ?? '';
 
   /**
-     * Constructor
-     * @param {IVideoRemoteProp} props
-     */
+   * Constructor
+   * @param {IVideoRemoteProp} props
+   */
   constructor(props: IVideoRemoteProp) {
     super(props);
     this.state = {
@@ -78,7 +81,7 @@ class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> {
         onSignalingStateChange(peer, event);
       };
       peer.ondatachannel = (event: RTCDataChannelEvent) => {
-        onDataChannel(event);
+        onCloseDataChannel(event);
       };
       peer.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => {
         onIceCandidateError(error);
@@ -110,6 +113,22 @@ class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> {
     }
   }
 
+  /**
+   * On Remote Peer listener
+   */
+  remotePeerListener (): void {
+
+  }
+
+  /**
+   * On countries change event handler
+   * @param {Array<CountryListItem['code']> | []} countries
+   * @return void
+   */
+  onCountriesChange = (countries: Array<CountryListItem['code']> | []): void => {
+    setItem('selected', countries);
+  }
+
   render(): React.JSX.Element {
     const { video } = this.state;
     const { socket } = this.props;
@@ -118,12 +137,11 @@ class VideoRemote extends React.Component<IVideoRemoteProp, IVideoRemoteState> {
           <div className="video-remote-container">
             <video id={this.containerId} disablePictureInPicture autoPlay playsInline poster={this.poster}/>
           </div>
-          <div className="video-remote-control">
-            {video
-              ? <VideoControlRemote socket={socket} video={video} />
-              : <></>
-            }
-          </div>
+          {video && socket.connected
+            ? <div className="video-remote-control">
+                <SelectRemoteCountry onCountriesChange={this.onCountriesChange} />
+              </div>
+            : <></>}
         </div>
     )
   }

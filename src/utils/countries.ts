@@ -64,7 +64,6 @@ export const countries: CountryListItem[] = [
   { name: 'Cape Verde', code: 'CV', flag: '🇨🇻' },
   {
     name: 'Cayman Islands',
-    dial_code: '+ 345',
     code: 'KY',
     flag: '🇰🇾'
   },
