@@ -143,7 +143,7 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
     const videoTracks = stream?.getVideoTracks();
     const audioTracks = stream?.getAudioTracks();
     return (
-        <div className="select-local-device">
+        <>
             {videoDevices.length > 0 && videoTracks.length > 0
               ? <div className="select-local-device-video">
                         <i className="pi pi-camera" style={{ fontSize: '1rem' }}>.</i>
@@ -176,7 +176,7 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
                 </div>
               : <></>
             }
-        </div>
+        </>
     );
   }
 }

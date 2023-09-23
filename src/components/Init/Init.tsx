@@ -112,11 +112,15 @@ class Init extends React.Component<IInitProp, IInitState> implements IInit {
           this.setState({
             isUserLogin: user.data?.ban === null,
             user: user.data ?? null
+          }, () => {
+            this.setState({ isLoaded: true });
           });
         } else {
           this.setState({
             isUserLogin: false,
             user: null
+          }, () => {
+            this.setState({ isLoaded: true });
           });
         }
       } catch (error: Error) {
@@ -139,7 +143,6 @@ class Init extends React.Component<IInitProp, IInitState> implements IInit {
 
   render(): React.JSX.Element {
     const { stream, isUserAgree, isUserLogin, user, isLoaded } = this.state;
-    setTimeout(() => { this.setState({ isLoaded: true }); }, 800);
     return (
         <div className="init">
           {!isUserAgree ? <Agreement onAgreementChange={this.onAgreementChange} /> : <></> }

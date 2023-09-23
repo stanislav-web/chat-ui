@@ -88,7 +88,7 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
         <div className="peer-container">
             {stream && user && connected
               ? <div className="peer-output">
-                  <Splitter style={{ height: '300px' }} className="mb-5">
+                  <Splitter className="mb-5">
                     <SplitterPanel className="flex align-items-center justify-content-center">
                       <VideoRemote socket={socket} user={user} />
                     </SplitterPanel>

@@ -1,17 +1,24 @@
-// i.video-control-local.d.ts
+// i.video-local.d.ts
 
 import type React from 'react';
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
 
 /**
- * @typedef IVideoControlLocal VideoControlLocal.tsx
- * @module interfaces/component/video-control-local
+ * @typedef IVideoLocal VideoLocal.tsx
+ * @module interfaces/component/video-local
  */
-export interface IVideoControlLocal {
+export interface IVideoLocal {
+
+  /**
+   * Local Peer listener
+   * @return void
+   */
+  readonly localPeerListener: () => void;
 
   /**
    * On Stream change (audio or media)
    * @param {IBasePeerSteam['stream']} stream
+   * @return void
    */
   readonly onStreamChange: (stream: IBasePeerSteam['stream']) => void;
 

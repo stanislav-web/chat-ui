@@ -11,5 +11,5 @@ import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
  */
 export interface ISelectRemoteCountryState extends IBasePeerSteam {
   countries: CountryListItem[];
-  selected: Array<CountryListItem['code']>;
+  selected: Array<CountryListItem['code']> | [];
 }

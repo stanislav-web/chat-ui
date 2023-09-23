@@ -81,7 +81,7 @@ export const captureStream = (
   sourceEl: HTMLVideoElement,
   config: ISnapshot
 ): Base64String => {
-  const canvas = document.createElement('canvas')
+  const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   ctx.canvas.width = config?.width | 128;
   ctx.canvas.height = config?.height | 128;

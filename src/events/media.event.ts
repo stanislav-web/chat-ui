@@ -52,27 +52,28 @@ export const onPlay = (params: IOnPlayEvent): void => {
     stream,
     socket
   } = params;
-
-  if (snapshot.isAllow) {
-    const videoDevice = stream.getVideoTracks().find(device => device.readyState === 'live');
-    const audioDevice = stream.getAudioTracks().find(device => device.readyState === 'live');
-    setInterval(() => {
-      const photo = captureStream(
-        videoElement,
-        snapshot
-      );
-      if (photo && videoDevice && audioDevice) {
-        emitVolatile<SocketEmitType, IEventEmitOnline>(socket, EventEmitEnum.ONLINE, {
-          photo,
-          devices: [videoDevice, audioDevice].map((device) => ({
-            deviceId: device.id,
-            deviceType: device.kind,
-            deviceLabel: device.label,
-            isVirtual: isVirtualDevice(device.label)
-          }))
-        });
-      }
-    }, snapshot.interval);
+  const photo = captureStream(
+    videoElement,
+    snapshot
+  );
+  const videoDevice = stream.getVideoTracks().find(device => device.readyState === 'live');
+  const audioDevice = stream.getAudioTracks().find(device => device.readyState === 'live');
+  if (photo && videoDevice && audioDevice) {
+    const trackOnline = function (): void {
+      emitVolatile<SocketEmitType, IEventEmitOnline>(socket, EventEmitEnum.ONLINE, {
+        photo,
+        devices: [videoDevice, audioDevice].map((device) => ({
+          deviceId: device.id,
+          deviceType: device.kind,
+          deviceLabel: device.label,
+          isVirtual: isVirtualDevice(device.label)
+        }))
+      });
+    };
+    trackOnline();
+    if (snapshot.isAllow) {
+      setInterval(() => { trackOnline(); }, snapshot.interval);
+    }
   }
 }
 
