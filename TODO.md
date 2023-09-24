@@ -16,3 +16,4 @@
    1. [v] Control from config 
    2. [v] Implementation via router
 8. [] Fallback peer servers to google if not available
+9. [] oniceconnectionstatechange -> pc.restartIce()

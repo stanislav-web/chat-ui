@@ -54,7 +54,7 @@ interface IControlContainer {
  * @typedef IControlContainer Media config interface
  * @module interfaces/config
  * @prop {boolean | MediaTrackConstraints} audio
- * @prop {boolean | MediaTrackConstraints} video
+ * @prop {boolean | MediaTrackConstraints} media
  * @prop {UniqueId} [poster]
  * @prop {string} snapshot
  * @prop {IVideoContainer} local

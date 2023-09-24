@@ -76,7 +76,7 @@ class Peer extends React.Component<IPeerProp, IPeerState> {
           ns: 'Exceptions'
         }), this.props.t(data.message, {
           ns: 'Exceptions'
-        }), 2000);
+        }), 3000);
       });
     }
   }

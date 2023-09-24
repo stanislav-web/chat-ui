@@ -1,5 +1,5 @@
 import { type MediaDevicesTypes } from '@types/media.type';
-import { type ISnapshot } from '@interfaces/video/i.snapshot';
+import { type ISnapshot } from '@interfaces/media/i.snapshot';
 import { type Base64String } from '@types/base.type';
 import { type IMediaConfig } from '@interfaces/config/media-config.interface';
 import { MediaDeviceException } from '@exceptions/media-device.exception';
@@ -71,7 +71,7 @@ export const findUserDeviceByLabel = (
 export const getUserMediaConstraints = (): MediaTrackSupportedConstraints => navigator.mediaDevices.getSupportedConstraints()
 
 /**
- * Capture video stream
+ * Capture media stream
  * @module functions
  * @param {HTMLVideoElement} sourceEl
  * @param {ISnapshot} config
@@ -83,14 +83,14 @@ export const captureStream = (
 ): Base64String => {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  ctx.canvas.width = config?.width | 128;
-  ctx.canvas.height = config?.height | 128;
+  ctx.canvas.width = config.width;
+  ctx.canvas.height = config.height;
   ctx.drawImage(sourceEl, 0, 0, ctx.canvas.width, ctx.canvas.height);
   return canvas.toDataURL(config.type, config.quality).split(',')[1];
 }
 
 /**
- * Attach audio output device to video element using device/sink ID.
+ * Attach audio output device to media element using device/sink ID.
  * @module functions
  * @param {HTMLMediaElement} element
  * @throws MediaDeviceException
@@ -106,7 +106,7 @@ export function attachSinkId(element: HTMLMediaElement, sinkId: string): Promise
 /**
  * Camera switcher
  * @module functions
- * @param {Pick<IMediaConfig, 'audio' | 'video'>} constraints
+ * @param {Pick<IMediaConfig, 'audio' | 'media'>} constraints
  * @param {HTMLVideoElement} videoElement
  * @param {MediaStream} currentStream
  * @param {RTCPeerConnection} [peer]
@@ -135,7 +135,7 @@ export const switchCamera = (
 /**
  * Microphone switcher
  * @module functions
- * @param {Pick<IMediaConfig, 'audio' | 'video'>} constraints
+ * @param {Pick<IMediaConfig, 'audio' | 'media'>} constraints
  * @param {MediaStream} currentStream
  * @param {RTCPeerConnection} [peer]
  * @return Promise<MediaStream>

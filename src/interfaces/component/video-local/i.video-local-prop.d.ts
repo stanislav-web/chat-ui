@@ -1,4 +1,4 @@
-// i.video-local-prop.d.ts
+// i.media-local-prop.d.ts
 
 import { type IBasePeerTransport } from '@interfaces/base/i.base-peer-transport';
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';

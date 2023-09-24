@@ -20,8 +20,8 @@ export const MediaConfig: IMediaConfig = {
     interval: 180000,
     type: 'image/png',
     quality: 0.92,
-    width: 64,
-    height: 64
+    width: 32,
+    height: 32
   },
   local: {
     containerId: uuid(),

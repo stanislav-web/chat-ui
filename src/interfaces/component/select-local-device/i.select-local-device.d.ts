@@ -8,7 +8,7 @@ import { type DropdownChangeEvent } from 'primereact/dropdown';
  */
 export interface ISelectLocalDevice {
   /**
-   * On video device change event handler
+   * On media device change event handler
    * @param {DropdownChangeEvent} value
    * @return void
    */

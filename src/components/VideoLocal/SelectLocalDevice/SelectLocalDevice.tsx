@@ -100,7 +100,7 @@ class SelectLocalDevice extends React.Component<ISelectLocalDeviceProp, ISelectL
   }
 
   /**
-     * On video device change event handler
+     * On media device change event handler
      * @param {DropdownChangeEvent} value
      * @return void
      */

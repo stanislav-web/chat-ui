@@ -112,6 +112,7 @@ export const onConnectionStateChange = (peer: RTCPeerConnection): void => {
     case RtcConnectionStateEnum.CLOSED:
       break;
     case RtcConnectionStateEnum.FAILED:
+      console.log('FAILED.... Restart')
       peer.restartIce();
       break;
     default:
@@ -178,7 +179,7 @@ export function onRemoteIceCandidate(socket: Socket, event: RTCPeerConnectionIce
 export function onTrack(target: HTMLVideoElement, event: RTCTrackEvent): void {
   const [remoteStream] = event.streams;
   if (!'srcObject' in target) {
-    throw new MediaTackException('No remote video');
+    throw new MediaTackException('No remote media');
   } else {
     if (target.srcObject !== remoteStream) {
       target.srcObject = remoteStream;

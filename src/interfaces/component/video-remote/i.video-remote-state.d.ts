@@ -1,4 +1,4 @@
-// i.video-remote-state.d.ts
+// i.media-remote-state.d.ts
 
 import { type IBasePeerElement } from '@interfaces/base/i.base-peer-element';
 import { type IBasePeerConnect } from '@interfaces/base/i.base-peer-connect';
