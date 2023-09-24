@@ -5,6 +5,7 @@
  */
 export enum EventEmitEnum {
   START = 'start',
+  STOP = 'stop',
   ONLINE = 'online',
   MUTE = 'mute',
   OFFER = 'offer',

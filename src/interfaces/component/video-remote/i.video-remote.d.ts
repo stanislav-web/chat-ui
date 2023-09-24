@@ -1,4 +1,4 @@
-// i.video-remote.d.ts
+// i.media-remote.d.ts
 
 /**
  * @typedef VideoRemote VideoRemote.tsx

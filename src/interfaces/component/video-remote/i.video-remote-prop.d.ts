@@ -1,4 +1,4 @@
-// i.video-remote-prop.d.ts
+// i.media-remote-prop.d.ts
 
 import { type IBasePeerTransport } from '@interfaces/base/i.base-peer-transport';
 import { type i18n } from 'i18next';

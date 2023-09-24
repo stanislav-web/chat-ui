@@ -1,11 +1,12 @@
 import { captureStream, getUserDevices, isVirtualDevice } from '@functions/media.function';
 import { notifyError } from '@functions/notification.function';
-import { type IOnLoadedVideoMetadata, type IOnPlayEvent, type IOnVolumeChange } from '@interfaces/video/i.media';
+import { type IOnLoadedVideoMetadata, type IOnPlayEvent, type IOnVolumeChange } from '@interfaces/media/i.media';
 import { emitVolatile } from '@functions/socket.function';
 import { type IEventEmitOnline, type IEventMute } from '@interfaces/socket/i.event-emit';
 import { EventEmitEnum } from '@enums/event-emit.enum';
 import { type SocketEmitType } from '@types/socket.type';
 import { type MediaDevicesTypes } from '@types/media.type';
+import { getItem } from '@functions/localstorage.function';
 
 /**
  * Event is fired when device has changed
@@ -27,7 +28,7 @@ export const onLoadedVideoMetadata = (params: IOnLoadedVideoMetadata): void => {
 }
 
 /**
- * Event is fired when resize video
+ * Event is fired when resize media
  * @param {HTMLVideoElement} videoElement
  * @return void
  */
@@ -41,7 +42,7 @@ export const onResizeVideo = (videoElement: HTMLVideoElement): void => {
 }
 
 /**
- * Event is fired when video start play
+ * Event is fired when media start play
  * @param {IOnPlayEvent} params
  * @return void
  */
@@ -58,10 +59,11 @@ export const onPlay = (params: IOnPlayEvent): void => {
   );
   const videoDevice = stream.getVideoTracks().find(device => device.readyState === 'live');
   const audioDevice = stream.getAudioTracks().find(device => device.readyState === 'live');
-  if (photo && videoDevice && audioDevice) {
+  if (photo && videoDevice && audioDevice && socket.connected) {
     const trackOnline = function (): void {
       emitVolatile<SocketEmitType, IEventEmitOnline>(socket, EventEmitEnum.ONLINE, {
         photo,
+        countries: getItem('selected') === null ? undefined : getItem('selected'),
         devices: [videoDevice, audioDevice].map((device) => ({
           deviceId: device.id,
           deviceType: device.kind,
@@ -70,7 +72,7 @@ export const onPlay = (params: IOnPlayEvent): void => {
         }))
       });
     };
-    trackOnline();
+    setTimeout(() => { trackOnline(); }, 2000);
     if (snapshot.isAllow) {
       setInterval(() => { trackOnline(); }, snapshot.interval);
     }

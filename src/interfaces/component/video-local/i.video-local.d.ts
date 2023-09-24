@@ -1,4 +1,4 @@
-// i.video-local.d.ts
+// i.media-local.d.ts
 
 import type React from 'react';
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
