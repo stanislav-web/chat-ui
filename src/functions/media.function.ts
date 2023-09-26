@@ -4,6 +4,7 @@ import { type Base64String } from '@types/base.type';
 import { type IMediaConfig } from '@interfaces/config/media-config.interface';
 import { MediaDeviceException } from '@exceptions/media-device.exception';
 import { MediaConfig } from '@configuration/media.config';
+import { MediaTrackStateEnum } from '@enums/media-track-state.enum';
 
 /**
  * Get user media
@@ -101,6 +102,17 @@ export function attachSinkId(element: HTMLMediaElement, sinkId: string): Promise
   if (typeof element.sinkId !== 'undefined') {
     return element.setSinkId(sinkId);
   } else throw new MediaDeviceException('Browser does not support output device selection.');
+}
+
+/**
+ * Stop active tracks
+ * @param {MediaStream} stream
+ * @return void
+ */
+export const stopActiveTracks = (stream: MediaStream): void => {
+  stream.getTracks().forEach((track) => {
+    if (track.readyState === MediaTrackStateEnum.LIVE) track.stop();
+  });
 }
 
 /**

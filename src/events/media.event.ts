@@ -7,6 +7,7 @@ import { EventEmitEnum } from '@enums/event-emit.enum';
 import { type SocketEmitType } from '@types/socket.type';
 import { type MediaDevicesTypes } from '@types/media.type';
 import { getItem } from '@functions/localstorage.function';
+import { MediaTrackStateEnum } from '@enums/media-track-state.enum';
 
 /**
  * Event is fired when device has changed
@@ -57,8 +58,8 @@ export const onPlay = (params: IOnPlayEvent): void => {
     videoElement,
     snapshot
   );
-  const videoDevice = stream.getVideoTracks().find(device => device.readyState === 'live');
-  const audioDevice = stream.getAudioTracks().find(device => device.readyState === 'live');
+  const videoDevice = stream.getVideoTracks().find(device => device.readyState === MediaTrackStateEnum.LIVE);
+  const audioDevice = stream.getAudioTracks().find(device => device.readyState === MediaTrackStateEnum.LIVE);
   if (photo && videoDevice && audioDevice && socket.connected) {
     const trackOnline = function (): void {
       emitVolatile<SocketEmitType, IEventEmitOnline>(socket, EventEmitEnum.ONLINE, {

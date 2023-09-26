@@ -15,6 +15,6 @@ export const encryptMessage = (message: string): string => AppConfig.isDecrypt
  * @param {string} encrypted
  * @return string
  */
-export const decryptMessage = (encrypted: string): string => AppConfig.isDecrypt
+export const decryptMessage = (encrypted?: string): string => AppConfig.isDecrypt && encrypted
   ? CryptoJS.AES.decrypt(encrypted, AppConfig.key).toString(CryptoJS.enc.Utf8)
   : encrypted;

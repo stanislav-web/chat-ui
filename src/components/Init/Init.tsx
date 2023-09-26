@@ -18,6 +18,7 @@ import { type IUserResponse } from '@interfaces/user/i.user-response';
 import { type IInit } from '@interfaces/component/init/i.init';
 import { withTranslation } from 'react-i18next';
 import { MediaConfig } from '@configuration/media.config';
+import Loading from '@components/Loading/Loading';
 
 /**
  * Init app class
@@ -137,21 +138,25 @@ class Init extends React.Component<IInitProp, IInitState> implements IInit {
    * On Agreement change
    * @param {boolean} state
    */
-  onAgreementChange = (state: boolean): void => {
-    this.setState({ isUserAgree: state, isUserLogin: false });
+  onAgreementChange (state: boolean): void {
+    this.setState({
+      isUserAgree: state,
+      isUserLogin: false,
+      isLoaded: true
+    });
   }
 
   render(): React.JSX.Element {
     const { stream, isUserAgree, isUserLogin, user, isLoaded } = this.state;
     return (
         <div className="init">
-          {!isUserAgree ? <Agreement onAgreementChange={this.onAgreementChange} /> : <></> }
+          {!isUserAgree ? <Agreement onAgreementChange={(state) => { this.onAgreementChange(state); }} /> : <></> }
           {isLoaded && stream && isUserAgree && !isUserLogin ? <Login /> : <></>}
           {isLoaded && stream && isUserAgree && isUserLogin && user !== null
             ? <Peer stream={stream} user={user}>
               </Peer>
-            : <>
-              </>}
+            : <Loading>
+              </Loading>}
         </div>
     );
   }

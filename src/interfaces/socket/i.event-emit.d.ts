@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { type MediaDeviceTypeEnum } from '@enums/media-device-type.enum';
 import { type UniqueId } from '@types/base.type';
+import { captureStream, isVirtualDevice } from '@functions/media.function';
+import { MediaConfig } from '@configuration/media.config';
 
 /**
  * Emit 'online'
@@ -36,7 +38,7 @@ export interface IEventEmitOnline {
  * @prop {Array<CountryListItem['code']> | []} countries
  */
 export interface IEventEmitStart extends IEventEmitOnline {
-  readonly countries: Array<CountryListItem['code']>;
+  readonly countries: Array<CountryListItem['code']> | [];
 }
 
 /**

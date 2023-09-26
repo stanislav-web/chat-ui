@@ -13,3 +13,51 @@
 .peer-error {
 
 }
+
+.peer-local {
+    display: inline-block;
+    padding: 1rem 1rem;
+    vertical-align: middle;
+}
+
+.peer-local video {
+    height: 480px;
+    width: 640px;
+}
+
+.peer-local .peer-local-container {
+
+}
+
+.peer-local .peer-local-control {
+
+}
+.peer-local .peer-local-country {
+
+}
+
+.peer-local .peer-local-control .peer-local-device {
+
+}
+.peer-local .peer-local-control .peer-local-buttons {
+
+}
+
+.peer-remote {
+    display: inline-block;
+    padding: 1rem 1rem;
+    vertical-align: middle;
+}
+
+.peer-remote video {
+    height: 480px;
+    width: 640px;
+}
+
+.peer-remote .peer-remote-container {
+
+}
+
+.peer-remote .peer-remote-control {
+
+}

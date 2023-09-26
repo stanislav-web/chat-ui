@@ -8,10 +8,13 @@ import { type IUserIce } from '@interfaces/user/i.user-ice';
  * @prop {UniqueId} id
  * @prop {string} [photoUrl]
  * @prop {any} [ban]
+ * @prop {CountryListItem['code']} [country]
+ * @prop {IUserIce[]} [ice]
  */
 export interface IUser {
   readonly id: UniqueId;
   readonly photoUrl?: string;
   readonly ban?: any;
+  readonly country?: CountryListItem['code'];
   readonly ice?: IUserIce[];
 }

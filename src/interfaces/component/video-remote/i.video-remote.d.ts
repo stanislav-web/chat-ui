@@ -12,9 +12,4 @@ export interface IVideoRemote {
    */
   readonly remotePeerListener: () => void;
 
-  /**
-   * On Countries change
-   * @param {Array<CountryListItem['code']> | []} countries
-   */
-  readonly onCountriesChange: (countries: Array<CountryListItem['code']> | []) => void;
 }

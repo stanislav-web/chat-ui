@@ -6,5 +6,5 @@
  * @prop {HTMLVideoElement | null} media
  */
 export interface IBasePeerElement {
-  video: HTMLVideoElement | null;
+  video: HTMLVideoElement;
 }

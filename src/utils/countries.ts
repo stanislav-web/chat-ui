@@ -125,7 +125,7 @@ export const countries: CountryListItem[] = [
     flag: '🇫🇰'
   },
   { name: 'Faroe Islands', code: 'FO', flag: '🇫🇴' },
-  // { name: 'England', code: 'GB', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { name: 'United Kingdom', code: 'GB', flag: '🇬🇧󠁿' },
   { name: 'Fiji', code: 'FJ', flag: '🇫🇯' },
   { name: 'Finland', code: 'FI', flag: '🇫🇮' },
   { name: 'France', code: 'FR', flag: '🇫🇷' },
