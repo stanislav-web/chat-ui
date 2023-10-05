@@ -3,9 +3,9 @@
 /**
  * @typedef INavigationConfig Navigation config interface
  * @module interfaces/config
- * @prop {string} title
- * @prop {string} href
- * @prop {string} onClick
+ * @property {string} title
+ * @property {string} href
+ * @property {string} onClick
  */
 export interface INavigationConfig {
   title: string;

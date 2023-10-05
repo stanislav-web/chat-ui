@@ -1,7 +1,6 @@
 // i.peer.d.ts
 
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
-import { type Socket } from 'socket.io-client';
 
 /**
  * @typedef IPeer Peer.tsx
@@ -42,13 +41,10 @@ export interface IPeer {
   readonly onReCall: () => void;
 
   /**
-   * Local Peer listener
-   * @param {Socket} socket
-   * @param {RTCPeerConnection} peer
-   * @param {RTCDataChannel} channel
+   * Stop connection from local side
    * @return void
    */
-  readonly localPeerListener: (socket: Socket, peer: RTCPeerConnection, channel: RTCDataChannel) => void;
+  readonly stopConnections: () => void;
 
   /**
    * Close connection from local side

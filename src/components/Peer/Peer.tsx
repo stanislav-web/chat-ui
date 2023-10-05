@@ -8,41 +8,38 @@ import { type Socket } from 'socket.io-client';
 import { type IException } from '@interfaces/socket/i.exception';
 import { withTranslation } from 'react-i18next';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-import { type UniqueId } from '@types/base.type';
 import { MediaConfig } from '@configuration/media.config';
 import SelectLocalDevice from '@components/Peer/SelectLocalDevice/SelectLocalDevice';
 import { Button } from 'primereact/button';
 import { countries } from '@utils/countries';
 import { type IPeer } from '@interfaces/component/peer/i.peer';
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
-import { type IBasePeerElement } from '@interfaces/base/i.base-peer-element';
 import SelectRemoteCountry from '@components/Peer/SelectRemoteCountry/SelectRemoteCountry';
 import { getItem, setItem } from '@functions/localstorage.function';
 import { type SocketEmitType, type SocketListenType } from '@types/socket.type';
-import { type IEventEmitAnswer, type IEventEmitStart, type IEventEmitStop } from '@interfaces/socket/i.event-emit';
+import {
+  type IEventEmitStart,
+  type IEventEmitStop
+} from '@interfaces/socket/i.event-emit';
 import { EventEmitEnum } from '@enums/event-emit.enum';
-import { captureStream, isVirtualDevice } from '@functions/media.function';
-import { addCandidate, addMediaTracks, createPeerAnswer, createPeerConnection } from '@functions/webrtc.function';
-import { v4 as uuid } from 'uuid';
+import { captureStream, isVirtualDevice, stopStream } from '@functions/media.function';
+import {
+  addMediaTracks
+} from '@functions/webrtc.function';
 import { MediaTrackStateEnum } from '@enums/media-track-state.enum';
 import { onLoadedVideoMetadata, onPlay, onResizeVideo, onVolumeChange } from '@events/media.event';
 import {
-  type IEventListenCandidate,
+  type IEventListenAnswer,
+  type IEventListenCandidates,
   type IEventListenConnect,
   type IEventListenConnectError,
   type IEventListenDisconnect,
-  type IEventListenException, type IEventListenOffer
+  type IEventListenException, type IEventListenNext, type IEventListenOffer
 } from '@interfaces/socket/i.event-listen';
 import { EventListenEnum } from '@enums/event-listen.enum';
-import {
-  onConnectionStateChange, onDataChannel,
-  onIceCandidate,
-  onIceCandidateError,
-  onIceGatheringStateChange,
-  onNegotiationNeeded,
-  onSignalingStateChange, onTrack
-} from '@events/peer.event';
-import { RtcIceGatheringStateEnum } from '@enums/rtc-ice-gathering-state.enum';
+import { type IUser } from '@interfaces/user/i.user';
+import { type Uri } from '@types/base.type';
+import { PeerConnection } from '@components/Peer/PeerConnection';
 
 /**
  * Peer app class
@@ -52,28 +49,33 @@ import { RtcIceGatheringStateEnum } from '@enums/rtc-ice-gathering-state.enum';
  */
 class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
   /**
-   * @type RTCPeerConnection peer
+   * @type {IUser} user
    * @private
+   * @readonly
    */
-  private peer: RTCPeerConnection = null;
+  private readonly user: IUser = null;
 
   /**
-   * @type string localContainerId
+   * @type {PeerConnection} peer
    * @private
    */
-  private readonly localContainerId: UniqueId = MediaConfig.local.containerId;
+  private peer: PeerConnection = null;
 
   /**
-   * @type string remoteContainerId
+   * Poster video placeholder
+   * @type {Uri} poster
+   * @readonly
    * @private
    */
-  private readonly remoteContainerId: UniqueId = MediaConfig.remote.containerId;
+  private readonly poster: Uri;
 
   /**
-   * @type string [poster]
+   * Socket connection
+   * @type {Socket} socket
    * @private
+   * @readonly
    */
-  private readonly poster: string = MediaConfig.poster ?? '';
+  private readonly socket: Socket;
 
   /**
      * Constructor
@@ -81,13 +83,14 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
      */
   constructor(props: IPeerProp) {
     super(props);
+    this.poster = MediaConfig.poster;
     this.state = {
-      socket: null,
-      localVideo: null,
-      remoteVideo: null,
-      localPeer: null,
-      remotePeer: null,
-      channel: null,
+      stream: this.props.stream,
+      callBtnLabel: 'Start',
+      isPeerConnected: false,
+      isPeerReady: false,
+      isDevicesAvailable: true,
+      isCountriesAvailable: true,
       callBtnDisabled: false,
       breakBtnDisabled: true,
       recallBtnDisabled: true,
@@ -95,117 +98,8 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
       breakBtnLoading: false,
       recallBtnLoading: false
     };
-  }
-
-  /**
-   * On Socket connect callback handler
-   * @param {Socket} socket
-   * @param {IBasePeerElement['video']} localVideo
-   * @param {IBasePeerElement['video']} remoteVideo
-   * @return void
-   */
-  onSocketConnectHandler(socket: Socket, localVideo: IBasePeerElement['video'], remoteVideo: IBasePeerElement['video']): void {
-    console.log('[!] Socket `connect`:', socket.connected);
-    const { stream } = this.props;
-    this.setState({
-      localVideo,
-      remoteVideo,
-      socket,
-      stream
-    }, () => {
-      const { snapshot } = MediaConfig;
-      localVideo.srcObject = stream;
-      localVideo.onloadedmetadata = () => { onLoadedVideoMetadata({ videoElement: localVideo }); };
-      localVideo.onresize = () => { onResizeVideo(localVideo); };
-      localVideo.onvolumechange = () => { onVolumeChange({ videoElement: localVideo, stream, socket }); };
-      localVideo.onplay = () => {
-        onPlay({
-          videoElement: localVideo,
-          stream,
-          socket,
-          snapshot
-        });
-      };
-
-      notifySuccess(this.props.t('Connected', {
-        ns: 'Base'
-      }), this.props.t('Welcome', {
-        ns: 'Base'
-      }), 2000);
-    });
-  }
-
-  /**
-   * On Socket disconnect callback handler
-   * @param {Socket} socket
-   * @param {Socket.DisconnectReason} reason
-   * @return void
-   */
-  onSocketDisconnectHandler(socket: Socket, reason: Socket.DisconnectReason): void {
-    console.log('[!] Socket `disconnect`: ', socket.disconnected, { reason });
-    this.setState({
-      socket,
-      callBtnLoading: false,
-      callBtnDisabled: false,
-      recallBtnLoading: false,
-      recallBtnDisabled: true,
-      breakBtnLoading: false,
-      breakBtnDisabled: true
-    }, () => {
-      notifyInfo(this.props.t('Disconnected', {
-        ns: 'Base'
-      }), this.props.t('Goodbye', {
-        ns: 'Base'
-      }), 2000);
-    });
-  }
-
-  /**
-   * On Socket connect error callback handler
-   * @param {Socket} socket
-   * @param {Error} error
-   * @return void
-   */
-  onSocketConnectErrorHandler(socket: Socket, error: Error): void {
-    console.log('[!] Socket `connect_error`:', { error })
-    this.setState({
-      socket,
-      callBtnLoading: false,
-      callBtnDisabled: false,
-      recallBtnLoading: false,
-      recallBtnDisabled: true,
-      breakBtnLoading: false,
-      breakBtnDisabled: true
-    }, () => {
-      notifyError(this.props.t('Disconnected', {
-        ns: 'Base'
-      }), error.message, 2000);
-    });
-  }
-
-  /**
-   * On Socket connect error callback handler
-   * @param {Socket} socket
-   * @param {IException} exception
-   * @return void
-   */
-  onSocketExceptionHandler(socket: Socket, exception: IException): void {
-    console.log('[!] Socket `exception`:', { exception });
-    this.setState({
-      socket,
-      callBtnLoading: false,
-      callBtnDisabled: false,
-      recallBtnLoading: false,
-      recallBtnDisabled: true,
-      breakBtnLoading: false,
-      breakBtnDisabled: true
-    }, () => {
-      notifyError(this.props.t('Exception', {
-        ns: 'Exceptions'
-      }), this.props.t(exception.message, {
-        ns: 'Exceptions'
-      }), 3000);
-    });
+    this.socket = getSocketInstance();
+    this.user = this.props.user;
   }
 
   /**
@@ -213,9 +107,8 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
    * @return Promise<void>
    */
   componentDidMount(): void {
-    const { user } = this.props;
-    const localVideo = document.querySelector('[data-id="' + this.localContainerId + '"]') as HTMLVideoElement;
-    const remoteVideo = document.querySelector('[data-id="' + this.remoteContainerId + '"]') as HTMLVideoElement;
+    const localVideo = document.querySelector('[data-id="' + MediaConfig.local.containerId + '"]');
+    const remoteVideo = document.querySelector('[data-id="' + MediaConfig.remote.containerId + '"]');
     if (!localVideo) {
       notifyError(this.props.t('Local Video', {
         ns: 'VideoLocal'
@@ -230,95 +123,134 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
         ns: 'Errors'
       })); return;
     }
-    const socket: Socket = getSocketInstance();
-    if (!socket.connected) socket.connect();
-    socket.on<SocketListenType, IEventListenConnect>(EventListenEnum.CONNECT,
-      (): void => { this.onSocketConnectHandler(socket, localVideo, remoteVideo); });
-    socket.on<SocketListenType, IEventListenDisconnect>(EventListenEnum.DISCONNECT,
-      (reason: Socket.DisconnectReason): void => { this.onSocketDisconnectHandler(socket, reason); });
-    socket.on<SocketListenType, IEventListenConnectError>(EventListenEnum.CONNECT_ERROR,
-      (error: Error): void => { this.onSocketConnectErrorHandler(socket, error); });
-    socket.on<SocketListenType, IEventListenException>(EventListenEnum.EXCEPTION,
-      (exception: IException): void => { this.onSocketExceptionHandler(socket, exception); });
-    socket.on<SocketListenType, IEventListenOffer>(EventListenEnum.OFFER, (event: IEventListenOffer) => {
-      this.peer = createPeerConnection(user.ice);
-      this.peer.ontrack = (event: RTCTrackEvent) => {
-        onTrack(remoteVideo, event);
-      }
-      Promise.all([
-        this.peer.setRemoteDescription(new RTCSessionDescription(event)),
-        createPeerAnswer(this.peer)
-      ]).then(([, answer]) => socket.emit<SocketEmitType, IEventEmitAnswer>(EventEmitEnum.ANSWER, answer))
-        .then(() => {
-          // this.setState({ remotePeer });
-        })
-        .catch((error: Error) => { notifyError('Peer Answer', error?.message); });
-    });
-    socket.on<SocketListenType, IEventListenCandidate>(EventListenEnum.CANDIDATE, (event: IEventListenCandidate) => {
-      addCandidate(this.peer, event).catch((error: Error) => { notifyError('Candidate', error?.message); });
+    this.setState({
+      localVideo, remoteVideo, isDevicesAvailable: true, isCountriesAvailable: true, callBtnDisabled: false
+    }, () => {
+      if (!this.socket.connected) this.socket.connect();
+      this.socket.on<SocketListenType, IEventListenConnect>(EventListenEnum.CONNECT,
+        (): void => { this.onSocketConnectHandler(localVideo); });
+      this.socket.on<SocketListenType, IEventListenDisconnect>(EventListenEnum.DISCONNECT,
+        (reason: Socket.DisconnectReason): void => { this.onSocketDisconnectHandler(reason); });
+      this.socket.on<SocketListenType, IEventListenConnectError>(EventListenEnum.CONNECT_ERROR,
+        (error: Error): void => { this.onSocketConnectErrorHandler(error); });
+      this.socket.on<SocketListenType, IEventListenException>(EventListenEnum.EXCEPTION,
+        (exception: IException): void => { this.onSocketExceptionHandler(exception); });
     });
   }
 
   /**
-   * Local Peer listener
-   * @param {Socket} socket
-   * @param {RTCPeerConnection} peer
-   * @param {RTCDataChannel} channel
+   * On Socket connect callback handler
+   * @param {HTMLVideoElement} localVideo
    * @return void
    */
-  localPeerListener (socket: Socket, peer: RTCPeerConnection, channel: RTCDataChannel): void {
-    if (socket && peer && channel) {
-      peer = this.peer;
-      const { remoteVideo } = this.state;
-      peer.onsignalingstatechange = () => {
-        onSignalingStateChange(peer);
-        console.log(`[!] SIGNAL STATE: ${peer.signalingState} / ${peer.connectionState}`);
+  onSocketConnectHandler(localVideo: HTMLVideoElement): void {
+    console.log('[!] Socket `connect`:', this.socket.connected);
+    const { stream } = this.props;
+    const { snapshot } = MediaConfig;
+    localVideo.srcObject = stream;
+    localVideo.onloadedmetadata = () => { onLoadedVideoMetadata({ videoElement: localVideo }); };
+    localVideo.onresize = () => { onResizeVideo(localVideo); };
+    localVideo.onvolumechange = () => {
+      onVolumeChange({
+        videoElement: localVideo,
+        stream,
+        socket: this.socket
+      });
+    };
+    localVideo.onplay = () => {
+      onPlay({
+        videoElement: localVideo,
+        stream,
+        socket: this.socket,
+        snapshot
+      });
+    };
+    notifySuccess(this.props.t('Connected', {
+      ns: 'Base'
+    }), this.props.t('Welcome', {
+      ns: 'Base'
+    }), 2000);
+  }
+
+  /**
+   * On Socket disconnect callback handler
+   * @param {Socket.DisconnectReason} reason
+   * @return void
+   */
+  onSocketDisconnectHandler(reason: Socket.DisconnectReason): void {
+    console.log('[!] Socket `disconnect`: ', this.socket.disconnected, { reason });
+    this.closeConnections();
+    notifyInfo(this.props.t('Disconnected', {
+      ns: 'Base'
+    }), this.props.t('Goodbye', {
+      ns: 'Base'
+    }), 2000);
+  }
+
+  /**
+   * On Socket connect error callback handler
+   * @param {Error} error
+   * @return void
+   */
+  onSocketConnectErrorHandler(error: Error): void {
+    console.log('[!] Socket `connect_error`:', { error })
+    this.closeConnections()
+    notifyError(this.props.t('Disconnected', {
+      ns: 'Base'
+    }), error.message, 2000);
+  }
+
+  /**
+   * On Socket exception error callback handler
+   * @param {IException} exception
+   * @return void
+   */
+  onSocketExceptionHandler(exception: IException): void {
+    console.log('[!] Socket `exception`:', { exception });
+    this.setState({
+      isPeerConnected: false,
+      isDevicesAvailable: true,
+      isCountriesAvailable: true,
+      callBtnLabel: 'Start',
+      callBtnDisabled: false,
+      breakBtnDisabled: true,
+      recallBtnDisabled: false,
+      callBtnLoading: false,
+      breakBtnLoading: false,
+      recallBtnLoading: false
+    }, () => {
+      notifyError(this.props.t('Exception', {
+        ns: 'Exceptions'
+      }), this.props.t(exception.message, {
+        ns: 'Exceptions'
+      }), 3000);
+    });
+  }
+
+  /**
+   * Stop connections from local side
+   * @return void
+   */
+  stopConnections(): void {
+    this.setState({
+      isPeerConnected: false,
+      isPeerReady: false,
+      isDevicesAvailable: true,
+      isCountriesAvailable: true,
+      callBtnDisabled: false,
+      breakBtnDisabled: false,
+      recallBtnDisabled: false,
+      callBtnLoading: false,
+      breakBtnLoading: true,
+      recallBtnLoading: false
+    }, () => {
+      if (!this.peer) { notifyInfo('Local Peer', 'Connection has already closed', 3000); return; }
+      this.peer.close();
+      if (this.state.remoteVideo) {
+        stopStream(this.state.remoteVideo);
+        this.setState({ remoteVideo: null });
       }
-      peer.onconnectionstatechange = () => {
-        onConnectionStateChange(peer);
-        console.log(`[!] CONNECTION STATE: ${peer.connectionState}`);
-      }
-      peer.onnegotiationneeded = () => {
-        onNegotiationNeeded(peer, socket);
-      }
-      peer.onicegatheringstatechange = (event: Event) => {
-        const iceGatheringState = onIceGatheringStateChange(event.target);
-        console.log('iceGatheringState', iceGatheringState);
-        if (iceGatheringState === RtcIceGatheringStateEnum.COMPLETE) {
-          this.setState({
-            breakBtnLoading: false,
-            breakBtnDisabled: false,
-            callBtnLoading: true,
-            callBtnDisabled: true,
-            recallBtnLoading: false,
-            recallBtnDisabled: true
-          });
-        }
-      }
-      peer.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-        onIceCandidate(peer, socket, event);
-      }
-      peer.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => {
-        onIceCandidateError(error);
-        this.closeConnections();
-        console.log('[X] ICE CANDIDATE ERROR', error);
-      }
-      peer.ontrack = (event: RTCTrackEvent) => {
-        onTrack(remoteVideo, event);
-      }
-      channel.onopen = (event) => {
-        onDataChannel(event);
-      };
-      channel.onmessage = (event) => {
-        onDataChannel(event);
-      }
-      channel.onerror = (event) => {
-        onDataChannel(event);
-      }
-      channel.onclose = (event) => {
-        onDataChannel(event);
-      };
-    }
+    })
   }
 
   /**
@@ -326,42 +258,25 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
    * @return void
    */
   closeConnections(): void {
-    const {
-      socket, channel,
-      localPeer, remotePeer
-    } = this.state;
     this.setState({
-      channel: null,
-      localPeer: null,
-      remotePeer: null,
+      isPeerReady: false,
+      isPeerConnected: false,
+      isDevicesAvailable: false,
+      isCountriesAvailable: false,
+      callBtnDisabled: true,
+      breakBtnDisabled: true,
+      recallBtnDisabled: true,
       callBtnLoading: false,
-      callBtnDisabled: false,
-      breakBtnDisabled: false,
       breakBtnLoading: false,
-      recallBtnDisabled: false,
       recallBtnLoading: false
     }, () => {
-      if (localPeer) {
-        localPeer.onconnectionstatechange = null;
-        localPeer.ondatachannel = null;
-        localPeer.ontrack = null;
-        localPeer.onsignalingstatechange = null;
-        localPeer.onicecandidate = null;
-        localPeer.close();
+      if (!this.peer) { notifyInfo('Local Peer', 'Connection has already closed', 3000); return; }
+      this.peer.close()
+      if (this.state.remoteVideo) {
+        stopStream(this.state.remoteVideo);
+        this.setState({ remoteVideo: null });
       }
-      if (remotePeer) {
-        remotePeer.onconnectionstatechange = null;
-        remotePeer.ondatachannel = null;
-        remotePeer.ontrack = null;
-        remotePeer.onsignalingstatechange = null;
-        remotePeer.onicecandidate = null;
-        remotePeer.close();
-      }
-      if (channel) channel.close();
-      socket.off<SocketListenType, IEventListenCandidate>(EventListenEnum.NEXT);
-      socket.off<SocketListenType, IEventListenCandidate>(EventListenEnum.OFFER);
-      socket.off<SocketListenType, IEventListenCandidate>(EventListenEnum.ANSWER);
-      socket.off<SocketListenType, IEventListenCandidate>(EventListenEnum.CANDIDATE);
+      this.socket.emit<SocketEmitType, IEventEmitStop>(EventEmitEnum.STOP);
     })
   }
 
@@ -387,17 +302,12 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
    * @return void
    */
   onCall(): void {
+    console.log('[!] CALL');
     this.setState({
       callBtnLoading: true,
-      callBtnDisabled: true,
-      breakBtnLoading: false,
-      breakBtnDisabled: false,
-      recallBtnLoading: false,
-      recallBtnDisabled: false
+      callBtnDisabled: true
     }, () => {
-      console.log('[!] CALL START');
-      const { stream, socket, localVideo } = this.state;
-      const { user } = this.props;
+      const { stream, localVideo } = this.state;
       const videoDevice = stream?.getVideoTracks().find(device => device.readyState === MediaTrackStateEnum.LIVE);
       const audioDevice = stream?.getAudioTracks().find(device => device.readyState === MediaTrackStateEnum.LIVE);
       if (!videoDevice) {
@@ -414,32 +324,69 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
           ns: 'Errors'
         }), 2000);
       }
-      if (user && socket.connected) {
-        const countries = getItem('selected') === null ? [] : getItem('selected');
-        socket.emit<SocketEmitType, IEventEmitStart>(EventEmitEnum.START, {
-          devices: [videoDevice, audioDevice].map((device) => ({
-            deviceId: device.id,
-            deviceType: device.kind,
-            deviceLabel: device.label,
-            isVirtual: isVirtualDevice(device.label)
-          })),
-          photo: captureStream(localVideo, MediaConfig.snapshot),
-          countries
-        });
-        this.peer = createPeerConnection(user.ice);
-        const channel = this.peer.createDataChannel(uuid(), {
-          ordered: true,
-          maxRetransmits: 3
-        });
+      const countries = getItem('selected') === null ? [] : getItem('selected');
+      this.socket.emit<SocketEmitType, IEventEmitStart>(EventEmitEnum.START, {
+        devices: [videoDevice, audioDevice].map((device) => ({
+          deviceId: device.id,
+          deviceType: device.kind,
+          deviceLabel: device.label,
+          isVirtual: isVirtualDevice(device.label)
+        })),
+        photo: captureStream(localVideo, MediaConfig.snapshot),
+        countries
+      });
+      this.socket.on<SocketListenType, IEventListenNext>(EventListenEnum.READY, async () => {
+        if (!this.peer) {
+          this.peer = new PeerConnection(this.socket, this.state.remoteVideo, this.user.ice);
+          await this.peer.createPeer();
+          this.peer.createDataChanel();
+          this.peer.trackDataChannel();
+          this.peer.trackPeer(() => {
+            this.setState({
+              callBtnLabel: 'Next',
+              isPeerConnected: true,
+              callBtnLoading: false,
+              callBtnDisabled: false,
+              breakBtnDisabled: false
+            });
+          }, (error: any) => {
+            this.setState({
+              callBtnLabel: 'Start',
+              isPeerConnected: false,
+              callBtnLoading: false,
+              callBtnDisabled: false,
+              breakBtnDisabled: false,
+              recallBtnDisabled: false
+            }, () => { notifyInfo(error.name, error.message); }
+            );
+          })
+        }
         try {
-          addMediaTracks(this.peer, stream);
-          this.setState({
-            localPeer: this.peer, stream, channel
-          }, () => { this.localPeerListener(socket, this.peer, channel); });
+          addMediaTracks(this.peer.getPeer(), stream);
+          await this.peer.sendOffer();
+          this.setState({ isPeerReady: true });
         } catch (error: Error) {
           notifyError(error.name, error.message);
         }
-      }
+        this.socket.on<SocketListenType, IEventListenCandidates>(EventListenEnum.CANDIDATES, (candidates: IEventListenCandidates) => {
+          if (this.state.isPeerReady && this.peer.getCandidates().length > 0) {
+            candidates.forEach((candidate) => {
+              this.peer.addCandidate(candidate);
+            })
+          }
+        })
+        this.socket.on<SocketListenType, IEventListenOffer>(EventListenEnum.OFFER, (event: IEventListenOffer) => {
+          if (this.state.isPeerReady) {
+            this.peer.sendAnswer(new RTCSessionDescription(event));
+          }
+        });
+        this.socket.on<SocketListenType, IEventListenOffer>(EventListenEnum.ANSWER, (event: IEventListenAnswer) => {
+          this.peer.setRemoteDescription(event)
+            .catch((error: Error) => {
+              notifyError('Peer', error.message);
+            });
+        });
+      });
     });
   }
 
@@ -448,31 +395,18 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
    * @return void
    */
   onBreak(): void {
+    console.log('[!] BREAK');
     this.setState({
       breakBtnLoading: true,
-      breakBtnDisabled: true,
-      callBtnLoading: false,
-      callBtnDisabled: true,
-      recallBtnLoading: false,
-      recallBtnDisabled: true
+      isPeerReady: false,
+      isPeerConnected: false
     }, () => {
-      console.log('[!] onBreak');
-      const { socket, localPeer, remotePeer } = this.state;
-      if (!localPeer && !remotePeer) {
-        this.setState({
-          breakBtnLoading: false,
-          breakBtnDisabled: false,
-          callBtnLoading: false,
-          callBtnDisabled: false
-        }, () => {
-          notifyInfo('Peer', 'Connection has already closed', 3000);
-        });
-      } else {
-        if (socket.connected) {
-          socket.emit<SocketEmitType, IEventEmitStop>(EventEmitEnum.STOP);
-        }
-        setTimeout(() => { this.closeConnections(); }, 500)
-      }
+      this.stopConnections();
+      this.setState({
+        callBtnLabel: 'Start',
+        breakBtnLoading: false,
+        breakBtnDisabled: false
+      });
     });
   }
 
@@ -481,92 +415,97 @@ class Peer extends React.Component<IPeerProp, IPeerState> implements IPeer {
    * @return void
    */
   onReCall(): void {
+    console.log('[!] RECALL');
+    notifyInfo('Re Call', 'Not implemented'); return;
     this.setState({
-      recallBtnLoading: true,
       recallBtnDisabled: true,
-      breakBtnLoading: false,
+      recallBtnLoading: true,
+      callBtnDisabled: true,
       breakBtnDisabled: true,
-      callBtnLoading: false,
-      callBtnDisabled: true
+      isPeerReady: false,
+      isPeerConnected: false
     }, () => {
-      console.log('[!] onReCall');
+      this.stopConnections();
+      this.setState({
+        callBtnLabel: 'Next',
+        recallBtnDisabled: false,
+        recallBtnLoading: false
+      });
     });
   }
 
   render(): React.JSX.Element {
     const {
-      localPeer,
-      socket, localVideo, remoteVideo,
+      stream, localVideo,
+      isCountriesAvailable, isDevicesAvailable, callBtnLabel,
       callBtnLoading, recallBtnLoading, breakBtnLoading,
       callBtnDisabled, recallBtnDisabled, breakBtnDisabled
     } = this.state;
-    const { stream, user } = this.props;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const country = countries.find((country: CountryListItem) => country.code === user?.country) as CountryListItem;
+    const country = countries.find((country: CountryListItem) => country.code === this.props.user?.country) as CountryListItem;
     return (
         <div className="peer-container">
-            {stream && user
-              ? <div className="peer-output">
-                  <Splitter className="mb-5">
-                    <SplitterPanel className="flex align-items-center justify-content-center">
-                      <div className="peer-remote">
-                        <div className="peer-remote-container">
-                          <video id="rmd" data-id={this.remoteContainerId} autoPlay playsInline poster={this.poster}/>
-                        </div>
-                        {remoteVideo && socket.connected
-                          ? <div className="peer-remote-control">
-                              <SelectRemoteCountry onCountriesChange={this.onCountriesChange} />
-                            </div>
-                          : <></>}
+          <div className="peer-output">
+            <Splitter className="mb-5">
+              <SplitterPanel className="flex align-items-center justify-content-center">
+                <div className="peer-remote">
+                  <div className="peer-remote-container">
+                    <video data-id={MediaConfig.remote.containerId} autoPlay playsInline poster={this.poster}/>
+                  </div>
+                  <div className="peer-remote-country"></div>
+                  {isCountriesAvailable
+                    ? <div className="peer-remote-control">
+                        <SelectRemoteCountry onCountriesChange={this.onCountriesChange} />
                       </div>
-                    </SplitterPanel>
-                    <SplitterPanel className="flex align-items-center justify-content-center">
-                      <div className="peer-local">
-                        <div className="peer-local-container">
-                          <video data-id={this.localContainerId} autoPlay playsInline muted poster={this.poster} />
-                        </div>
-                        {country
-                          ? <div className="peer-local-country">
-                              <span>{country.flag} {country.name}</span>
-                            </div>
-                          : <></>
-                        }
-                        {localVideo && socket.connected
-                          ? <div className="peer-local-control">
-                              <div className="peer-local-device">
-                                <SelectLocalDevice onStreamChange={this.onStreamChange} stream={stream} peer={localPeer} video={localVideo} />
-                              </div>
-                              <div className="peer-local-buttons">
-                                <Button
-                                    label="Start"
-                                    disabled={callBtnDisabled}
-                                    icon="pi pi-phone"
-                                    loading={callBtnLoading}
-                                    onClick={() => { this.onCall(); }}
-                                />
-                                <Button
-                                    label="Stop"
-                                    disabled={breakBtnDisabled}
-                                    icon="pi pi-stop-circle"
-                                    loading={breakBtnLoading}
-                                    onClick={() => { this.onBreak(); }}
-                                />
-                                <Button
-                                    label="Restart"
-                                    icon="pi pi-history"
-                                    disabled={recallBtnDisabled}
-                                    loading={recallBtnLoading}
-                                    onClick={() => { this.onReCall(); }}
-                                />
-                              </div>
-                            </div>
-                          : <></>}
-                      </div>
-                    </SplitterPanel>
-                  </Splitter>
+                    : <></>
+                  }
                 </div>
-              : <></>
-            }
+              </SplitterPanel>
+              <SplitterPanel className="flex align-items-center justify-content-center">
+                <div className="peer-local">
+                  <div className="peer-local-container">
+                    <video data-id={MediaConfig.local.containerId} autoPlay playsInline muted poster={this.poster} />
+                  </div>
+                  {country
+                    ? <div className="peer-local-country">
+                        <span>{country.flag} {country.name}</span>
+                      </div>
+                    : <></>
+                  }
+                  {isDevicesAvailable && stream
+                    ? <div className="peer-local-control">
+                        <div className="peer-local-device">
+                          <SelectLocalDevice onStreamChange={this.onStreamChange} stream={stream} peer={this.peer?.getPeer()} video={localVideo} />
+                        </div>
+                        <div className="peer-local-buttons">
+                          <Button
+                              label={callBtnLabel}
+                              disabled={callBtnDisabled}
+                              icon="pi pi-phone"
+                              loading={callBtnLoading}
+                              onClick={() => { this.onCall(); }}
+                          />
+                          <Button
+                              label="Stop"
+                              disabled={breakBtnDisabled}
+                              icon="pi pi-stop-circle"
+                              loading={breakBtnLoading}
+                              onClick={() => { this.onBreak(); }}
+                          />
+                          <Button
+                              label="Restart"
+                              icon="pi pi-history"
+                              disabled={recallBtnDisabled}
+                              loading={recallBtnLoading}
+                              onClick={() => { this.onReCall(); }}
+                          />
+                        </div>
+                      </div>
+                    : <></>}
+                </div>
+              </SplitterPanel>
+            </Splitter>
+          </div>
         </div>
     )
   }

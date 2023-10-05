@@ -1,13 +1,14 @@
 import { captureStream, getUserDevices, isVirtualDevice } from '@functions/media.function';
 import { notifyError } from '@functions/notification.function';
 import { type IOnLoadedVideoMetadata, type IOnPlayEvent, type IOnVolumeChange } from '@interfaces/media/i.media';
-import { emitVolatile } from '@functions/socket.function';
 import { type IEventEmitOnline, type IEventMute } from '@interfaces/socket/i.event-emit';
 import { EventEmitEnum } from '@enums/event-emit.enum';
 import { type SocketEmitType } from '@types/socket.type';
 import { type MediaDevicesTypes } from '@types/media.type';
 import { getItem } from '@functions/localstorage.function';
 import { MediaTrackStateEnum } from '@enums/media-track-state.enum';
+import { AppConfig } from '@configuration/app.config';
+import { encryptMessage } from '@functions/crypt.function';
 
 /**
  * Event is fired when device has changed
@@ -62,8 +63,8 @@ export const onPlay = (params: IOnPlayEvent): void => {
   const audioDevice = stream.getAudioTracks().find(device => device.readyState === MediaTrackStateEnum.LIVE);
   if (photo && videoDevice && audioDevice && socket.connected) {
     const trackOnline = function (): void {
-      emitVolatile<SocketEmitType, IEventEmitOnline>(socket, EventEmitEnum.ONLINE, {
-        photo,
+      socket.volatile.emit<SocketEmitType, IEventEmitOnline>(EventEmitEnum.ONLINE, {
+        photo: AppConfig.isDecrypt ? encryptMessage(photo) : photo,
         countries: getItem('selected') === null ? undefined : getItem('selected'),
         devices: [videoDevice, audioDevice].map((device) => ({
           deviceId: device.id,
@@ -91,7 +92,7 @@ export const onVolumeChange = (params: IOnVolumeChange): void => {
   const videoTrack = stream.getVideoTracks()[0];
 
   if (videoTrack.readyState === 'live') {
-    emitVolatile<SocketEmitType, IEventMute>(socket, EventEmitEnum.MUTE, {
+    socket.volatile.emit<SocketEmitType, IEventMute>(EventEmitEnum.MUTE, {
       deviceId: videoTrack.id,
       isMute: videoTrack.muted
     })

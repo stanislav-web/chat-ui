@@ -3,16 +3,14 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { type MediaDeviceTypeEnum } from '@enums/media-device-type.enum';
 import { type UniqueId } from '@types/base.type';
-import { captureStream, isVirtualDevice } from '@functions/media.function';
-import { MediaConfig } from '@configuration/media.config';
 
 /**
  * Emit 'online'
  * @typedef IEventEmitOnline socket.emit interface
  * @module interfaces/socket/emit
- * @prop {string} photo
- * @prop {Array<CountryListItem['code']> | []} [countries]
- * @prop {Array<{
+ * @property {string} photo
+ * @property {Array<CountryListItem['code']> | []} [countries]
+ * @property {Array<{
  *     deviceId: UniqueId;
  *     deviceType: MediaDeviceTypeEnum;
  *     deviceLabel: string;
@@ -35,7 +33,7 @@ export interface IEventEmitOnline {
  * @typedef IEventEmitStart socket.emit interface
  * @module interfaces/socket/emit
  * @extends IEventEmitOnline
- * @prop {Array<CountryListItem['code']> | []} countries
+ * @property {Array<CountryListItem['code']> | []} countries
  */
 export interface IEventEmitStart extends IEventEmitOnline {
   readonly countries: Array<CountryListItem['code']> | [];
@@ -84,8 +82,8 @@ export interface IEventEmitStop {
  * Emit 'mute'
  * @typedef IEventEmitStop socket.emit interface
  * @module interfaces/socket/emit
- * @prop {UniqueId} deviceId
- * @prop {boolean} isMute
+ * @property {UniqueId} deviceId
+ * @property {boolean} isMute
  */
 export interface IEventMute {
   readonly deviceId: UniqueId;

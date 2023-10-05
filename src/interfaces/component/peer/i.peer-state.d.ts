@@ -2,33 +2,34 @@
 
 import { type IBasePeerSteam } from '@interfaces/base/i.base-peer-steam';
 import { type IBasePeerElement } from '@interfaces/base/i.base-peer-element';
-import { type IBasePeerTransport } from '@interfaces/base/i.base-peer-transport';
-import { type IBasePeerConnect } from '@interfaces/base/i.base-peer-connect';
-import { type IBasePeerChannel } from '@interfaces/base/i.base-peer-channel';
 
 /**
- * @typedef IPeerState Loading.tsx state
+ * @typedef IPeerState IPeer.tsx state
  * @module interfaces/component/peer
- * @prop {IBasePeerConnect['peer'] | null} localPeer
- * @prop {IBasePeerConnect['peer'] | null} remotePeer
- * @prop {IBasePeerElement['video'] | null} localVideo
- * @prop {IBasePeerElement['video'] | null} remoteVideo
- * @prop {boolean} callBtnLoading
- * @prop {boolean} breakBtnLoading
- * @prop {boolean} recallBtnLoading
- * @prop {boolean} callBtnDisabled
- * @prop {boolean} breakBtnDisabled
- * @prop {boolean} recallBtnDisabled
- * @extends IBasePeerSteam
- * @extends IBasePeerTransport
- * @extends IBasePeerChannel
+ * @extends {IBasePeerSteam}
+ * @property {boolean} isPeerConnected
+ * @property {boolean} isPeerReady
+ * @property {boolean} isDevicesAvailable
+ * @property {boolean} isCountriesAvailable
+ * @property {IBasePeerElement['video']} localVideo
+ * @property {IBasePeerElement['video']} remoteVideo
+ * @property {boolean} callBtnLoading
+ * @property {boolean} breakBtnLoading
+ * @property {boolean} recallBtnLoading
+ * @property {string} callBtnLabel
+ * @property {boolean} callBtnDisabled
+ * @property {boolean} breakBtnDisabled
+ * @property {boolean} recallBtnDisabled
  */
-export interface IPeerState extends IBasePeerSteam, IBasePeerTransport, IBasePeerChannel {
-  localPeer: IBasePeerConnect['peer'];
-  remotePeer: IBasePeerConnect['peer'];
+export interface IPeerState extends IBasePeerSteam {
+  isPeerConnected: boolean;
+  isPeerReady: boolean;
+  isDevicesAvailable: boolean;
+  isCountriesAvailable: boolean;
   localVideo: IBasePeerElement['video'];
   remoteVideo: IBasePeerElement['video'];
   callBtnDisabled: boolean;
+  callBtnLabel: string;
   breakBtnDisabled: boolean;
   recallBtnDisabled: boolean;
   callBtnLoading: boolean;

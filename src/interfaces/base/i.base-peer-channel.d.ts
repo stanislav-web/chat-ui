@@ -3,7 +3,7 @@
 /**
  * @typedef IBasePeerChannel
  * @module interfaces/base Peer channel
- * @prop {RTCDataChannel} channel
+ * @property {RTCDataChannel} channel
  */
 export interface IBasePeerChannel {
   channel: RTCDataChannel;

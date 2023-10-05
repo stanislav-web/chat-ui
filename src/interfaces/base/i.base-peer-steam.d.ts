@@ -3,7 +3,7 @@
 /**
  * @typedef IBasePeerSteam
  * @module interfaces/base Peer stream
- * @prop {MediaStream | null} stream
+ * @property {MediaStream | null} stream
  */
 export interface IBasePeerSteam {
   readonly stream: MediaStream | null;

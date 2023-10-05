@@ -4,22 +4,22 @@ import { type UniqueId } from '@types/base.type';
 /**
  * @typedef IUserBrowser
  * @module interfaces/user User browser interface
- * @prop {UniqueId} deviceId
- * @prop {string} browser
- * @prop {string} browserVersion
- * @prop {string} deviceModel
- * @prop {string} deviceBrand
- * @prop {string} deviceFamily
- * @prop {string} os
- * @prop {string} osVersion
- * @prop {string} region
- * @prop {string} [ipAddress]
- * @prop {string[]} [languages]
- * @prop {string} [city]
- * @prop {string} [cityLatLong]
- * @prop {string} [countryCode]
- * @prop {string} [countryName]
- * @prop {string[]} [currencies]
+ * @property {UniqueId} deviceId
+ * @property {string} browser
+ * @property {string} browserVersion
+ * @property {string} deviceModel
+ * @property {string} deviceBrand
+ * @property {string} deviceFamily
+ * @property {string} os
+ * @property {string} osVersion
+ * @property {string} region
+ * @property {string} [ipAddress]
+ * @property {string[]} [languages]
+ * @property {string} [city]
+ * @property {string} [cityLatLong]
+ * @property {string} [countryCode]
+ * @property {string} [countryName]
+ * @property {string[]} [currencies]
  */
 export interface IUserBrowser {
   readonly deviceId: UniqueId;

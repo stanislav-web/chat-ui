@@ -8,8 +8,9 @@ export enum EventListenEnum {
   DISCONNECT = 'disconnect',
   CONNECT_ERROR = 'connect_error',
   EXCEPTION = 'exception',
-  NEXT = 'next',
+  READY = 'ready',
   OFFER = 'offer',
   ANSWER = 'answer',
-  CANDIDATE = 'candidate'
+  CANDIDATE = 'candidate',
+  CANDIDATES = 'candidates',
 }

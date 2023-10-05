@@ -3,7 +3,7 @@
 /**
  * @typedef IBasePeerDevice
  * @module interfaces/base Peer device
- * @prop {MediaDeviceInfo[] | []} devices
+ * @property {MediaDeviceInfo[] | []} devices
  */
 export interface IBasePeerDevice {
   readonly devices: MediaDeviceInfo[] | [];

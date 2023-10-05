@@ -18,7 +18,7 @@ export interface IEventListenConnect {
  * Listen 'disconnect'
  * @typedef IEventListenDisconnect socket.on interface
  * @module interfaces/socket/listen
- * @prop {Socket.DisconnectReason} reason
+ * @property {Socket.DisconnectReason} reason
  */
 export interface IEventListenDisconnect {
   reason: Socket.DisconnectReason;
@@ -28,7 +28,7 @@ export interface IEventListenDisconnect {
  * Listen 'connect_error'
  * @typedef IEventListenDisconnect socket.on interface
  * @module interfaces/socket/listen
- * @prop {Error} error
+ * @property {Error} error
  */
 export interface IEventListenConnectError {
   error: Error;
@@ -38,7 +38,7 @@ export interface IEventListenConnectError {
  * Listen 'exception'
  * @typedef IEventListenException socket.on interface
  * @module interfaces/socket/listen
- * @prop {IException} exception
+ * @property {IException} exception
  */
 export interface IEventListenException {
   exception: IException;
@@ -80,5 +80,15 @@ export interface IEventListenAnswer extends RTCSessionDescriptionInit {
  * @extends RTCIceCandidate
  */
 export interface IEventListenCandidate extends RTCIceCandidate {
+
+}
+
+/**
+ * Listen 'candidates'
+ * @typedef IEventListenCandidates socket.on interface
+ * @module interfaces/socket/listen
+ * @extends Array<RTCIceCandidate>
+ */
+export interface IEventListenCandidates extends Array<RTCIceCandidate> {
 
 }

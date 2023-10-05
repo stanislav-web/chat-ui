@@ -12,8 +12,8 @@ class About extends React.Component<any, any> {
     };
   }
 
-  componentDidMount(): void {
-  }
+  // componentDidMount(): void {
+  // }
 
   render(): React.JSX.Element {
     return (

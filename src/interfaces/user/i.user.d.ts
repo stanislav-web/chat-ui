@@ -5,11 +5,11 @@ import { type IUserIce } from '@interfaces/user/i.user-ice';
 /**
  * @typedef IUser
  * @module interfaces/user User interface
- * @prop {UniqueId} id
- * @prop {string} [photoUrl]
- * @prop {any} [ban]
- * @prop {CountryListItem['code']} [country]
- * @prop {IUserIce[]} [ice]
+ * @property {UniqueId} id
+ * @property {string} [photoUrl]
+ * @property {any} [ban]
+ * @property {CountryListItem['code']} [country]
+ * @property {IUserIce[]} [ice]
  */
 export interface IUser {
   readonly id: UniqueId;

@@ -6,8 +6,8 @@ import { type ExceptionStatusType, type FailedStatusType, type SuccessStatusType
 /**
  * @typedef IUserResponse
  * @module interfaces/user User response interfaces
- * @prop {SuccessStatusType|FailedStatusType|ExceptionStatusType} status
- * @prop {IUser} data
+ * @property {SuccessStatusType|FailedStatusType|ExceptionStatusType} status
+ * @property {IUser} data
  */
 export interface IUserResponse {
   readonly status: SuccessStatusType | FailedStatusType | ExceptionStatusType;

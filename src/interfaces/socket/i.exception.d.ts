@@ -5,8 +5,8 @@ import { type ExceptionStatusType, type FailedStatusType, type SuccessStatusType
 /**
  * @typedef IException
  * @module interfaces/socket Socket exception interface
- * @prop {SuccessStatusType|FailedStatusType|ExceptionStatusType} status
- * @prop {any} message
+ * @property {SuccessStatusType|FailedStatusType|ExceptionStatusType} status
+ * @property {any} message
  */
 export interface IException {
   readonly status: SuccessStatusType | FailedStatusType | ExceptionStatusType;

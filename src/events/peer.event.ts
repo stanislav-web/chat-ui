@@ -1,11 +1,9 @@
 import { notifyError } from '@functions/notification.function';
 import { type Socket } from 'socket.io-client';
 import { type SocketEmitType, type SocketListenType } from '@types/socket.type';
-import { type IEventEmitCandidate, type IEventEmitOffer } from '@interfaces/socket/i.event-emit';
+import { type IEventEmitOffer } from '@interfaces/socket/i.event-emit';
 import { MediaTackException } from '@exceptions/media-tack.exception';
-import { createPeerOffer, isPeerReadyForAnswer, isPeerReadyForOffer, isPeerReadyToSendCandidate } from '@functions/webrtc.function';
-import { RtcConnectionStateEnum } from '@enums/rtc-connection-state.enum';
-import { RtcSignallingStateEnum } from '@enums/rtc-signalling-state.enum';
+import { createPeerOffer, isPeerReadyForAnswer, isPeerReadyForOffer } from '@functions/webrtc.function';
 import { type IEventListenAnswer, type IEventListenNext, type IEventListenOffer } from '@interfaces/socket/i.event-listen';
 import { EventListenEnum } from '@enums/event-listen.enum';
 import { EventEmitEnum } from '@enums/event-emit.enum';
@@ -16,13 +14,15 @@ import { RtcIceGatheringStateEnum } from '@enums/rtc-ice-gathering-state.enum';
  * @module events
  * @param {RTCPeerConnection} peer
  * @param {Socket} socket
+ * @param {function} cb
  * @return void
  */
-export const onNegotiationNeeded = (peer: RTCPeerConnection, socket: Socket): void => {
-  socket.on<SocketListenType, IEventListenNext>(EventListenEnum.NEXT, () => {
+export const onNegotiationNeeded = (peer: RTCPeerConnection, socket: Socket, cb?: undefined): void => {
+  socket.on<SocketListenType, IEventListenNext>(EventListenEnum.READY, () => {
     if (isPeerReadyForOffer(peer)) {
       createPeerOffer(peer)
         .then((offer) => socket.emit<SocketEmitType, IEventEmitOffer>(EventEmitEnum.OFFER, offer))
+        .then(() => cb())
         .catch(error => { notifyError('Peer', error?.message); })
     }
   });
@@ -32,31 +32,6 @@ export const onNegotiationNeeded = (peer: RTCPeerConnection, socket: Socket): vo
         .catch((error: Error) => { notifyError('Peer', error.message); });
     }
   });
-}
-
-/**
- * RTC Signaling state change handler
- * @module events
- * @param {RTCPeerConnection} peer
- * @return void
- */
-export function onSignalingStateChange(peer: RTCPeerConnection): void {
-  switch (peer.signalingState) {
-    case RtcSignallingStateEnum.HAVE_LOCAL_OFFER:
-      break;
-    case RtcSignallingStateEnum.HAVE_LOCAL_ANSWER:
-      break;
-    case RtcSignallingStateEnum.HAVE_REMOTE_OFFER:
-      break;
-    case RtcSignallingStateEnum.HAVE_REMOTE_ANSWER:
-      break;
-    case RtcSignallingStateEnum.CLOSED:
-      break;
-    case RtcSignallingStateEnum.STABLE:
-      break;
-    default:
-      break;
-  }
 }
 
 /**
@@ -83,36 +58,6 @@ export function onIceGatheringStateChange(peer: RTCPeerConnection): RTCIceGather
 }
 
 /**
- * Event is sent on an RTCPeerConnection object after a new track has been added to an RTCRtpReceiver
- * which is part of the connection.
- * The new connection state can be found in connectionState
- * and is one of the string values: new, connecting, connected, disconnected, failed, or closed.
- * @module events
- * @param {RTCPeerConnection} peer
- * @return void
- */
-export const onConnectionStateChange = (peer: RTCPeerConnection): void => {
-  switch (peer.connectionState) {
-    case RtcConnectionStateEnum.NEW:
-      break;
-    case RtcConnectionStateEnum.CONNECTING:
-      break;
-    case RtcConnectionStateEnum.CONNECTED:
-      break;
-    case RtcConnectionStateEnum.DISCONNECTED:
-      break;
-    case RtcConnectionStateEnum.CLOSED:
-      break;
-    case RtcConnectionStateEnum.FAILED:
-      console.log('FAILED.... Restart')
-      peer.restartIce();
-      break;
-    default:
-      break;
-  }
-}
-
-/**
  * On Data chanel
  * @param {RTCDataChannelEvent} event
  * @return void
@@ -131,31 +76,21 @@ export const onIceCandidateError = (error: RTCPeerConnectionIceErrorEvent): void
 }
 
 /**
- * RTC ice candidates handler
- * @param {RTCPeerConnection} peer
- * @param {Socket} socket
- * @param {RTCPeerConnectionIceEvent} event
- * @return void
- */
-export function onIceCandidate(peer: RTCPeerConnection, socket: Socket, event: RTCPeerConnectionIceEvent): void {
-  if (isPeerReadyToSendCandidate(peer, event)) {
-    console.log('[!] CANDIDATE:', event.candidate);
-    socket.emit<SocketEmitType, IEventEmitCandidate>(EventEmitEnum.CANDIDATE, event.candidate);
-  }
-}
-
-/**
  * RTC track handler
  * @param {HTMLVideoElement} target
- * @param {RTCTrackEvent} event
+ * @param {MediaStreamTrack} track
+ * @param {MediaStream[]} streams
  * @return void
  */
-export function onTrack(target: HTMLVideoElement, event: RTCTrackEvent): void {
-  const [remoteStream] = event.streams;
+export function onTrack(target: HTMLVideoElement, track: MediaStreamTrack, streams: MediaStream[]): void {
+  const [remoteStream] = streams;
   if (!'srcObject' in target) {
     throw new MediaTackException('No remote media');
   } else {
-    console.log({ remoteVideo: target, remoteStream });
+    track.onunmute = () => {
+      if (target.srcObject) return;
+      target.srcObject = remoteStream;
+    };
     if (target.srcObject !== remoteStream) {
       target.srcObject = remoteStream;
     }

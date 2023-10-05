@@ -4,8 +4,8 @@ import { type EnglishLanguageType, type LanguageType, type RussianLanguageType, 
 /**
  * @typedef ILanguageState Language.tsx class interface
  * @module interfaces/component/language
- * @prop {LanguageType | null} selectedLanguage
- * @prop {Record<EnglishLanguageType | UkrainianLanguageType | RussianLanguageType, { title: string; }>} languages
+ * @property {LanguageType | null} selectedLanguage
+ * @property {Record<EnglishLanguageType | UkrainianLanguageType | RussianLanguageType, { title: string; }>} languages
  */
 export interface ILanguageState {
   selectedLanguage: LanguageType | null;

@@ -41,7 +41,7 @@ export const getUserBrowser = async (): Promise<IUserBrowser> => {
  * @throws UserFingerprintException
  * @return Promise<IUserFingerprint>
  */
-export const getUserFingerprint = async (extendedResult: boolean = true, linkedId?: string): Promise<IUserFingerprint> => {
+export const getUserFingerprint = async (extendedResult = true, linkedId?: string): Promise<IUserFingerprint> => {
   const options = {
     apiKey: process.env.REACT_APP_FINGERPRINT_JS_PUBLIC_KEY as string,
     region: process.env.REACT_APP_FINGERPRINT_JS_REGION as Region,

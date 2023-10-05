@@ -1,8 +1,3 @@
-@import url('https://unpkg.com/primeicons/primeicons.css');
-@import url('https://unpkg.com/primereact/resources/themes/lara-light-indigo/theme.css');
-@import url('https://unpkg.com/primereact/resources/primereact.min.css');
-@import url('https://unpkg.com/primeflex@3.2.1/primeflex.min.css');
-
 @media print {
     html, body {
         display: none;

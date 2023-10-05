@@ -167,7 +167,7 @@ const config: webpack.Configuration = {
         include: srcDir,
         exclude: ['/node_modules/', '/public/'],
         use: {
-          loader: 'babel-loader',
+          loader: 'babel-loader?cacheDirectory=true',
           options: {
             presets: [
               '@babel/preset-env',
@@ -183,8 +183,7 @@ const config: webpack.Configuration = {
         type: 'asset'
       },
       {
-        test: /\.css|.scss$/i,
-        include: srcDir,
+        test: /\.css$/,
         use: [isProduction ? MiniCssExtractPlugin.loader : 'style-loader', {
           loader: 'css-loader',
           options: { sourceMap: !isProduction }
