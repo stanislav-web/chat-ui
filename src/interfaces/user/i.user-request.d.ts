@@ -6,9 +6,9 @@ import { type UniqueId } from '@types/base.type';
 /**
  * @typedef IUserRequest
  * @module interfaces/user User request interface
- * @prop {UniqueId} [requestId]
- * @prop {UniqueId} visitorId
- * @prop {number} [score]
+ * @property {UniqueId} [requestId]
+ * @property {UniqueId} visitorId
+ * @property {number} [score]
  */
 export interface IUserRequest extends IUserBrowser {
   readonly requestId?: UniqueId;

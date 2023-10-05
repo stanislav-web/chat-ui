@@ -7,10 +7,10 @@
 
 /**
  * SocketListen type
- * @type {SocketEmitType|string|string}
+ * @type {string|string|string|string|string|string}
  * @const
  */
- type SocketListenType = SocketEmitType | 'ban' | 'exception';
+ type SocketListenType = 'next' | 'ban' | 'exception' | 'connect' | 'disconnect' | 'connect_error';
 
 export type {
   SocketEmitType,

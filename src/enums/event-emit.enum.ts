@@ -11,4 +11,5 @@ export enum EventEmitEnum {
   OFFER = 'offer',
   ANSWER = 'answer',
   CANDIDATE = 'candidate',
+  CANDIDATES = 'candidates',
 }

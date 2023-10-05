@@ -3,7 +3,7 @@
 /**
  * @typedef IAgreementState Agreement.tsx state
  * @module interfaces/component/agreement
- * @prop {boolean} isHidden
+ * @property {boolean} isHidden
  */
 export interface IAgreementState {
   isHidden: boolean;

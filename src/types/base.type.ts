@@ -11,3 +11,10 @@ export type UniqueId = string;
  * @const
  */
 export type Base64String = string;
+
+/**
+ * Uri type
+ * @type {string}
+ * @const
+ */
+export type Uri = string;

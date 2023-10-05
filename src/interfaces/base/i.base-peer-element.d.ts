@@ -3,8 +3,8 @@
 /**
  * @typedef IBasePeerElement
  * @module interfaces/base Peer element
- * @prop {HTMLVideoElement | null} media
+ * @property {HTMLVideoElement | null} media
  */
 export interface IBasePeerElement {
-  video: HTMLVideoElement | null;
+  video: HTMLVideoElement;
 }

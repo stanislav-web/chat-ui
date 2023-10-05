@@ -6,9 +6,9 @@ import { type WebrtcStunServerType, type WebrtcTurnServerType } from '@types/web
 /**
  * @typedef IUserIce
  * @module interfaces/user User ice servers
- * @prop {WebrtcStunServerType | WebrtcTurnServerType | string} urls
- * @prop {UniqueId} [username]
- * @prop {UniqueId} [credential]
+ * @property {WebrtcStunServerType | WebrtcTurnServerType | string} urls
+ * @property {UniqueId} [username]
+ * @property {UniqueId} [credential]
  */
 export interface IUserIce {
   readonly urls: WebrtcStunServerType | WebrtcTurnServerType | string;

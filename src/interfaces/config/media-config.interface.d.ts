@@ -1,15 +1,15 @@
 import { type ImageType } from '@types/image.type';
-import { type UniqueId } from '@types/base.type';
+import { type UniqueId, type Uri } from '@types/base.type';
 
 /**
  * @typedef ISnapshot Media config interface
  * @module interfaces/config
- * @prop {boolean} isAllow
- * @prop {number} interval
- * @prop {ImageType} type
- * @prop {number} quality
- * @prop {number} width
- * @prop {number} height
+ * @property {boolean} isAllow
+ * @property {number} interval
+ * @property {ImageType} type
+ * @property {number} quality
+ * @property {number} width
+ * @property {number} height
  */
 interface ISnapshot {
   isAllow: boolean;
@@ -23,9 +23,9 @@ interface ISnapshot {
 /**
  * @typedef IVideoContainer Media config interface
  * @module interfaces/config
- * @prop {UniqueId} containerId
- * @prop {number} containerWidth
- * @prop {number} containerHeight
+ * @property {UniqueId} containerId
+ * @property {number} containerWidth
+ * @property {number} containerHeight
  */
 interface IVideoContainer {
   containerId: UniqueId;
@@ -36,11 +36,11 @@ interface IVideoContainer {
 /**
  * @typedef IControlContainer Media config interface
  * @module interfaces/config
- * @prop {UniqueId} videoSelectorId
- * @prop {UniqueId} audioSelectorId
- * @prop {UniqueId} callBtnId
- * @prop {UniqueId} breakBtnId
- * @prop {UniqueId} recallBtnId
+ * @property {UniqueId} videoSelectorId
+ * @property {UniqueId} audioSelectorId
+ * @property {UniqueId} callBtnId
+ * @property {UniqueId} breakBtnId
+ * @property {UniqueId} recallBtnId
  */
 interface IControlContainer {
   videoSelectorId: UniqueId;
@@ -53,18 +53,18 @@ interface IControlContainer {
 /**
  * @typedef IControlContainer Media config interface
  * @module interfaces/config
- * @prop {boolean | MediaTrackConstraints} audio
- * @prop {boolean | MediaTrackConstraints} media
- * @prop {UniqueId} [poster]
- * @prop {string} snapshot
- * @prop {IVideoContainer} local
- * @prop {IVideoContainer} remote
- * @prop {IControlContainer} control
+ * @property {boolean | MediaTrackConstraints} audio
+ * @property {boolean | MediaTrackConstraints} media
+ * @property {Uri} [poster]
+ * @property {string} snapshot
+ * @property {IVideoContainer} local
+ * @property {IVideoContainer} remote
+ * @property {IControlContainer} control
  */
 export interface IMediaConfig {
   audio: boolean | MediaTrackConstraints;
   video: boolean | MediaTrackConstraints;
-  poster?: string;
+  poster?: Uri;
   virtualDevicesRegex: RegExp;
   snapshot: ISnapshot;
   local: IVideoContainer;

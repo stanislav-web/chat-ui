@@ -6,10 +6,10 @@ import { type ImageHeight, type ImageType, type ImageWidth } from '@types/image.
  * On snapshot
  * @typedef ISnapshot
  * @module interfaces/media
- * @prop {ImageType} type
- * @prop {number} [quality]
- * @prop {ImageWidth} [width]
- * @prop {ImageHeight} height
+ * @property {ImageType} type
+ * @property {number} [quality]
+ * @property {ImageWidth} [width]
+ * @property {ImageHeight} height
  */
 export interface ISnapshot {
   type: ImageType;
@@ -23,8 +23,8 @@ export interface ISnapshot {
  * @typedef IESnapshot
  * @module interfaces/media
  * @extends ISnapshot
- * @prop {boolean} isAllow
- * @prop {number} interval
+ * @property {boolean} isAllow
+ * @property {number} interval
  */
 export interface IESnapshot extends ISnapshot {
   isAllow: boolean;

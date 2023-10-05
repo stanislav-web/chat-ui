@@ -4,6 +4,7 @@ import { type Base64String } from '@types/base.type';
 import { type IMediaConfig } from '@interfaces/config/media-config.interface';
 import { MediaDeviceException } from '@exceptions/media-device.exception';
 import { MediaConfig } from '@configuration/media.config';
+import { MediaTrackStateEnum } from '@enums/media-track-state.enum';
 
 /**
  * Get user media
@@ -64,13 +65,6 @@ export const findUserDeviceByLabel = (
 ): MediaDeviceInfo | undefined => devices.find(device => device.label === label)
 
 /**
- * Get user media devices support properties
- * @module functions
- * @return MediaTrackSupportedConstraints
- */
-export const getUserMediaConstraints = (): MediaTrackSupportedConstraints => navigator.mediaDevices.getSupportedConstraints()
-
-/**
  * Capture media stream
  * @module functions
  * @param {HTMLVideoElement} sourceEl
@@ -90,17 +84,22 @@ export const captureStream = (
 }
 
 /**
- * Attach audio output device to media element using device/sink ID.
- * @module functions
- * @param {HTMLMediaElement} element
- * @throws MediaDeviceException
- * @param {string} sinkId
- * @return Promise<undefined>
+ * Stop active tracks
+ * @param {MediaStream} stream
+ * @return void
  */
-export function attachSinkId(element: HTMLMediaElement, sinkId: string): Promise<undefined> {
-  if (typeof element.sinkId !== 'undefined') {
-    return element.setSinkId(sinkId);
-  } else throw new MediaDeviceException('Browser does not support output device selection.');
+export const stopActiveTracks = (stream: MediaStream): void => {
+  stream.getTracks().forEach((track) => {
+    if (track.readyState === MediaTrackStateEnum.LIVE) track.stop();
+  });
+}
+
+/**
+ * Stop video stream displaying
+ * @param {HTMLVideoElement} videoElement
+ */
+export const stopStream = (videoElement: HTMLVideoElement): void => {
+  videoElement.srcObject = null;
 }
 
 /**

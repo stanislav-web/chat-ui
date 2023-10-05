@@ -3,20 +3,20 @@
 /**
  * @typedef IBaseEnvironment
  * @module interfaces/base Base environment
- * @prop {boolean} isWebRTCSupported
- * @prop {boolean} isMobileDevice
- * @prop {boolean} isWebSocketsBlocked
- * @prop {boolean} isWebSocketsSupported
- * @prop {boolean} isCookiesSupported
- * @prop {boolean} isLocalStorageSupported
- * @prop {boolean} hasWebcam
- * @prop {boolean} hasMicrophone
- * @prop {boolean} hasSpeakers
- * @prop {string} detectRTCVersion
- * @prop {string} osName
- * @prop {string} osVersion
- * @prop {'Edge' | 'Chrome' | 'Firefox' | string} browserName
- * @prop {string | number} browserVersion
+ * @property {boolean} isWebRTCSupported
+ * @property {boolean} isMobileDevice
+ * @property {boolean} isWebSocketsBlocked
+ * @property {boolean} isWebSocketsSupported
+ * @property {boolean} isCookiesSupported
+ * @property {boolean} isLocalStorageSupported
+ * @property {boolean} hasWebcam
+ * @property {boolean} hasMicrophone
+ * @property {boolean} hasSpeakers
+ * @property {string} detectRTCVersion
+ * @property {string} osName
+ * @property {string} osVersion
+ * @property {'Edge' | 'Chrome' | 'Firefox' | string} browserName
+ * @property {string | number} browserVersion
  */
 export interface IBaseEnvironment {
   readonly isWebRTCSupported: boolean;

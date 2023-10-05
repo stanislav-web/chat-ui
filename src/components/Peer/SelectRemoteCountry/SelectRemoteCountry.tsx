@@ -73,7 +73,7 @@ class SelectRemoteCountry extends React.Component<ISelectRemoteCountryProp, ISel
                 optionLabel="name"
                 optionValue="code"
                 display="chip"
-                placeholder="Select Countries"
+                placeholder="Select Countries (All)"
                 maxSelectedLabels={3}
                 className="w-full md:w-30rem" />
           </div>;

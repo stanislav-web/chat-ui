@@ -15,5 +15,6 @@
 7. [v] NavBar
    1. [v] Control from config 
    2. [v] Implementation via router
-8. [] Fallback peer servers to google if not available
+8. [V] Fallback peer servers to google if not available
 9. [] oniceconnectionstatechange -> pc.restartIce()
+10. [] Show country for local  and remote candidate

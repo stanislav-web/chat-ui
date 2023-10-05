@@ -7,7 +7,7 @@ import { type IESnapshot } from '@interfaces/media/i.snapshot';
  * On video load
  * @typedef IOnLoadedVideoMetadata On load video
  * @module interfaces/media
- * @prop {HTMLVideoElement} videoElement
+ * @property {HTMLVideoElement} videoElement
  */
 export interface IOnLoadedVideoMetadata {
   videoElement: HTMLVideoElement;
@@ -18,9 +18,9 @@ export interface IOnLoadedVideoMetadata {
  * @typedef IOnPlayEvent
  * @module interfaces/media
  * @extends IOnLoadedVideoMetadata
- * @prop {MediaStream} stream
- * @prop {Socket} socket
- * @prop {IESnapshot} snapshot
+ * @property {MediaStream} stream
+ * @property {Socket} socket
+ * @property {IESnapshot} snapshot
  */
 export interface IOnPlayEvent extends IOnLoadedVideoMetadata {
   stream: MediaStream;
@@ -33,8 +33,8 @@ export interface IOnPlayEvent extends IOnLoadedVideoMetadata {
  * @typedef IOnVolumeChange
  * @module interfaces/media
  * @extends IOnLoadedVideoMetadata
- * @prop {MediaStream} stream
- * @prop {Socket} socket
+ * @property {MediaStream} stream
+ * @property {Socket} socket
  */
 export interface IOnVolumeChange extends IOnLoadedVideoMetadata {
   stream: MediaStream;

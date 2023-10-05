@@ -4,7 +4,7 @@ import { type Socket } from 'socket.io-client';
 /**
  * @typedef IBasePeerTransport
  * @module interfaces/base Peer transport
- * @prop {Socket} stream
+ * @property {Socket} stream
  */
 export interface IBasePeerTransport {
   readonly socket: Socket;

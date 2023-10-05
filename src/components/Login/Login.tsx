@@ -63,7 +63,7 @@ class Login extends React.Component<ILoginProps, ILoginState> implements ILogin 
             modal={true}
             visible={true}
             style={{ width: '35vw' }}
-            onHide={() => { }}
+            // onHide={() => { }}
             footer={Footer}>
             <div className="space-y-6 social-logins">
                 <FacebookLoginButton onClick={ () => {
